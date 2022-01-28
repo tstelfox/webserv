@@ -6,13 +6,16 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/28 11:37:35 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/01/28 13:10:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/01/28 13:38:56 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstring>
+#include <iostream>
+#include <fstream>
+#include <unistd.h>
 
 int		main(int argc, char *argv[]) {
 	
@@ -47,9 +50,30 @@ int		main(int argc, char *argv[]) {
 
 	listen(server_fd, 3);
 
-	socklen_t addrlen;
-	int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+	while (1) {
+		socklen_t addrlen;
+		int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
 
-	/* Part 4: send and receieve messages */
-	
+		/* Part 4: send and receieve messages */
+		char buffer[1024] = {0};
+		int valread = read(new_socket, buffer, 1024);
+		std::cout << buffer << std::endl;
+		if (valread < 0) {
+			std::cout << "No bytes to read";
+		}
+
+		char *hey = "Diobestia dal server";
+		write(new_socket, hey, strlen(hey));
+		close(new_socket);
+
+				/* How the shit do you do this part in c++? */
+				// std::ifstream new_socket;
+				// // new_socket.open();
+				// std::cout << new_socket << std::endl;
+
+				// // char *hello = "Hello from the server";
+				// std::ofstream new_socket;
+				// new_socket << "Hello from the server";
+				// close(new_socket);
+	}
 }
