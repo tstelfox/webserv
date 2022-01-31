@@ -10,3 +10,8 @@ echo what
 
 # https://www.educba.com/socket-programming-in-c-plus-plus/
 
+# https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_72/rzab6/xnonblock.htm
+
+# http://www.mnuwer.dbasedeveloper.co.uk/dlearn/web/session01.htm
+
+# http://www.wijata.com/cgi/cgispec.html#4.0
