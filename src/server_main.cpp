@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/28 11:37:35 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/01 16:19:31 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/01 16:25:36 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,10 @@ int		main() {
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 		// std::cout << "EPPORCA LA MADONNA " << content << " diobe";
-		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length:9\n\nPorcoddio";
+		// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length:9\n\nPorcoddio";
+		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length:535\n\n";
+		header.append(content);
 		char *hey = new char[header.length() + 1];
-		// header.append(content);
 		std::strcpy(hey, header.c_str());
 		// char *hey = strdup(myfile.read()); // Will change this to c++
 		write(new_socket, hey, strlen(hey));
