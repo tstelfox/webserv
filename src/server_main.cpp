@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/28 11:37:35 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/01 12:46:57 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/01 13:25:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <fstream>
+#include <sstream>
 
 int		main() {
 	
@@ -62,9 +64,18 @@ int		main() {
 			std::cout << "No bytes to read";
 		}
 
-		char *hey = strdup("Diobestia dal server"); // Will change this to c++
+		std::ostringstream file_content;
+		std::ifstream myfile;
+		myfile.open("pages/index.html");
+		file_content << myfile.rdbuf();
+		std::string content = file_content.str();
+		// std::cout << "EPPORCA LA MADONNA " << content << " diobe";
+		char *hey = new char[content.length() + 1];
+		std::strcpy(hey, content.c_str());
+		// char *hey = strdup(myfile.read()); // Will change this to c++
 		write(new_socket, hey, strlen(hey));
 		close(new_socket);
+		// break;
 
 				/* How the shit do you do this part in c++? */
 				// std::ifstream new_socket;
