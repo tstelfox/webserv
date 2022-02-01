@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   main.cpp                                           :+:    :+:            */
+/*   server_main.cpp                                    :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/28 11:37:35 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/01/28 13:38:56 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/01 12:46:57 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <fstream>
 #include <unistd.h>
 
-int		main(int argc, char *argv[]) {
+int		main() {
 	
 	/* Part 1: Create the Socket
 	socket(domain, type, protocol); */
@@ -62,7 +62,7 @@ int		main(int argc, char *argv[]) {
 			std::cout << "No bytes to read";
 		}
 
-		char *hey = "Diobestia dal server";
+		char *hey = strdup("Diobestia dal server"); // Will change this to c++
 		write(new_socket, hey, strlen(hey));
 		close(new_socket);
 
