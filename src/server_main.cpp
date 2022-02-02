@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/01/28 11:37:35 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/01 16:26:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/02 13:59:56 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,18 +64,31 @@ int		main() {
 			std::cout << "No bytes to read";
 		}
 
+
+		/* Here I just open a file I know is present for testing. */
+		/* The thought process is:
+			1 - Client requests a file.
+			2 - I check for existence of said fileno
+			3 - I return the appropriate code and response depending on whether
+					the file is accessible/existent or not */
 		std::ostringstream file_content;
 		std::ifstream myfile;
 		myfile.open("pages/index.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 		// std::cout << "EPPORCA LA MADONNA " << content << " diobe";
-		// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length:9\n\nPorcoddio";
+
+		// This is the creation of the header which will need to be worked out
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:535\n\n";
 		header.append(content);
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
-		// char *hey = strdup(myfile.read()); // Will change this to c++
+
+
+		// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length:9\n\nPorcoddio";
+		// char *hey = strdup(myfile.read()); // Will change this to c++ 
+
+		//Here I actually write to the socket
 		write(new_socket, hey, strlen(hey));
 		close(new_socket);
 		// break;
