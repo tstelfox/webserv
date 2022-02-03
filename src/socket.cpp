@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 12:26:58 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 14:25:30 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,6 @@ socketMan::socketMan(int domain, int service, int protocol, int port,
 	// Create the socket
 	sock = socket(domain, service, protocol);
 	test_connection(sock);
-	// Bind/connect the socket
-	connection = connect_server(sock, address);
-	test_connection(connection);
 	
 
 }
