@@ -6,17 +6,17 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/02 19:20:09 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 10:56:02 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
-socket::socket() {
+socket::socket(int domain, int service, int protocol) {
 	
 }
 
 socket::~socket() {
-
+	
 }
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/02 19:20:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 10:55:51 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@
 class socket 
 {
 	public:
-		socket();
+		socket(int domain, int service, int protocol);
 		~socket();
 	private:
+		int sock;
 		/* data */
 };
 
