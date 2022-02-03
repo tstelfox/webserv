@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 12:22:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 12:26:58 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@ socketMan::socketMan(int domain, int service, int protocol, int port,
 	address.sin_port = htons(port);
 	// Create the socket
 	sock = socket(domain, service, protocol);
+	test_connection(sock);
 	// Bind/connect the socket
 	connection = connect_server(sock, address);
+	test_connection(connection);
 	
 
 }
@@ -42,4 +44,7 @@ int	serverSock::connect_server(int sock, struct sockaddr_in address) {
 	return bind(sock, (struct sockaddr *)&address, (socklen_t)&addrlen);
 }
 
-
+int	clientSock::connect_server(int sock, struct sockaddr_in address) {
+	// int addrlen;
+	return connect(sock, (struct sockaddr *)&address, (socklen_t)&addrlen);
+}
