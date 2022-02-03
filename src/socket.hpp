@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 12:26:28 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 13:09:16 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class socketMan
 		virtual int connect_server(int sock, struct sockaddr_in	address) = 0;
 		void		test_connection(int);
 
-	private:
+	protected:
 		int sock;
 		int connection;
 		struct sockaddr_in	address;
@@ -35,7 +35,11 @@ class	serverSock : public socketMan {
 	
 	public:
 		serverSock(int domain, int service, int protocol,
-			int port, u_long interface) : socketMan(domain, service, protocol, port, interface);
+			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) {
+				// Bind/connect the socket
+				connection = connect_server(sock, address);
+				test_connection(connection);
+			}
 
 		virtual int	connect_server(int sock, struct sockaddr_in address);
 	private:
@@ -48,7 +52,11 @@ class	clientSock : public socketMan {
 	
 	public:
 		clientSock(int domain, int service, int protocol,
-			int port, u_long interface) : socketMan(domain, service, protocol, port, interface);
+			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) {
+				// Bind/connect the socket
+				connection = connect_server(sock, address);
+				test_connection(connection);
+			}
 
 		virtual int	connect_server(int sock, struct sockaddr_in address);
 	private:
