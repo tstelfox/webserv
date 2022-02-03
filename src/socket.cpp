@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 12:07:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 12:22:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,8 @@ void socketMan::test_connection(int to_test) {
 }
 
 int	serverSock::connect_server(int sock, struct sockaddr_in address) {
-	
+	// int addrlen;
+	return bind(sock, (struct sockaddr *)&address, (socklen_t)&addrlen);
 }
+
+
