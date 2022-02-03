@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 15:51:24 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/03 16:26:20 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int		main() {
 	while (1) {
 		socklen_t	addrlen;
 		int new_socket = accept(hello.getSock(), (struct sockaddr *)&hello.getAddr(), (socklen_t*)&addrlen);
-			char buffer[1024] = {0};
+		char buffer[1024] = {0};
 		int valread = read(new_socket, buffer, 1024);
 		std::cout << buffer << std::endl;
 		if (valread < 0) {
@@ -37,7 +37,6 @@ int		main() {
 		myfile.open("pages/index.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
-		// std::cout << "EPPORCA LA MADONNA " << content << " diobe";
 
 		// This is the creation of the header which will need to be worked out
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:535\n\n";
@@ -47,7 +46,6 @@ int		main() {
 
 
 		// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length:9\n\nPorcoddio";
-		// char *hey = strdup(myfile.read()); // Will change this to c++ 
 
 		//Here I actually write to the socket
 		write(new_socket, hey, strlen(hey));
