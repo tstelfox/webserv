@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 17:28:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/04 18:05:02 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int		serverSock::connect_server(int sock, struct sockaddr_in address) {
 
 void	serverSock::listen_server(int bcklg) {
 	backlog = bcklg;
-	connection = listen(sock, backlog);
+	int connection = listen(sock, backlog);
 	test_connection(connection);
 }
 

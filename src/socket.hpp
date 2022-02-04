@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 17:21:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/04 18:04:57 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ class socketMan
 		void		test_connection(int);
 
 		int	getSock() { return sock; }
-		int	getConnection() { return connection; }
+		// int	getConnection() { return connection; }
 		struct sockaddr_in&	getAddr() { return address; }
 
 	protected:
 		int sock;
-		int connection;
+		// int connection;
 		struct sockaddr_in	address;
 };
 
@@ -41,7 +41,7 @@ class	serverSock : public socketMan {
 		serverSock(int domain, int service, int protocol,
 			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) , backlog(0) {
 				// Bind/connect the socket
-				connection = connect_server(sock, address);
+				int connection = connect_server(sock, address);
 				test_connection(connection);
 
 			}
