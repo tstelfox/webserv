@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 15:55:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/04 17:21:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,19 @@ class	serverSock : public socketMan {
 	
 	public:
 		serverSock(int domain, int service, int protocol,
-			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) {
+			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) , backlog(0) {
 				// Bind/connect the socket
 				connection = connect_server(sock, address);
 				test_connection(connection);
+
 			}
 
 		virtual int	connect_server(int sock, struct sockaddr_in address);
+		void		listen_server(int bcklg);
+
 	private:
 		socklen_t	addrlen;
+		int			backlog;
 		serverSock();
 		
 };

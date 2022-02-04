@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/03 16:26:20 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/04 17:21:56 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ int		main() {
 
 	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
 	
-	listen(hello.getSock(), 3);
+	hello.listen_server(2);
+	// listen(hello.getSock(), 3);
 
 	while (1) {
 		socklen_t	addrlen;
