@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 18:04:57 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/04 19:36:49 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ class socketMan
 	public:
 		socketMan(int domain, int service, int protocol,
 			int port, u_long interface);
+
 		virtual ~socketMan(); // This means inherited classes don't need to have a destructor
 
 		virtual int connect_server(int sock, struct sockaddr_in	address) = 0;
@@ -43,8 +44,8 @@ class	serverSock : public socketMan {
 				// Bind/connect the socket
 				int connection = connect_server(sock, address);
 				test_connection(connection);
-
 			}
+		// serverSock(serverSock const &x);
 
 		virtual int	connect_server(int sock, struct sockaddr_in address);
 		void		listen_server(int bcklg);

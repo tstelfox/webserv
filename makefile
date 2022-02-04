@@ -6,18 +6,18 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/02/04 18:37:28 by tmullan       ########   odam.nl          #
+#    Updated: 2022/02/04 19:19:43 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = clang++
-SRC = server_main.cpp sockets/*.cpp
+SRC = server_main.cpp sockets/*.cpp server.cpp
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
-INCLUDES = -Isrc/sockets
+INCLUDES = -Isrc/sockets -Isrc
 
 
 

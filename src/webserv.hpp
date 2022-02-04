@@ -1,29 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   server.hpp                                         :+:    :+:            */
+/*   webserv.hpp                                        :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 19:42:51 by tmullan       ########   odam.nl         */
+/*   Created: 2022/02/04 19:01:03 by tmullan       #+#    #+#                 */
+/*   Updated: 2022/02/04 19:18:36 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include "webserv.hpp"
 
-class serverBoy {
+#include <iostream>
+#include <unistd.h>
+#include <sstream>
+#include <fstream>
 
-	public:
-		serverBoy(serverSock &sock);
-
-		void	run_server(int backlog);
-
-		~serverBoy();
-	private:
-		serverBoy();
-		serverSock	*socket;
-		int			ready_socket;
-};
-
+#include "socket.hpp"
+#include "server.hpp"
