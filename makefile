@@ -6,26 +6,27 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/02/04 18:13:36 by tmullan       ########   odam.nl          #
+#    Updated: 2022/02/04 18:37:28 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = clang++
-SRC = server_main.cpp socket.cpp
+SRC = server_main.cpp sockets/*.cpp
 OBJ_DIR = obj
+SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
-# INCLUDES = -Isrc/vector -Isrc/map -Isrc/stack -Isrc/iterators -Isrc/utils
+INCLUDES = -Isrc/sockets
 
 
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CXX) $^ $(FLAGS) -o $(NAME)
+	$(CXX) $^ $(FLAGS) $(INCLUDES) -o $(NAME)
 
-$(OBJ_DIR)/%.o: src/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(FLAGS) $(INCLUDES) -c $< -o $@
 
