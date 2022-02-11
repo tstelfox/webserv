@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 19:36:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 20:52:43 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ socketMan::socketMan(int domain, int service, int protocol, int port,
 	sock = socket(domain, service, protocol);
 	test_connection(sock);
 	
-
 }
 
 socketMan::~socketMan() {}
@@ -36,12 +35,7 @@ void 	socketMan::test_connection(int to_test) {
 
 }
 
-// serverSock::serverSock(serverSock const &x) {
-// 	*this = x;
-// }
-
 int		serverSock::connect_server(int sock, struct sockaddr_in address) {
-	// int addrlen;
 	return bind(sock, (struct sockaddr *)&address, sizeof(address));
 }
 
