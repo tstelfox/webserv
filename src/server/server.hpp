@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 19:42:51 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 21:08:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,10 @@ class serverBoy {
 	public:
 		serverBoy(serverSock &sock);
 
-		void	run_server(int backlog);
-
 		~serverBoy();
+
+		void	run_server(int backlog);
+		serverSock	*get_socket() { return socket; }
 	private:
 		serverBoy();
 		serverSock	*socket;
