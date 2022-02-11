@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/11 21:17:56 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 21:20:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #include <fstream>
 
 int		main() {
-
 	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
 	serverBoy	serf(hello);
 
