@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 19:36:49 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 21:16:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,14 @@ class socketMan
 
 		virtual ~socketMan(); // This means inherited classes don't need to have a destructor
 
-		virtual int connect_server(int sock, struct sockaddr_in	address) = 0;
-		void		test_connection(int);
+		virtual int connectServer(int sock, struct sockaddr_in	address) = 0;
+		void		testConnection(int);
 
-		int	getSock() { return sock; }
-		// int	getConnection() { return connection; }
-		struct sockaddr_in&	getAddr() { return address; }
+		int	getSock();
+		struct sockaddr_in&	getAddr();
 
 	protected:
 		int sock;
-		// int connection;
 		struct sockaddr_in	address;
 };
 
@@ -42,13 +40,13 @@ class	serverSock : public socketMan {
 		serverSock(int domain, int service, int protocol,
 			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) , backlog(0) {
 				// Bind/connect the socket
-				int connection = connect_server(sock, address);
-				test_connection(connection);
+				int connection = connectServer(sock, address);
+				testConnection(connection);
 			}
 		// serverSock(serverSock const &x);
 
-		virtual int	connect_server(int sock, struct sockaddr_in address);
-		void		listen_server(int bcklg);
+		virtual int	connectServer(int sock, struct sockaddr_in address);
+		void		listenServer(int bcklg);
 
 	private:
 		socklen_t	addrlen;

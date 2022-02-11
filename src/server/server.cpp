@@ -6,24 +6,24 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/04 19:44:02 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 21:17:24 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
-serverBoy::serverBoy(serverSock &sock) : socket(&sock), ready_socket(-1) {
-	// socket = &sock;
+serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {
+	// _socket = &sock;
 }
 
 serverBoy::~serverBoy() {}
 
-void	serverBoy::run_server(int backlog) {
+void	serverBoy::runServer(int backlog) {
 	
-	socket->listen_server(backlog);
+	_socket->listenServer(backlog);
 	while (1) {
 		socklen_t	addrlen;
-		ready_socket = accept(socket->getSock(), (struct sockaddr *)&socket->getAddr(), (socklen_t *)&addrlen);
+		ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 		char buffer[1024] = {0};
 		int valread = read(ready_socket, buffer, 1024);
 		std::cout << buffer << std::endl;
@@ -46,3 +46,5 @@ void	serverBoy::run_server(int backlog) {
 		close(ready_socket);
 	}
 }
+
+serverSock*	serverBoy::getSocket() { return _socket; }

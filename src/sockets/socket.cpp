@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/11 20:52:43 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/11 21:14:05 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ socketMan::socketMan(int domain, int service, int protocol, int port,
 	address.sin_port = htons(port);
 	// Create the socket
 	sock = socket(domain, service, protocol);
-	test_connection(sock);
+	testConnection(sock);
 	
 }
 
 socketMan::~socketMan() {}
 
-void 	socketMan::test_connection(int to_test) {
+void 	socketMan::testConnection(int to_test) {
 	if (to_test < 0) {
 		std::cerr << "Failed to connect";
 		exit(EXIT_FAILURE);
@@ -35,14 +35,18 @@ void 	socketMan::test_connection(int to_test) {
 
 }
 
-int		serverSock::connect_server(int sock, struct sockaddr_in address) {
+int		socketMan::getSock() { return sock; }
+
+struct sockaddr_in&	socketMan::getAddr() { return address; }
+
+int		serverSock::connectServer(int sock, struct sockaddr_in address) {
 	return bind(sock, (struct sockaddr *)&address, sizeof(address));
 }
 
-void	serverSock::listen_server(int bcklg) {
+void	serverSock::listenServer(int bcklg) {
 	backlog = bcklg;
 	int connection = listen(sock, backlog);
-	test_connection(connection);
+	testConnection(connection);
 }
 
 // int	clientSock::connect_server(int sock, struct sockaddr_in address) {
