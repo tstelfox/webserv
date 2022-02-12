@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/11 21:22:15 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/12 16:10:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ void	serverBoy::runServer(int backlog) {
 	while (true) {
 		socklen_t	addrlen;
 		ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+		
+		
 		char buffer[1024] = {0};
 		int valread = read(ready_socket, buffer, 1024);
 		std::cout << buffer << std::endl;
@@ -36,7 +38,7 @@ void	serverBoy::runServer(int backlog) {
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
-		// This is the creation of the header which will need to be worked out
+		/* Have to create the header file here from the data of the file */
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:535\n\n";
 		header.append(content);
 		char *hey = new char[header.length() + 1];
