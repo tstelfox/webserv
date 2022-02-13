@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/12 16:10:27 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/13 23:49:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,9 @@ void	serverBoy::runServer(int backlog) {
 		std::string content = file_content.str();
 
 		/* Have to create the header file here from the data of the file */
-		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:535\n\n";
+		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+		std::string len = file_content.str().size(); // Literally only got time to do this
+		// 535\n\n";
 		header.append(content);
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
