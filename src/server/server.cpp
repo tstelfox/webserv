@@ -34,14 +34,16 @@ void	serverBoy::runServer(int backlog) {
 		}
 		std::ostringstream file_content;
 		std::ifstream myfile;
-		myfile.open("pages/index.html");
+		myfile.open("pages/other.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
 		/* Have to create the header file here from the data of the file */
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-		std::string len = file_content.str().size(); // Literally only got time to do this
+		int len = file_content.str().size(); // Literally only got time to do this
 		// 535\n\n";
+		header.append(std::to_string(len));
+        header.append("\n\n");
 		header.append(content);
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
