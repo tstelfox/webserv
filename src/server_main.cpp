@@ -18,6 +18,8 @@
 #include <fstream>
 
 int		main() {
+
+    // Parse config file and from there build servers/sockets and sheet
 	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
 	serverBoy	serf(hello);
 

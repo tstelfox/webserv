@@ -29,6 +29,10 @@ void	serverBoy::runServer(int backlog) {
 		char buffer[1024] = {0};
 		int valread = read(ready_socket, buffer, 1024);
 		std::cout << buffer << std::endl;
+		// Parse the buffer for GET/POST/DELETE
+		// Build header
+		// Write it
+
 		if (valread < 0) {
 			std::cout << "No bytes to read";
 		}
@@ -41,7 +45,6 @@ void	serverBoy::runServer(int backlog) {
 		/* Have to create the header file here from the data of the file */
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 		int len = file_content.str().size(); // Literally only got time to do this
-		// 535\n\n";
 		header.append(std::to_string(len));
         header.append("\n\n");
 		header.append(content);
@@ -50,6 +53,7 @@ void	serverBoy::runServer(int backlog) {
 
 		write(ready_socket, hey, strlen(hey));
 		close(ready_socket);
+		delete[] hey;
 	}
 }
 
