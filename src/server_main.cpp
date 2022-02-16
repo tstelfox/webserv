@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/11 21:20:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/16 18:27:28 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 int		main() {
 
     // Parse config file and from there build servers/sockets and sheet
+	// Write a config file
 	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
 	serverBoy	serf(hello);
 
