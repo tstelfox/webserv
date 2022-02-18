@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/18 11:05:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/18 11:06:29 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class	serverSock : public socketMan {
 	public:
 		serverSock(int domain, int service, int protocol,
 			int port, u_long interface);
-		~serverSock();
+		virtual ~serverSock();
 		// serverSock(serverSock const &x);
 
 		virtual int	connectServer(int sock, struct sockaddr_in address);
