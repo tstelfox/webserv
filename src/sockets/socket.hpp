@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/11 21:16:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/18 11:05:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,8 @@ class	serverSock : public socketMan {
 	
 	public:
 		serverSock(int domain, int service, int protocol,
-			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) , backlog(0) {
-				// Bind/connect the socket
-				int connection = connectServer(sock, address);
-				testConnection(connection);
-			}
+			int port, u_long interface);
+		~serverSock();
 		// serverSock(serverSock const &x);
 
 		virtual int	connectServer(int sock, struct sockaddr_in address);
