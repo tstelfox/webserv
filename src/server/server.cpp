@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/13 23:49:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/21 14:24:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	serverBoy::runServer(int backlog) {
 		}
 		std::ostringstream file_content;
 		std::ifstream myfile;
-		myfile.open("pages/other.html");
+		myfile.open("pages/index.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
