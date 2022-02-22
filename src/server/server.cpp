@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/22 18:44:40 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/22 19:16:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,11 @@ void	serverBoy::runServer(int backlog) {
 		// Parse the buffer for GET/POST/DELETE
 		// Build header
 		// Write it
-
 		if (valread < 0) {
 			std::cout << "No bytes to read";
 		}
+		read_browser_request(buffer);
+		break ;
 		std::ostringstream file_content;
 		std::ifstream myfile;
 		myfile.open("pages/other.html");
@@ -60,6 +61,9 @@ void	serverBoy::runServer(int backlog) {
 serverSock*	serverBoy::getSocket() { return _socket; }
 
 std::string	serverBoy::read_browser_request(char *buffer) {
-	(void)buffer;
+	
+	std::string	buff(buffer, buffer + 1024);
+	std::cout << buff << std::endl;
+
 	return "fuck off";
 }
