@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/22 18:33:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/02/22 18:44:40 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	serverBoy::runServer(int backlog) {
 		}
 		std::ostringstream file_content;
 		std::ifstream myfile;
-		myfile.open("pages/index.html");
+		myfile.open("pages/other.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
@@ -60,5 +60,6 @@ void	serverBoy::runServer(int backlog) {
 serverSock*	serverBoy::getSocket() { return _socket; }
 
 std::string	serverBoy::read_browser_request(char *buffer) {
-	
+	(void)buffer;
+	return "fuck off";
 }

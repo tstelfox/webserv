@@ -8,6 +8,7 @@
 
 # https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_72/rzab6/xnonblock.htm
 
+# https://beej.us/guide/bgnet/html/#what-is-a-socket
 
 
 # The following is CGI stuff tbd at the end
