@@ -10,6 +10,7 @@
 
 # https://beej.us/guide/bgnet/html/#what-is-a-socket
 
+#I am going to use poll()
 
 # The following is CGI stuff tbd at the end
 
