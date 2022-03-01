@@ -6,11 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/02/18 11:05:35 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:47:04 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "socket.hpp"
+// #include "socket.hpp"
+#include "webserv.hpp"
 
 socketMan::socketMan(int domain, int service, int protocol, int port,
 		u_long interface) {
@@ -42,6 +43,21 @@ struct sockaddr_in&	socketMan::getAddr() { return address; }
 serverSock::serverSock(int domain, int service, int protocol,
 			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) , backlog(0) {
 				// Bind/connect the socket
+				int ret;
+				int on = 1;
+				// Make socket reusable
+				ret = setsockopt(getSock(), SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
+				if (ret < 0) {
+					std::cout << "setsock fucked up" << std::endl;
+					exit(-1);
+				}
+				
+				//Set socket to be nonblocking
+				ret = ioctl(getSock(), FIONBIO, (char *)&on);
+				if (ret < 0) {
+					std::cout << "ioctl failed" << std::endl;
+					exit(-1);
+				}
 				int connection = connectServer(sock, address);
 				testConnection(connection);
 }

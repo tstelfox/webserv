@@ -6,11 +6,13 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:36:34 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:47:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+// #include "server.hpp"
+#include "webserv.hpp"
+
 
 serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {
 	// _socket = &sock;
@@ -34,7 +36,7 @@ void	serverBoy::runServer(int backlog) {
 	// update_maxfd(socket_fd, &max_fd);
 	int new_fd = -1;
 	int i;
-	int on = 1;
+	// int on = 1;
 
 	int ret;
 	std::cout << "Socket fd is: " << socket_fd << std::endl;
@@ -43,11 +45,19 @@ void	serverBoy::runServer(int backlog) {
 
 	_socket->listenServer(backlog);
 
-	// Make socket reusable
-	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on)); // check for failure
+	// // Make socket reusable
+	// ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on)); // check for failure
+	// if (ret < 0) {
+	// 	std::cout << "setsock fucked up" << std::endl;
+	// 	exit(-1);
+	// }
 	
-	//Set socket to be nonblocking
-	ret = ioctl(socket_fd, FIONBIO, (char *)&on);
+	// //Set socket to be nonblocking
+	// ret = ioctl(socket_fd, FIONBIO, (char *)&on);
+	// if (ret < 0) {
+	// 	std::cout << "ioctl failed" << std::endl;
+	// 	exit(-1);
+	// }
 	// do {
 	// }
 	// all of this needs to be filtered through poll() 
