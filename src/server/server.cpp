@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:47:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/01 17:47:03 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,6 @@ void	serverBoy::runServer(int backlog) {
 	// int max_fd = 0;
 	int socket_fd = _socket->getSock();
 	memset(poll_set, 0, sizeof(poll_set));
-	poll_set[0].fd = socket_fd;
-	poll_set[0].events = POLLIN;
-	int timeout = (30 * 1000);
 	numfds++;
 	// update_maxfd(socket_fd, &max_fd);
 	int new_fd = -1;
@@ -45,6 +42,11 @@ void	serverBoy::runServer(int backlog) {
 
 	_socket->listenServer(backlog);
 
+	poll_set[0].fd = socket_fd;
+	poll_set[0].events = POLLIN;
+	int timeout = (60 * 1000);
+
+	char buffer[1024] = {0};
 	// // Make socket reusable
 	// ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on)); // check for failure
 	// if (ret < 0) {
@@ -74,7 +76,8 @@ void	serverBoy::runServer(int backlog) {
 			std::cout << "Poll timed out. End" << std::endl;
 			break;
 		}
-		for (i = 0; i < numfds; i++) {
+		int current_size = numfds;
+		for (i = 0; i < current_size; i++) {
 			// std::cout << "i is " << i << " and numfds " << numfds << std::endl;
 			if (poll_set[i].revents == 0) {
 				continue;
@@ -85,22 +88,37 @@ void	serverBoy::runServer(int backlog) {
 			}
 			if (poll_set[i].fd == socket_fd) {
 				std::cout << "Listening socket is readable" << std::endl;
-				do {
-					// std::cout << "Is this gonna loop?" << std::endl;
-					new_fd = accept(socket_fd, NULL, NULL);
-					// std::cout << "gettin stuck?" << std::endl;
-					if (new_fd < 0) {
-						if (errno != EWOULDBLOCK) {
-							std::cout << "Accept balls" << std::endl;
-							// yonked = 1;
-						}
-						break;
+				// do {
+				// std::cout << "Is this gonna loop?" << std::endl;
+				// socklen_t addrlen;
+				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+				new_fd = accept(socket_fd, NULL, NULL);
+				// std::cout << "accepted fd: " << new_fd << std::endl;
+				// std::cout << "gettin stuck?" << std::endl;
+				if (new_fd < 0) {
+					// std::cout << "what" << numfds << std::endl;
+					// perror("Yonk why");
+					if (errno != EWOULDBLOCK) {
+						std::cout << "Accept balls" << std::endl;
+						// yonked = 1;
 					}
-					std::cout << "New incoming connection " << new_fd << std::endl;
-					poll_set[numfds].fd = new_fd;
-					poll_set[numfds].events = POLLIN;
-					numfds++;
-				} while (new_fd != -1);
+					break;
+				}
+				std::cout << "New incoming connection " << new_fd << std::endl;
+				poll_set[numfds].fd = new_fd;
+				poll_set[numfds].events = POLLIN;
+				std::cout << "numfds " << numfds << std::endl;
+				numfds++;
+				// std::cout << "fd we're attempting to get at is " << poll_set[numfds].fd << " i is " << i << std::endl;
+				// // char buffer[1024] = {0};
+				// int valread = recv(poll_set[numfds].fd, &buffer, 1024, 0);
+				// // int valread = read(poll_set[0].fd, buffer, 1024);
+				// if (valread < 0) {
+				// 	std::cout << "No bytes to read" << std::endl;
+				// }
+				// perror("What is errno?");
+				// std::cout << buffer << std::endl;
+				// } while (new_fd != -1);
 			}
 			// std::cout << "Well?" << std::endl;
 			// else {
@@ -114,18 +132,19 @@ void	serverBoy::runServer(int backlog) {
 		// ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 		
 		
-		char buffer[1024] = {0};
-		int valread = recv(poll_set[0].fd, buffer, sizeof(buffer), 0);
-		// int valread = read(ready_socket, buffer, 1024);
+		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
+		int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+		// int valread = read(poll_set[0].fd, buffer, 1024);
+		if (valread < 0) {
+			std::cout << "No bytes to read" << std::endl;
+		}
+		// perror("What is errno?");
 		std::cout << buffer << std::endl;
 		// Parse the buffer for GET/POST/DELETE
 		// Build header
 		// Write it
-		if (valread < 0) {
-			std::cout << "No bytes to read";
-		}
 		read_browser_request(buffer);
-		break ;
+		// break ;
 		std::ostringstream file_content;
 		std::ifstream myfile;
 		myfile.open("pages/other.html");
