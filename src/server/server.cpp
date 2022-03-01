@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:20:57 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/01 16:36:34 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,25 @@ void	serverBoy::runServer(int backlog) {
 	numfds++;
 	// update_maxfd(socket_fd, &max_fd);
 	int new_fd = -1;
+	int i;
+	int on = 1;
 
 	int ret;
 	std::cout << "Socket fd is: " << socket_fd << std::endl;
+
 	// int yonked = -1;
 
+	_socket->listenServer(backlog);
+
+	// Make socket reusable
+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on)); // check for failure
+	
+	//Set socket to be nonblocking
+	ret = ioctl(socket_fd, FIONBIO, (char *)&on);
 	// do {
 	// }
 	// all of this needs to be filtered through poll() 
 	
-	_socket->listenServer(backlog);
 	
 	while (true) {
 		std::cout << "Waiting on poll()..." << std::endl;
@@ -55,9 +64,11 @@ void	serverBoy::runServer(int backlog) {
 			std::cout << "Poll timed out. End" << std::endl;
 			break;
 		}
-		for (int i = 0; i < numfds; i++) {
-			if (poll_set[i].revents == 0)
+		for (i = 0; i < numfds; i++) {
+			// std::cout << "i is " << i << " and numfds " << numfds << std::endl;
+			if (poll_set[i].revents == 0) {
 				continue;
+			}
 			if (poll_set[i].revents != POLLIN) {
 				std::cout << "Error. revents = " << poll_set[i].revents << std::endl;
 				break;
@@ -67,6 +78,7 @@ void	serverBoy::runServer(int backlog) {
 				do {
 					// std::cout << "Is this gonna loop?" << std::endl;
 					new_fd = accept(socket_fd, NULL, NULL);
+					// std::cout << "gettin stuck?" << std::endl;
 					if (new_fd < 0) {
 						if (errno != EWOULDBLOCK) {
 							std::cout << "Accept balls" << std::endl;
@@ -80,11 +92,12 @@ void	serverBoy::runServer(int backlog) {
 					numfds++;
 				} while (new_fd != -1);
 			}
-			std::cout << "Well?" << std::endl;
+			// std::cout << "Well?" << std::endl;
 			// else {
 
 			// }
 		}
+
 		// if (yonked == 1)
 		// 	break;
 		// socklen_t	addrlen;
@@ -118,8 +131,8 @@ void	serverBoy::runServer(int backlog) {
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
 
-		write(ready_socket, hey, strlen(hey));
-		close(ready_socket);
+		write(new_fd, hey, strlen(hey));
+		close(new_fd);
 		delete[] hey;
 	}
 }
