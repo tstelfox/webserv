@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 17:48:21 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/02 16:44:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,11 @@ serverSock::serverSock(int domain, int service, int protocol,
 				}
 				
 				//Set socket to be nonblocking
-				// ret = ioctl(getSock(), FIONBIO, (char *)&on);
+				
 				ret = fcntl(getSock(), F_GETFL, 0);
+				/* The following is the fcntl version which must be used, as per subject */
 				// ret = fcntl(getSock(), F_SETFL, O_NONBLOCK);
+
 				if (ret < 0) {
 					std::cout << "ioctl failed" << std::endl;
 					exit(-1);
