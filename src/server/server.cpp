@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/03 19:03:34 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/03 19:19:05 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,21 +109,8 @@ void	serverBoy::runServer(int backlog) {
 				poll_set[numfds].events = POLLIN;
 				std::cout << "numfds " << numfds << std::endl;
 				numfds++;
-				// std::cout << "fd we're attempting to get at is " << poll_set[numfds].fd << " i is " << i << std::endl;
-				// // char buffer[1024] = {0};
-				// int valread = recv(poll_set[numfds].fd, &buffer, 1024, 0);
-				// // int valread = read(poll_set[0].fd, buffer, 1024);
-				// if (valread < 0) {
-				// 	std::cout << "No bytes to read" << std::endl;
-				// }
-				// perror("What is errno?");
-				// std::cout << buffer << std::endl;
 				// } while (new_fd != -1);
 			}
-			// std::cout << "Well?" << std::endl;
-			// else {
-
-			// }
 		}
 
 		// if (yonked == 1)
@@ -131,7 +118,7 @@ void	serverBoy::runServer(int backlog) {
 		// socklen_t	addrlen;
 		// ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 		std::cout << "Number of available fds is: " << ret << std::endl;
-		sleep(20); // With this 
+		// sleep(20); // With this 
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
 		int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
@@ -143,7 +130,7 @@ void	serverBoy::runServer(int backlog) {
 		std::cout << buffer << std::endl;
 		// Parse the buffer for GET/POST/DELETE
 		// Build header
-		break;
+		break;	
 		// Write it
 		read_browser_request(buffer);
 		// break ;
@@ -165,6 +152,7 @@ void	serverBoy::runServer(int backlog) {
 		write(new_fd, hey, strlen(hey));
 		close(new_fd);
 		delete[] hey;
+		// break;
 	}
 }
 
