@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/03 18:46:30 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/03 18:58:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ void	serverBoy::runServer(int backlog) {
 		// socklen_t	addrlen;
 		// ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 		
+		sleep(10);
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
 		int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
