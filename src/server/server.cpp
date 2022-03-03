@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/03 21:11:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/03 21:23:20 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,10 @@ void	serverBoy::runServer(int backlog) {
 		// sleep(20); // With this 
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
-		while (true) {
+		int k = i;
+		while (k < numfds) {
 			std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
-			int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+			int valread = recv(poll_set[k].fd, &buffer, 1024, 0);
 			// int valread = read(poll_set[0].fd, buffer, 1024);
 			if (valread < 0) {
 				std::cout << "No bytes to read" << std::endl;
@@ -131,8 +132,10 @@ void	serverBoy::runServer(int backlog) {
 				std::cout << "Connection closed" << std::endl;
 				break;
 			}
+			new_fd = poll_set[k].fd;
 			// perror("What is errno");
 			std::cout << buffer << std::endl;
+			k++;
 		}
 
 		// if (yonked == 1)
@@ -141,13 +144,16 @@ void	serverBoy::runServer(int backlog) {
 		// ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 		// Parse the buffer for GET/POST/DELETE
 		// Build header
-		break;	
+		// break;	
 		// Write it
 		// read_browser_request(buffer);
 		// break ;
 		std::ostringstream file_content;
 		std::ifstream myfile;
-		myfile.open("pages/other.html");
+		if (k % 2)
+			myfile.open("pages/other.html");
+		else
+			myfile.open("pages/index.html");
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
@@ -156,10 +162,11 @@ void	serverBoy::runServer(int backlog) {
 		int len = file_content.str().size(); // Literally only got time to do this
 		header.append(std::to_string(len));
         header.append("\n\n");
-		header.append(content);
+		// header.append(content);
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
 
+		std::cout << "Never here?" << std::endl;
 		write(new_fd, hey, strlen(hey));
 		close(new_fd);
 		delete[] hey;
