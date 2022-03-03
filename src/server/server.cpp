@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 17:47:03 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/03 18:46:30 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	serverBoy::runServer(int backlog) {
 				continue;
 			}
 			if (poll_set[i].revents != POLLIN) {
-				std::cout << "Error. revents = " << poll_set[i].revents << std::endl;
+				std::cout << "Error: revents=" << poll_set[i].revents << std::endl;
 				break;
 			}
 			if (poll_set[i].fd == socket_fd) {
@@ -138,10 +138,11 @@ void	serverBoy::runServer(int backlog) {
 		if (valread < 0) {
 			std::cout << "No bytes to read" << std::endl;
 		}
-		// perror("What is errno?");
+		perror("What is errno");
 		std::cout << buffer << std::endl;
 		// Parse the buffer for GET/POST/DELETE
 		// Build header
+		break;
 		// Write it
 		read_browser_request(buffer);
 		// break ;
