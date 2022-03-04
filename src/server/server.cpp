@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/03 21:23:20 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/04 13:00:56 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,7 @@ void	serverBoy::runServer(int backlog) {
 		// break ;
 		std::ostringstream file_content;
 		std::ifstream myfile;
+		// The fuck was this about, really?
 		if (k % 2)
 			myfile.open("pages/other.html");
 		else
@@ -162,7 +163,7 @@ void	serverBoy::runServer(int backlog) {
 		int len = file_content.str().size(); // Literally only got time to do this
 		header.append(std::to_string(len));
         header.append("\n\n");
-		// header.append(content);
+		header.append(content);
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
 
@@ -170,7 +171,7 @@ void	serverBoy::runServer(int backlog) {
 		write(new_fd, hey, strlen(hey));
 		close(new_fd);
 		delete[] hey;
-		// break;
+		break;
 	}
 }
 
