@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/04 13:00:56 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/04 13:21:59 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,9 @@ void	serverBoy::runServer(int backlog) {
 				// } while (new_fd != -1);
 			}
 		}
-		sleep(10);
+		// sleep(10);
 		
 		std::cout << "Number of available fds is: " << ret << std::endl;
-		// sleep(20); // With this 
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
 		int k = i;
@@ -171,7 +170,7 @@ void	serverBoy::runServer(int backlog) {
 		write(new_fd, hey, strlen(hey));
 		close(new_fd);
 		delete[] hey;
-		break;
+		// break;
 	}
 }
 
