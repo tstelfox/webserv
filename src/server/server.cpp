@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/04 13:21:59 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/04 13:54:06 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,9 @@ void	serverBoy::runServer(int backlog) {
 				continue;
 			}
 			if (poll_set[i].revents != POLLIN) {
-				std::cout << "Error: revents=" << poll_set[i].revents << std::endl;
+				// This happens every loop and I can't tell if that's fine?
+				// perror("revents");
+				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
 			if (poll_set[i].fd == socket_fd) {
@@ -93,7 +95,7 @@ void	serverBoy::runServer(int backlog) {
 				// socklen_t addrlen;
 				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				new_fd = accept(socket_fd, NULL, NULL);
-				// std::cout << "accepted fd: " << new_fd << std::endl;
+				std::cout << "accepted fd: " << new_fd << std::endl;
 				// std::cout << "gettin stuck?" << std::endl;
 				if (new_fd < 0) {
 					// std::cout << "what" << numfds << std::endl;
@@ -115,12 +117,12 @@ void	serverBoy::runServer(int backlog) {
 		}
 		// sleep(10);
 		
-		std::cout << "Number of available fds is: " << ret << std::endl;
+		// std::cout << "Number of available fds is: " << ret << std::endl;
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
-		int k = i;
+		int k = numfds;
 		while (k < numfds) {
-			std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
+			std::cout << "Trying to read from fd " << poll_set[k].fd << std::endl;
 			int valread = recv(poll_set[k].fd, &buffer, 1024, 0);
 			// int valread = read(poll_set[0].fd, buffer, 1024);
 			if (valread < 0) {
@@ -166,8 +168,8 @@ void	serverBoy::runServer(int backlog) {
 		char *hey = new char[header.length() + 1];
 		std::strcpy(hey, header.c_str());
 
-		std::cout << "Never here?" << std::endl;
 		write(new_fd, hey, strlen(hey));
+		// std::cout << "What" << std::endl;
 		close(new_fd);
 		delete[] hey;
 		// break;
