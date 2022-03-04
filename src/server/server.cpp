@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/04 13:54:06 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/04 14:33:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,33 +111,33 @@ void	serverBoy::runServer(int backlog) {
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN;
 				numfds++;
-				std::cout << "numfds " << numfds << std::endl;
+				// std::cout << "numfds " << numfds << std::endl;
 				// } while (new_fd != -1);
 			}
 		}
-		// sleep(10);
+		sleep(10);
 		
 		// std::cout << "Number of available fds is: " << ret << std::endl;
 		
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
-		int k = numfds;
-		while (k < numfds) {
-			std::cout << "Trying to read from fd " << poll_set[k].fd << std::endl;
-			int valread = recv(poll_set[k].fd, &buffer, 1024, 0);
-			// int valread = read(poll_set[0].fd, buffer, 1024);
-			if (valread < 0) {
-				std::cout << "No bytes to read" << std::endl;
-				break;
-			}
-			if (valread == 0) {
-				std::cout << "Connection closed" << std::endl;
-				break;
-			}
-			new_fd = poll_set[k].fd;
-			// perror("What is errno");
-			std::cout << buffer << std::endl;
-			k++;
+		// int k = numfds;
+		// while (k < numfds) {
+		std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
+		int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+		// int valread = read(poll_set[0].fd, buffer, 1024);
+		if (valread < 0) {
+			std::cout << "No bytes to read" << std::endl;
+			break;
 		}
+		if (valread == 0) {
+			std::cout << "Connection closed" << std::endl;
+			break;
+		}
+		new_fd = poll_set[i].fd;
+		// perror("What is errno");
+		std::cout << buffer << std::endl;
+			// k++;
+		// }
 
 		// if (yonked == 1)
 		// 	break;
@@ -152,7 +152,7 @@ void	serverBoy::runServer(int backlog) {
 		std::ostringstream file_content;
 		std::ifstream myfile;
 		// The fuck was this about, really?
-		if (k % 2)
+		if (i % 2)
 			myfile.open("pages/other.html");
 		else
 			myfile.open("pages/index.html");
@@ -169,8 +169,8 @@ void	serverBoy::runServer(int backlog) {
 		std::strcpy(hey, header.c_str());
 
 		write(new_fd, hey, strlen(hey));
-		// std::cout << "What" << std::endl;
 		close(new_fd);
+		// std::cout << "What" << std::endl;
 		delete[] hey;
 		// break;
 	}
