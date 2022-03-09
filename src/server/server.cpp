@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 15:31:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 16:16:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	serverBoy::runServer(int backlog) {
 	_socket->listenServer(backlog);
 
 	poll_set[0].fd = socket_fd;
-	poll_set[0].events = POLLIN;
+	poll_set[0].events = POLLIN | POLLOUT;
 	int timeout = (60 * 1000);
 
 	char buffer[1024] = {0};
@@ -62,7 +62,7 @@ void	serverBoy::runServer(int backlog) {
 			break;
 		}
 		int current_size = numfds;
-		sleep(3);
+		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
 		std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			if (poll_set[i].revents == 0) {
@@ -89,12 +89,12 @@ void	serverBoy::runServer(int backlog) {
 				}
 				std::cout << "New incoming connection " << new_fd << std::endl;
 				poll_set[numfds].fd = new_fd;
-				poll_set[numfds].events = POLLIN;
+				poll_set[numfds].events = POLLIN | POLLOUT;
 				
 				if (poll_set[i].revents & POLLIN) {
 					std::cout << "Trying to read from fd " << new_fd << std::endl;
 					// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-					int valread = recv(new_fd, &buffer, 1024, 0);
+					ssize_t valread = recv(new_fd, &buffer, 1024, 0);
 					if (valread < 0) {
 						std::cout << "No bytes to read" << std::endl;
 						break;
@@ -103,14 +103,30 @@ void	serverBoy::runServer(int backlog) {
 						std::cout << "Connection closed" << std::endl;
 						break;
 					}
-					// new_fd = poll_set[i].fd;
-					// perror("What is errno");
 					std::cout << buffer << std::endl;
-					memset(buffer, 0, sizeof(buffer));
+					
+					
+					/* At this point should parse the request 
+						from the browser and then
+					send appropriate response back */
+					// ----------------------------- //
+
 					// close(new_fd);
 
 				}
+				// ----------------------------- //
+				/* Here I am attempting to check if the socket is ready
+				for me to send a response back to the client(browser) */
+				// ----------------------------- //
+				int ready_to_send = poll_set[i].revents & POLLOUT;
+				std::cout << ready_to_send << std::endl;
+				if (poll_set[i].revents & POLLOUT) {
+					std::cout << "You can write to the client" << std::endl;
+				}
 				
+
+				// Reset buffer
+				memset(buffer, 0, sizeof(buffer));
 
 				numfds++;
 
