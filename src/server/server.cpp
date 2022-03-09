@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 15:09:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 15:31:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,6 @@ void	serverBoy::runServer(int backlog) {
 	// 	exit(-1);
 	// }
 	
-	// //Set socket to be nonblocking
-	// ret = ioctl(socket_fd, FIONBIO, (char *)&on);
-	// if (ret < 0) {
-	// 	std::cout << "ioctl failed" << std::endl;
-	// 	exit(-1);
-	// }
-	// do {
-	// }
-	// all of this needs to be filtered through poll() 
-	
-	
 	while (true) {
 		std::cout << "Waiting on poll()..." << std::endl;
 		ret = poll(poll_set, numfds, timeout);
@@ -73,6 +62,8 @@ void	serverBoy::runServer(int backlog) {
 			break;
 		}
 		int current_size = numfds;
+		sleep(3);
+		std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			if (poll_set[i].revents == 0) {
 				continue;
@@ -85,9 +76,9 @@ void	serverBoy::runServer(int backlog) {
 			if (poll_set[i].fd == socket_fd) {
 				std::cout << "Listening socket is readable" << std::endl;
 				// do {
-				// socklen_t addrlen;
-				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				new_fd = accept(socket_fd, NULL, NULL);
+				socklen_t addrlen;
+				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+				// new_fd = accept(socket_fd, NULL, NULL);
 				std::cout << "accepted fd: " << new_fd << std::endl;
 				if (new_fd < 0) {
 					if (errno != EWOULDBLOCK) {
@@ -101,7 +92,7 @@ void	serverBoy::runServer(int backlog) {
 				poll_set[numfds].events = POLLIN;
 				
 				if (poll_set[i].revents & POLLIN) {
-					std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
+					std::cout << "Trying to read from fd " << new_fd << std::endl;
 					// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
 					int valread = recv(new_fd, &buffer, 1024, 0);
 					if (valread < 0) {
@@ -115,19 +106,19 @@ void	serverBoy::runServer(int backlog) {
 					// new_fd = poll_set[i].fd;
 					// perror("What is errno");
 					std::cout << buffer << std::endl;
-					// memset(buffer, 0, sizeof(buffer));
+					memset(buffer, 0, sizeof(buffer));
 					// close(new_fd);
 
 				}
 				
-				numfds++;
 
+				numfds++;
 
 				// std::cout << "numfds " << numfds << std::endl;
 				// } while (new_fd != -1);
 			}
 		}
-		sleep(10);
+		
 
 
 		/* PORCODDIO */
