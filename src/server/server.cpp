@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 14:50:58 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 15:09:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ void	serverBoy::runServer(int backlog) {
 				if (new_fd < 0) {
 					if (errno != EWOULDBLOCK) {
 						std::cout << "Accept balls" << std::endl;
-						// yonked = 1;
 					}
 					std::cout << "Should re-route to poll again" << std::endl;
 					break;
@@ -128,7 +127,7 @@ void	serverBoy::runServer(int backlog) {
 				// } while (new_fd != -1);
 			}
 		}
-
+		sleep(10);
 
 
 		/* PORCODDIO */
