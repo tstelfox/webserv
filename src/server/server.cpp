@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 16:16:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 18:32:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,28 +66,28 @@ void	serverBoy::runServer(int backlog) {
 		std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			if (poll_set[i].revents == 0) {
+				// std::cout << "Nothing to report" << std::endl;
 				continue;
 			}
-			if (poll_set[i].revents != POLLIN) {
+			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
 				// perror("revents");
 				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
-			if (poll_set[i].fd == socket_fd) {
+			// if (poll_set[i].fd == socket_fd) {
+			if (poll_set[i].revents & POLLIN) {
 				std::cout << "Listening socket is readable" << std::endl;
-				// do {
 				socklen_t addrlen;
 				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				// new_fd = accept(socket_fd, NULL, NULL);
-				std::cout << "accepted fd: " << new_fd << std::endl;
 				if (new_fd < 0) {
 					if (errno != EWOULDBLOCK) {
 						std::cout << "Accept balls" << std::endl;
 					}
-					std::cout << "Should re-route to poll again" << std::endl;
+					// std::cout << "Should re-route to poll again" << std::endl;
 					break;
 				}
-				std::cout << "New incoming connection " << new_fd << std::endl;
+				std::cout << "accepted fd: " << new_fd << std::endl;
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN | POLLOUT;
 				
@@ -104,28 +104,24 @@ void	serverBoy::runServer(int backlog) {
 						break;
 					}
 					std::cout << buffer << std::endl;
-					
-					
 					/* At this point should parse the request 
 						from the browser and then
 					send appropriate response back */
 					// ----------------------------- //
-
-					// close(new_fd);
-
 				}
 				// ----------------------------- //
 				/* Here I am attempting to check if the socket is ready
 				for me to send a response back to the client(browser) */
 				// ----------------------------- //
-				int ready_to_send = poll_set[i].revents & POLLOUT;
-				std::cout << ready_to_send << std::endl;
-				if (poll_set[i].revents & POLLOUT) {
+				else if (poll_set[i].revents & POLLOUT) {
 					std::cout << "You can write to the client" << std::endl;
+				}
+				else if (poll_set[i].revents & POLLERR) {
+					std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 				}
 				
 
-				// Reset buffer
+				// Reset
 				memset(buffer, 0, sizeof(buffer));
 
 				numfds++;
