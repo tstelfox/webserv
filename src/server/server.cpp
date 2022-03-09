@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 14:32:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 14:50:58 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,17 @@ void	serverBoy::runServer(int backlog) {
 	
 	/* The following is an attempt at using poll() */
 
-	struct pollfd poll_set[42]; // 42 is arbitrary I believe
+	struct pollfd poll_set[42]; // 42 is arbitrary - Don't know how many we should be preparing for
 	int numfds = 1;
 	// int max_fd = 0;
 	int socket_fd = _socket->getSock();
 	memset(poll_set, 0, sizeof(poll_set));
-	// numfds++;
 	// update_maxfd(socket_fd, &max_fd);
 	int new_fd = -1;
 	int i;
-	// int on = 1;
 
 	int ret;
 	std::cout << "Socket fd is: " << socket_fd << std::endl;
-
-	// int yonked = -1;
 
 	_socket->listenServer(backlog);
 
@@ -69,7 +65,7 @@ void	serverBoy::runServer(int backlog) {
 		std::cout << "Waiting on poll()..." << std::endl;
 		ret = poll(poll_set, numfds, timeout);
 		if (ret < 0) {
-			std::cout << "Shit's fucked" << std::endl;
+			perror("poll");
 			break;
 		}
 		if (ret == 0) {
@@ -78,12 +74,10 @@ void	serverBoy::runServer(int backlog) {
 		}
 		int current_size = numfds;
 		for (i = 0; i < current_size; i++) {
-			// std::cout << "i is " << i << " and numfds " << numfds << std::endl;
 			if (poll_set[i].revents == 0) {
 				continue;
 			}
 			if (poll_set[i].revents != POLLIN) {
-				// This happens every loop and I can't tell if that's fine?
 				// perror("revents");
 				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
@@ -91,15 +85,11 @@ void	serverBoy::runServer(int backlog) {
 			if (poll_set[i].fd == socket_fd) {
 				std::cout << "Listening socket is readable" << std::endl;
 				// do {
-				// std::cout << "Is this gonna loop?" << std::endl;
 				// socklen_t addrlen;
 				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				new_fd = accept(socket_fd, NULL, NULL);
 				std::cout << "accepted fd: " << new_fd << std::endl;
-				// std::cout << "gettin stuck?" << std::endl;
 				if (new_fd < 0) {
-					// std::cout << "what" << numfds << std::endl;
-					// perror("Yonk why");
 					if (errno != EWOULDBLOCK) {
 						std::cout << "Accept balls" << std::endl;
 						// yonked = 1;
@@ -111,11 +101,10 @@ void	serverBoy::runServer(int backlog) {
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN;
 				
-				if (poll_set[i].revents && POLLIN) {
+				if (poll_set[i].revents & POLLIN) {
 					std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
 					// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
 					int valread = recv(new_fd, &buffer, 1024, 0);
-					// int valread = read(poll_set[0].fd, buffer, 1024);
 					if (valread < 0) {
 						std::cout << "No bytes to read" << std::endl;
 						break;
@@ -124,9 +113,12 @@ void	serverBoy::runServer(int backlog) {
 						std::cout << "Connection closed" << std::endl;
 						break;
 					}
-					new_fd = poll_set[i].fd;
+					// new_fd = poll_set[i].fd;
 					// perror("What is errno");
 					std::cout << buffer << std::endl;
+					// memset(buffer, 0, sizeof(buffer));
+					// close(new_fd);
+
 				}
 				
 				numfds++;
@@ -136,40 +128,6 @@ void	serverBoy::runServer(int backlog) {
 				// } while (new_fd != -1);
 			}
 		}
-		sleep(10);
-		
-		// std::cout << "Number of available fds is: " << ret << std::endl;
-		
-		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
-		// int k = numfds;
-		// while (k < numfds) {
-		// std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
-		// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-		// // int valread = read(poll_set[0].fd, buffer, 1024);
-		// if (valread < 0) {
-		// 	std::cout << "No bytes to read" << std::endl;
-		// 	break;
-		// }
-		// if (valread == 0) {
-		// 	std::cout << "Connection closed" << std::endl;
-		// 	break;
-		// }
-		// new_fd = poll_set[i].fd;
-		// // perror("What is errno");
-		// std::cout << buffer << std::endl;
-			// k++;
-		// }
-
-		// if (yonked == 1)
-		// 	break;
-		// socklen_t	addrlen;
-		// ready_socket = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-		// Parse the buffer for GET/POST/DELETE
-		// Build header
-		// break;	
-		// Write it
-		// read_browser_request(buffer);
-		// break ;
 
 
 
