@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/09 18:32:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 19:01:14 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,12 +113,12 @@ void	serverBoy::runServer(int backlog) {
 				/* Here I am attempting to check if the socket is ready
 				for me to send a response back to the client(browser) */
 				// ----------------------------- //
-				else if (poll_set[i].revents & POLLOUT) {
-					std::cout << "You can write to the client" << std::endl;
-				}
-				else if (poll_set[i].revents & POLLERR) {
-					std::cout << "DIO PORCO MAIALE GANE" << std::endl;
-				}
+				// if (poll_set[i].revents & POLLOUT) {
+				// 	std::cout << "You can write to the client" << std::endl;
+				// }
+				// else if (poll_set[i].revents & POLLERR) {
+				// 	std::cout << "DIO PORCO MAIALE GANE" << std::endl;
+				// }
 				
 
 				// Reset
@@ -128,6 +128,12 @@ void	serverBoy::runServer(int backlog) {
 
 				// std::cout << "numfds " << numfds << std::endl;
 				// } while (new_fd != -1);
+			}
+			if (poll_set[i].revents & POLLOUT) {
+				std::cout << "You can write to the client" << std::endl;
+			}
+			else if (poll_set[i].revents & POLLERR) {
+				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
 		}
 		
