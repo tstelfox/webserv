@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/04 14:33:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/09 14:32:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,28 @@ void	serverBoy::runServer(int backlog) {
 				std::cout << "New incoming connection " << new_fd << std::endl;
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN;
+				
+				if (poll_set[i].revents && POLLIN) {
+					std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
+					// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+					int valread = recv(new_fd, &buffer, 1024, 0);
+					// int valread = read(poll_set[0].fd, buffer, 1024);
+					if (valread < 0) {
+						std::cout << "No bytes to read" << std::endl;
+						break;
+					}
+					if (valread == 0) {
+						std::cout << "Connection closed" << std::endl;
+						break;
+					}
+					new_fd = poll_set[i].fd;
+					// perror("What is errno");
+					std::cout << buffer << std::endl;
+				}
+				
 				numfds++;
+
+
 				// std::cout << "numfds " << numfds << std::endl;
 				// } while (new_fd != -1);
 			}
@@ -122,20 +143,20 @@ void	serverBoy::runServer(int backlog) {
 		//  std::cout << "fd we're attempting to get at is " << poll_set[i].fd << " i is " << i << std::endl;
 		// int k = numfds;
 		// while (k < numfds) {
-		std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
-		int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-		// int valread = read(poll_set[0].fd, buffer, 1024);
-		if (valread < 0) {
-			std::cout << "No bytes to read" << std::endl;
-			break;
-		}
-		if (valread == 0) {
-			std::cout << "Connection closed" << std::endl;
-			break;
-		}
-		new_fd = poll_set[i].fd;
-		// perror("What is errno");
-		std::cout << buffer << std::endl;
+		// std::cout << "Trying to read from fd " << poll_set[i].fd << std::endl;
+		// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+		// // int valread = read(poll_set[0].fd, buffer, 1024);
+		// if (valread < 0) {
+		// 	std::cout << "No bytes to read" << std::endl;
+		// 	break;
+		// }
+		// if (valread == 0) {
+		// 	std::cout << "Connection closed" << std::endl;
+		// 	break;
+		// }
+		// new_fd = poll_set[i].fd;
+		// // perror("What is errno");
+		// std::cout << buffer << std::endl;
 			// k++;
 		// }
 
@@ -149,7 +170,11 @@ void	serverBoy::runServer(int backlog) {
 		// Write it
 		// read_browser_request(buffer);
 		// break ;
-		std::ostringstream file_content;
+
+
+
+		/* PORCODDIO */
+		/* std::ostringstream file_content;
 		std::ifstream myfile;
 		// The fuck was this about, really?
 		if (i % 2)
@@ -159,7 +184,6 @@ void	serverBoy::runServer(int backlog) {
 		file_content << myfile.rdbuf();
 		std::string content = file_content.str();
 
-		/* Have to create the header file here from the data of the file */
 		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 		int len = file_content.str().size(); // Literally only got time to do this
 		header.append(std::to_string(len));
@@ -171,7 +195,11 @@ void	serverBoy::runServer(int backlog) {
 		write(new_fd, hey, strlen(hey));
 		close(new_fd);
 		// std::cout << "What" << std::endl;
-		delete[] hey;
+		delete[] hey; */
+
+
+
+
 		// break;
 	}
 }
