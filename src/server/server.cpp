@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/10 15:38:18 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/10 15:50:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,11 +130,20 @@ void	serverBoy::runServer(int backlog) {
 				// } while (new_fd != -1);
 			}
 			if (poll_set[i].revents & POLLOUT) {
-				std::cout << "You can write to the client" << std::endl;
 				// Write
-				socklen_t addrlen;
-				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				std::ostringstream file_content;
+				std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
+				// socklen_t addrlen;
+				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+				if (new_fd < 0) {
+					if (errno != EWOULDBLOCK) {
+						std::cout << "Accept balls" << std::endl;
+					}
+					// std::cout << "Should re-route to poll again" << std::endl;
+					break;
+				}
+				
+				first_response(poll_set[i].fd);
+				/* std::ostringstream file_content;
 				std::ifstream myfile;
 				if (i % 2)
 					myfile.open("pages/other.html");
@@ -155,48 +164,42 @@ void	serverBoy::runServer(int backlog) {
 				send(new_fd, hey, strlen(hey), 0);
 				// close(new_fd);
 				// std::cout << "What" << std::endl;
-				delete[] hey;
+				delete[] hey; */
 
 			}
 			else if (poll_set[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
 		}
-		
-
-
-		/* PORCODDIO */
-		/* std::ostringstream file_content;
-		std::ifstream myfile;
-		// The fuck was this about, really?
-		if (i % 2)
-			myfile.open("pages/other.html");
-		else
-			myfile.open("pages/index.html");
-		file_content << myfile.rdbuf();
-		std::string content = file_content.str();
-
-		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-		int len = file_content.str().size(); // Literally only got time to do this
-		header.append(std::to_string(len));
-        header.append("\n\n");
-		header.append(content);
-		char *hey = new char[header.length() + 1];
-		std::strcpy(hey, header.c_str());
-
-		write(new_fd, hey, strlen(hey));
-		close(new_fd);
-		// std::cout << "What" << std::endl;
-		delete[] hey; */
-
-
-
-
-		// break;
 	}
 }
 
 serverSock*	serverBoy::getSocket() { return _socket; }
+
+void		serverBoy::first_response(int sock_fd) {
+	std::ostringstream file_content;
+	std::ifstream myfile;
+	if (sock_fd % 2)
+		myfile.open("pages/other.html");
+	else
+		myfile.open("pages/index.html");
+	file_content << myfile.rdbuf();
+	std::string content = file_content.str();
+
+	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+	int len = file_content.str().size();
+	header.append(std::to_string(len));
+	header.append("\n\n");
+	header.append(content);
+	char *hey = new char[header.length() + 1];
+	std::strcpy(hey, header.c_str());
+
+	// write(sock_fd, hey, strlen(hey));
+	send(sock_fd, hey, strlen(hey), 0);
+	close(sock_fd);
+	// std::cout << "What" << std::endl;
+	delete[] hey;
+}
 
 std::string	serverBoy::read_browser_request(char *buffer) {
 	
