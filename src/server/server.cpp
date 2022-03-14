@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/10 15:50:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/14 15:22:45 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void	serverBoy::runServer(int backlog) {
 			}
 			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
 				// perror("revents");
+				// Questo dovrebbe stare in silenzio diocane
 				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
