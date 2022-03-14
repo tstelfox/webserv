@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/14 15:22:45 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/14 18:24:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	serverBoy::runServer(int backlog) {
 		}
 		int current_size = numfds;
 		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
-		std::cout << "number of fds: " << numfds << std::endl;
+		// std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			if (poll_set[i].revents == 0) {
 				// std::cout << "Nothing to report" << std::endl;
@@ -72,7 +72,7 @@ void	serverBoy::runServer(int backlog) {
 			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
 				// perror("revents");
 				// Questo dovrebbe stare in silenzio diocane
-				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
+				// std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
 			// if (poll_set[i].fd == socket_fd) {
