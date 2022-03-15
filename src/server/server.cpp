@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 15:13:15 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 15:20:53 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,56 +106,58 @@ void	serverBoy::runServer(int backlog) {
 					break;
 				}
 			}
-			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
-				std::cout << "Listening socket is readable" << std::endl;
-				close_conn = 0;
-				std::cout << "accepted fd: " << new_fd << std::endl;
-				std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
-				poll_set[numfds].fd = new_fd;
-				poll_set[numfds].events = POLLIN | POLLOUT;
-				numfds++;
-				
-				std::cout << "Trying to read from fd " << new_fd << std::endl;
-				// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-				ssize_t valread = recv(new_fd, &buffer, 1024, 0);
-				if (valread < 0) {
-					std::cout << "No bytes to read" << std::endl;
-					close_conn = 1;
-					break;
-				}
-				if (valread == 0) {
-					std::cout << "Connection closed" << std::endl;
-					close_conn = 1;
-					break;
-				}
-				std::cout << buffer << std::endl;
-				/* At this point should parse the request 
-					from the browser and then
-				send appropriate response back */
-				
+			else {
+				if (poll_set[i].revents & (POLLIN|POLLOUT)) {
+					std::cout << "Listening socket is readable" << std::endl;
+					close_conn = 0;
+					std::cout << "accepted fd: " << new_fd << std::endl;
+					std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
+					poll_set[numfds].fd = new_fd;
+					poll_set[numfds].events = POLLIN | POLLOUT;
+					numfds++;
+					
+					std::cout << "Trying to read from fd " << new_fd << std::endl;
+					// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+					ssize_t valread = recv(new_fd, &buffer, 1024, 0);
+					if (valread < 0) {
+						std::cout << "No bytes to read" << std::endl;
+						close_conn = 1;
+						break;
+					}
+					if (valread == 0) {
+						std::cout << "Connection closed" << std::endl;
+						close_conn = 1;
+						break;
+					}
+					std::cout << buffer << std::endl;
+					/* At this point should parse the request 
+						from the browser and then
+					send appropriate response back */
+					
 
-				// Reset
-				memset(buffer, 0, sizeof(buffer));
+					// Reset
+					memset(buffer, 0, sizeof(buffer));
 
-				std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
-				
-				// Respond to client
-				ret = first_response(new_fd);
-				if (ret < 0) {
-					perror ("   send() failed");
-					close_conn = 1;
-					break;
+					std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
+					
+					// Respond to client
+					ret = first_response(new_fd);
+					if (ret < 0) {
+						perror ("   send() failed");
+						close_conn = 1;
+						break;
+					}
 				}
-			}
-			else if (poll_set[i].revents & POLLERR) {
-				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
-			}
-			if (close_conn) {
-				std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
-				close(new_fd);
-				poll_set[i].fd = -1;
-				// numfds--;
-			}
+				else if (poll_set[i].revents & POLLERR) {
+					std::cout << "DIO PORCO MAIALE GANE" << std::endl;
+				}
+				if (close_conn) {
+					std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
+					close(new_fd);
+					poll_set[i].fd = -1;
+					// numfds--;
+				}
+			} // End of current connection
 		} // End of loop through pollable connections
 	}
 }
