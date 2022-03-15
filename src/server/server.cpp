@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 13:45:08 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 14:11:49 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,16 +75,20 @@ void	serverBoy::runServer(int backlog) {
 		// std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
+			if (poll_set[i].fd == -1) {
+				std::cout << "This was closed" << std::endl;
+				continue;
+			}
 			if (poll_set[i].revents == 0) {
 				std::cout << "Nothing to report on " << i << std::endl;
 				continue;
 			}
-			// if (poll_set[i].revents & POLLHUP) {
-			// 	close(poll_set[i].fd);
-			// 	poll_set[i].fd = -1;
-			// 	std::cout << "Connection was hung up" << std::endl;
-			// 	continue;
-			// }
+			if (poll_set[i].revents & (POLLHUP|POLLNVAL)) {
+				close(poll_set[i].fd);
+				poll_set[i].fd = -1;
+				std::cout << "Connection was hung up or invalid requested events" << std::endl;
+				continue;
+			}
 			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
 				// perror("revents is te");
 				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
