@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 12:22:03 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 12:28:51 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@ serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {
 
 serverBoy::~serverBoy() {}
 
+
+	/*--------- Should just use a vector for every client connection which contains:
+					-socket
+					-buffer of shit to read
+					-something else?
+				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer(int backlog) {
 	
 	/* The following is an attempt at using poll() */
