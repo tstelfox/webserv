@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 12:28:51 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 12:54:29 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,35 +64,43 @@ void	serverBoy::runServer(int backlog) {
 		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
 		// std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
+			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poll_set[i].revents == 0) {
 				// std::cout << "Nothing to report" << std::endl;
 				continue;
 			}
+			// if (poll_set[i].revents & POLLHUP) {
+			// 	close(poll_set[i].fd);
+			// 	poll_set[i].fd = -1;
+			// 	std::cout << "Connection was hung up" << std::endl;
+			// 	continue;
+			// }
 			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
-				// perror("revents");
-				// std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
+				// perror("revents is te");
+				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
 			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
 				std::cout << "Listening socket is readable" << std::endl;
 				socklen_t addrlen;
-				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+				new_fd = accept(poll_set[i].fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				// new_fd = accept(socket_fd, NULL, NULL);
 				if (new_fd < 0) {
 					if (errno != EWOULDBLOCK) {
-						std::cout << "Accept balls" << std::endl;
+						perror("accept failed");
 						// close_conn = 1;
 					}
 					break;
 				}
 				close_conn = 0;
 				std::cout << "accepted fd: " << new_fd << std::endl;
-				poll_set[numfds].fd = new_fd;
+				poll_set[i].fd = new_fd;
+				poll_set[numfds].fd = socket_fd;
 				poll_set[numfds].events = POLLIN | POLLOUT;
 				
 				std::cout << "Trying to read from fd " << new_fd << std::endl;
 				// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-				ssize_t valread = recv(new_fd, &buffer, 1024, 0);
+				ssize_t valread = recv(poll_set[i].fd, &buffer, 1024, 0);
 				if (valread < 0) {
 					std::cout << "No bytes to read" << std::endl;
 					close_conn = 1;
@@ -114,16 +122,8 @@ void	serverBoy::runServer(int backlog) {
 
 				numfds++;
 				std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
-				// socklen_t addrlen;
-				// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				if (new_fd < 0) {
-					if (errno != EWOULDBLOCK) {
-						std::cout << "write balls" << std::endl;
-					}
-					// std::cout << "Should re-route to poll again" << std::endl;
-					break;
-				}
 				
+				// Respond to client
 				ret = first_response(poll_set[i].fd);
 				if (ret < 0) {
 					perror ("   send() failed");
@@ -131,7 +131,6 @@ void	serverBoy::runServer(int backlog) {
 					break;
 				}
 			}
-			// if (poll_set[i].revents & POLLOUT) {} Moved the contents of this up above
 			else if (poll_set[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
@@ -140,6 +139,7 @@ void	serverBoy::runServer(int backlog) {
 			std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
 			close(poll_set[i].fd);
 			poll_set[i].fd = -1;
+			// numfds--;
 		}
 	}
 }
@@ -166,7 +166,7 @@ int		serverBoy::first_response(int sock_fd) {
 
 	// write(sock_fd, hey, strlen(hey));
 	int ret = send(sock_fd, hey, strlen(hey), 0);
-	close(sock_fd);
+	// close(sock_fd);
 	// std::cout << "What" << std::endl;
 	delete[] hey;
 	return ret;
