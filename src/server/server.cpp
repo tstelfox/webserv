@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 12:54:29 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 13:37:21 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	serverBoy::runServer(int backlog) {
 		for (i = 0; i < current_size; i++) {
 			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poll_set[i].revents == 0) {
-				// std::cout << "Nothing to report" << std::endl;
+				std::cout << "Nothing to report on " << i << std::endl;
 				continue;
 			}
 			// if (poll_set[i].revents & POLLHUP) {
@@ -80,27 +80,47 @@ void	serverBoy::runServer(int backlog) {
 				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
 				break;
 			}
+			// if (poll_set[i].fd == socket_fd) {
+			// 	do {
+			// 		socklen_t addrlen;
+			// 		new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+			// 		if (new_fd < 0) {
+			// 			if (errno != EWOULDBLOCK) {
+			// 				perror("accept failed");
+			// 				// close_conn = 1;
+			// 			}
+			// 			break;
+			// 		}
+			// 		poll_set[i].fd = new_fd;
+			// 		poll_set[numfds].fd = new_fd;
+			// 		poll_set[numfds].events = POLLIN | POLLOUT;
+			// 		numfds++;
+			// 	} while (new_fd != -1);
+			// }
 			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
 				std::cout << "Listening socket is readable" << std::endl;
 				socklen_t addrlen;
-				new_fd = accept(poll_set[i].fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				// new_fd = accept(socket_fd, NULL, NULL);
+				if (i == 0)
+					new_fd = accept(poll_set[i].fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				if (new_fd < 0) {
 					if (errno != EWOULDBLOCK) {
 						perror("accept failed");
 						// close_conn = 1;
 					}
+					// perror("Here? ");
 					break;
 				}
 				close_conn = 0;
 				std::cout << "accepted fd: " << new_fd << std::endl;
-				poll_set[i].fd = new_fd;
-				poll_set[numfds].fd = socket_fd;
+				std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
+				// poll_set[i].fd = new_fd;
+				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN | POLLOUT;
+				numfds++;
 				
 				std::cout << "Trying to read from fd " << new_fd << std::endl;
 				// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
-				ssize_t valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+				ssize_t valread = recv(new_fd, &buffer, 1024, 0);
 				if (valread < 0) {
 					std::cout << "No bytes to read" << std::endl;
 					close_conn = 1;
@@ -120,11 +140,10 @@ void	serverBoy::runServer(int backlog) {
 				// Reset
 				memset(buffer, 0, sizeof(buffer));
 
-				numfds++;
 				std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
 				
 				// Respond to client
-				ret = first_response(poll_set[i].fd);
+				ret = first_response(new_fd);
 				if (ret < 0) {
 					perror ("   send() failed");
 					close_conn = 1;
@@ -137,7 +156,7 @@ void	serverBoy::runServer(int backlog) {
 		} // End of i loop
 		if (close_conn) {
 			std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
-			close(poll_set[i].fd);
+			close(new_fd);
 			poll_set[i].fd = -1;
 			// numfds--;
 		}
