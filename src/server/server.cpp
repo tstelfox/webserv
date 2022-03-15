@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 14:11:49 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/15 15:13:15 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	serverBoy::runServer(int backlog) {
 		// std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
 			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
-			if (poll_set[i].fd == -1) {
+			if (poll_set[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
 				std::cout << "This was closed" << std::endl;
 				continue;
 			}
@@ -108,21 +108,9 @@ void	serverBoy::runServer(int backlog) {
 			}
 			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
 				std::cout << "Listening socket is readable" << std::endl;
-				// socklen_t addrlen;
-				// if (i == 0)
-				// 	new_fd = accept(poll_set[i].fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				// if (new_fd < 0) {
-				// 	if (errno != EWOULDBLOCK) {
-				// 		perror("accept failed");
-				// 		// close_conn = 1;
-				// 	}
-				// 	// perror("Here? ");
-				// 	break;
-				// }
 				close_conn = 0;
 				std::cout << "accepted fd: " << new_fd << std::endl;
 				std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
-				// poll_set[i].fd = new_fd;
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN | POLLOUT;
 				numfds++;
@@ -162,13 +150,13 @@ void	serverBoy::runServer(int backlog) {
 			else if (poll_set[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
-		} // End of i loop
-		if (close_conn) {
-			std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
-			close(new_fd);
-			poll_set[i].fd = -1;
-			// numfds--;
-		}
+			if (close_conn) {
+				std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
+				close(new_fd);
+				poll_set[i].fd = -1;
+				// numfds--;
+			}
+		} // End of loop through pollable connections
 	}
 }
 
