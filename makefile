@@ -6,13 +6,15 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/03/16 16:51:03 by tmullan       ########   odam.nl          #
+#    Updated: 2022/03/16 20:44:24 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = c++
-SRC = server_main.cpp sockets/*.cpp server/*.cpp
+SRC = server_main.cpp sockets/socket.cpp $(SERVER_PREFIX)
+SERVER_PREFIX = $(addprefix server/, $(SERV))
+SERV = clientConnecter.cpp server.cpp
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
