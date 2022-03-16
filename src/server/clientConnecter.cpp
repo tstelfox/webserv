@@ -22,3 +22,5 @@ void	 clientConnecter::setPollFd(int fd, short events) {
 	newPollFd.events = events;
 	_connections.push_back(newPollFd);
 }
+
+std::vector<struct pollfd>&	clientConnecter::getConnections() { return _connections; }

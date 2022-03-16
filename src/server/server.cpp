@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 21:03:33 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 21:33:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,11 @@ serverBoy::~serverBoy() {}
 				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer(int backlog) {
 	
-
-	struct pollfd poll_set[42]; // 42 is arbitrary - Just use a vector.push_back() fam of pointers to class
+	clientConnecter		poller;
+	// struct pollfd poll_set[42]; // 42 is arbitrary - Just use a vector.push_back() fam of pointers to class
 	int numfds = 1;
 	int socket_fd = _socket->getSock();
-	memset(poll_set, 0, sizeof(poll_set));
+	// memset(poll_set, 0, sizeof(poll_set));
 	int new_fd = -1;
 	int i;
 
@@ -41,8 +41,10 @@ void	serverBoy::runServer(int backlog) {
 
 	_socket->listenServer(backlog);
 
-	poll_set[0].fd = socket_fd;
-	poll_set[0].events = POLLIN | POLLOUT;
+	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
+
+	// poll_set[0].fd = socket_fd;
+	// poll_set[0].events = POLLIN | POLLOUT;
 	int timeout = (60 * 1000);
 
 	char buffer[1024] = {0};
@@ -50,7 +52,7 @@ void	serverBoy::runServer(int backlog) {
 
 	while (true) {
 		std::cout << "Waiting on poll()..." << std::endl;
-		ret = poll(poll_set, numfds, timeout);
+		ret = poll(&poller.getConnections()[0], numfds, timeout); // Could use std::vector::data() but that's c++11
 		if (ret < 0) {
 			perror("poll");
 			break;
@@ -59,31 +61,32 @@ void	serverBoy::runServer(int backlog) {
 			std::cout << "Poll timed out. End" << std::endl;
 			break;
 		}
-		int current_size = numfds;
+		int current_size = poller.getConnections().size();
 		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
 		// std::cout << "number of fds: " << numfds << std::endl;
+		std::cout << "Size of the connections: " << poller.getConnections().size() << std::endl;
 		for (i = 0; i < current_size; i++) {
 			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
-			if (poll_set[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
+			if (poller.getConnections()[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
 				// std::cout << "This was closed" << std::endl;
 				continue;
 			}
-			if (poll_set[i].revents == 0) {
+			if (poller.getConnections()[i].revents == 0) {
 				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
 			}
-			if (poll_set[i].revents & (POLLHUP|POLLNVAL)) {
-				close(poll_set[i].fd);
-				poll_set[i].fd = -1;
+			if (poller.getConnections()[i].revents & (POLLHUP|POLLNVAL)) {
+				close(poller.getConnections()[i].fd);
+				poller.getConnections()[i].fd = -1;
 				// std::cout << "Connection was hung up or invalid requested events" << std::endl;
 				continue;
 			}
-			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
+			if (poller.getConnections()[i].revents != POLLIN && poller.getConnections()[i].revents != POLLOUT) {
 				// perror("revents is te");
-				std::cout << "Error: revents=" << std::hex << poll_set[i].revents << std::endl;
+				std::cout << "Error: revents=" << std::hex << poller.getConnections()[i].revents << std::endl;
 				break;
 			}
-			if (poll_set[i].fd == socket_fd) {
+			if (poller.getConnections()[i].fd == socket_fd) {
 				socklen_t	addrlen;
 				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 				if (new_fd < 0) {
@@ -94,19 +97,23 @@ void	serverBoy::runServer(int backlog) {
 					// perror("Here? ");
 					break;
 				}
+				poller.setPollFd(new_fd, (POLLIN|POLLOUT));
 			}
 			// else {
-			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
+			if (poller.getConnections()[i].revents & (POLLIN|POLLOUT)) {
 				std::cout << "Listening socket is readable" << std::endl;
 				close_conn = 0;
 				// std::cout << "accepted fd: " << new_fd << std::endl;
 				// std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
-				poll_set[numfds].fd = new_fd;
-				poll_set[numfds].events = POLLIN | POLLOUT;
-				numfds++;
+				// poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+				// poll_set[numfds].fd = new_fd;
+				// poll_set[numfds].events = POLLIN | POLLOUT;
+				
+				/* REALLY CAN USE THE VECTOR'S SIZE() FUNCTION */
+				// numfds++; // Should
 				
 				std::cout << "Trying to read from fd " << new_fd << std::endl;
-				// int valread = recv(poll_set[i].fd, &buffer, 1024, 0);
+				// int valread = recv(poller.getConnections()[i].fd, &buffer, 1024, 0);
 				ssize_t valread = recv(new_fd, &buffer, 1024, 0);
 				if (valread < 0) {
 					std::cout << "No bytes to read" << std::endl;
@@ -127,7 +134,7 @@ void	serverBoy::runServer(int backlog) {
 				// Reset
 				memset(buffer, 0, sizeof(buffer));
 
-				std::cout << "You can write to the client on fd: " << poll_set[i].fd << std::endl;
+				std::cout << "You can write to the client on fd: " << poller.getConnections()[i].fd << std::endl;
 				
 				// Respond to client
 				ret = first_response(new_fd);
@@ -137,13 +144,14 @@ void	serverBoy::runServer(int backlog) {
 					break;
 				}
 			}
-			else if (poll_set[i].revents & POLLERR) {
+			else if (poller.getConnections()[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
 			if (close_conn) {
-				std::cout << "Closing connection: " << poll_set[i].fd << std::endl;
+				std::cout << "Closing connection: " << poller.getConnections()[i].fd << std::endl;
 				close(new_fd);
-				poll_set[i].fd = -1;
+				std::vector<struct pollfd>::iterator to_close = poller.getConnections().begin();
+				poller.getConnections().erase(to_close + i);
 				// numfds--;
 			}
 			// } // End of current connection

@@ -20,6 +20,7 @@ class clientConnecter
 		~clientConnecter();
 
 		void	setPollFd(int fd, short events);
+		std::vector<struct pollfd>& getConnections();
 	private:
 		std::vector<struct pollfd> _connections;
 
