@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 17:30:37 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 21:03:33 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ serverBoy::~serverBoy() {}
 				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer(int backlog) {
 	
-	/* The following is an attempt at using poll() */
 
 	struct pollfd poll_set[42]; // 42 is arbitrary - Just use a vector.push_back() fam of pointers to class
 	int numfds = 1;
@@ -64,19 +63,19 @@ void	serverBoy::runServer(int backlog) {
 		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
 		// std::cout << "number of fds: " << numfds << std::endl;
 		for (i = 0; i < current_size; i++) {
-			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
+			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poll_set[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
-				std::cout << "This was closed" << std::endl;
+				// std::cout << "This was closed" << std::endl;
 				continue;
 			}
 			if (poll_set[i].revents == 0) {
-				std::cout << "Nothing to report on " << i << std::endl;
+				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
 			}
 			if (poll_set[i].revents & (POLLHUP|POLLNVAL)) {
 				close(poll_set[i].fd);
 				poll_set[i].fd = -1;
-				std::cout << "Connection was hung up or invalid requested events" << std::endl;
+				// std::cout << "Connection was hung up or invalid requested events" << std::endl;
 				continue;
 			}
 			if (poll_set[i].revents != POLLIN && poll_set[i].revents != POLLOUT) {
@@ -100,8 +99,8 @@ void	serverBoy::runServer(int backlog) {
 			if (poll_set[i].revents & (POLLIN|POLLOUT)) {
 				std::cout << "Listening socket is readable" << std::endl;
 				close_conn = 0;
-				std::cout << "accepted fd: " << new_fd << std::endl;
-				std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
+				// std::cout << "accepted fd: " << new_fd << std::endl;
+				// std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
 				poll_set[numfds].fd = new_fd;
 				poll_set[numfds].events = POLLIN | POLLOUT;
 				numfds++;
