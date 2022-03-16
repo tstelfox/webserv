@@ -6,12 +6,12 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/02/11 21:00:23 by tmullan       ########   odam.nl          #
+#    Updated: 2022/03/16 16:51:03 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
-CXX = clang++
+CXX = c++
 SRC = server_main.cpp sockets/*.cpp server/*.cpp
 OBJ_DIR = obj
 SRC_DIR = src
