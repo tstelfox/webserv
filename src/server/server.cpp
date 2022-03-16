@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 21:33:46 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 21:39:15 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	serverBoy::runServer(int backlog) {
 			break;
 		}
 		int current_size = poller.getConnections().size();
-		sleep(3); // Currently without this we not going anywhere but surely there must be a way without
+		sleep(2); // Currently without this we not going anywhere but surely there must be a way without
 		// std::cout << "number of fds: " << numfds << std::endl;
 		std::cout << "Size of the connections: " << poller.getConnections().size() << std::endl;
 		for (i = 0; i < current_size; i++) {
@@ -134,7 +134,7 @@ void	serverBoy::runServer(int backlog) {
 				// Reset
 				memset(buffer, 0, sizeof(buffer));
 
-				std::cout << "You can write to the client on fd: " << poller.getConnections()[i].fd << std::endl;
+				std::cout << "You can write to the client on fd: " << new_fd << std::endl;
 				
 				// Respond to client
 				ret = first_response(new_fd);
@@ -149,9 +149,9 @@ void	serverBoy::runServer(int backlog) {
 			}
 			if (close_conn) {
 				std::cout << "Closing connection: " << poller.getConnections()[i].fd << std::endl;
-				close(new_fd);
-				std::vector<struct pollfd>::iterator to_close = poller.getConnections().begin();
-				poller.getConnections().erase(to_close + i);
+				close(poller.getConnections()[i].fd);
+				// std::vector<struct pollfd>::iterator to_close = poller.getConnections().begin();
+				poller.getConnections().erase(poller.getConnections().begin() + i);
 				// numfds--;
 			}
 			// } // End of current connection
