@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 19:01:03 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 17:24:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 19:16:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,4 +26,4 @@
 
 #include "socket.hpp"
 #include "server.hpp"
-#include "clientConnection.hpp"
+#include "clientConnecter.hpp"

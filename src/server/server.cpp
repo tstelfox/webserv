@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 17:24:58 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 17:30:37 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,7 @@ void	serverBoy::runServer(int backlog) {
 
 	char buffer[1024] = {0};
 	int close_conn = 0;
-	
-	// socklen_t	addrlen;
-	// new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-	// if (new_fd < 0) {
-	// 	if (errno != EWOULDBLOCK) {
-	// 		perror("accept failed");
-	// 		// close_conn = 1;
-	// 	}
-	// 	// perror("Here? ");
-	// 	return;
-	// }
+
 	while (true) {
 		std::cout << "Waiting on poll()..." << std::endl;
 		ret = poll(poll_set, numfds, timeout);

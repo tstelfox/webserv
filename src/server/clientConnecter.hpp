@@ -1,30 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   clientConnection.hpp                               :+:    :+:            */
+/*   clientConnecter.hpp                               :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/16 17:24:04 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 17:24:17 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 19:04:58 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+#include "webserv.hpp"
 
-class clientConnection
+class clientConnecter
 {
-private:
-	/* data */
-public:
-	clientConnection(/* args */);
-	~clientConnection();
+	public:
+		clientConnecter();
+		~clientConnecter();
+
+		void	setPollFd(int fd, short events);
+	private:
+		std::vector<struct pollfd> _connections;
+
+		// Also keep the buffers and catalogue them with their fds in a map, probably
+
 };
 
-clientConnection::clientConnection(/* args */)
-{
-}
-
-clientConnection::~clientConnection()
-{
-}
