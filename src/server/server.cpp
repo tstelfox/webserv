@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 21:39:15 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 21:42:16 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,17 +67,17 @@ void	serverBoy::runServer(int backlog) {
 		std::cout << "Size of the connections: " << poller.getConnections().size() << std::endl;
 		for (i = 0; i < current_size; i++) {
 			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
-			if (poller.getConnections()[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
-				// std::cout << "This was closed" << std::endl;
-				continue;
-			}
+			// if (poller.getConnections()[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
+			// 	// std::cout << "This was closed" << std::endl;
+			// 	continue;
+			// }
 			if (poller.getConnections()[i].revents == 0) {
 				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
 			}
 			if (poller.getConnections()[i].revents & (POLLHUP|POLLNVAL)) {
 				close(poller.getConnections()[i].fd);
-				poller.getConnections()[i].fd = -1;
+				poller.getConnections().erase(poller.getConnections().begin() + i);
 				// std::cout << "Connection was hung up or invalid requested events" << std::endl;
 				continue;
 			}
