@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 19:01:03 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/15 12:46:44 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/16 17:24:47 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <sys/fcntl.h>
+#include <vector>
 
 #include "socket.hpp"
 #include "server.hpp"
+#include "clientConnection.hpp"
