@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/17 15:44:33 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/17 15:47:49 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void	serverBoy::runServer(int backlog) {
 				// std::cout << "Trying to read from fd " << new_fd << std::endl;
 				// int valread = recv(poller.getConnections()[i].fd, &buffer, 1024, 0);
 				while (true) {
-					ssize_t valread = recv(new_fd, &buffer, 1024, 0);
+					ssize_t valread = recv(new_fd, &buffer, 200, 0);
 					if (valread < 0) {
 						std::cout << "No bytes to read" << std::endl;
 						// close_conn = 1;
