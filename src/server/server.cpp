@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 21:42:16 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/17 15:44:33 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,10 @@ void	serverBoy::runServer(int backlog) {
 
 	char buffer[1024] = {0};
 	int close_conn = 0;
+	int current_size;
 
 	while (true) {
-		std::cout << "Waiting on poll()..." << std::endl;
+		std::cout << "<<------Waiting on poll()...------>>" << std::endl;
 		ret = poll(&poller.getConnections()[0], numfds, timeout); // Could use std::vector::data() but that's c++11
 		if (ret < 0) {
 			perror("poll");
@@ -61,10 +62,10 @@ void	serverBoy::runServer(int backlog) {
 			std::cout << "Poll timed out. End" << std::endl;
 			break;
 		}
-		int current_size = poller.getConnections().size();
-		sleep(2); // Currently without this we not going anywhere but surely there must be a way without
+		current_size = poller.getConnections().size();
+		sleep(1); // Currently without this we not going anywhere but surely there must be a way without
 		// std::cout << "number of fds: " << numfds << std::endl;
-		std::cout << "Size of the connections: " << poller.getConnections().size() << std::endl;
+		std::cout << "Size of the connections: " << current_size << std::endl;
 		for (i = 0; i < current_size; i++) {
 			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			// if (poller.getConnections()[i].fd == -1) { // Surely there is a better way to actually loop through this shit and discard connections
@@ -76,9 +77,9 @@ void	serverBoy::runServer(int backlog) {
 				continue;
 			}
 			if (poller.getConnections()[i].revents & (POLLHUP|POLLNVAL)) {
+				std::cout << "Connection was hung up or invalid requested events" << std::endl;
 				close(poller.getConnections()[i].fd);
 				poller.getConnections().erase(poller.getConnections().begin() + i);
-				// std::cout << "Connection was hung up or invalid requested events" << std::endl;
 				continue;
 			}
 			if (poller.getConnections()[i].revents != POLLIN && poller.getConnections()[i].revents != POLLOUT) {
@@ -101,7 +102,7 @@ void	serverBoy::runServer(int backlog) {
 			}
 			// else {
 			if (poller.getConnections()[i].revents & (POLLIN|POLLOUT)) {
-				std::cout << "Listening socket is readable" << std::endl;
+				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
 				close_conn = 0;
 				// std::cout << "accepted fd: " << new_fd << std::endl;
 				// std::cout << "Current iteration: " << i << " and numfds (next struct being set): " << numfds << std::endl;
@@ -112,36 +113,38 @@ void	serverBoy::runServer(int backlog) {
 				/* REALLY CAN USE THE VECTOR'S SIZE() FUNCTION */
 				// numfds++; // Should
 				
-				std::cout << "Trying to read from fd " << new_fd << std::endl;
+				// std::cout << "Trying to read from fd " << new_fd << std::endl;
 				// int valread = recv(poller.getConnections()[i].fd, &buffer, 1024, 0);
-				ssize_t valread = recv(new_fd, &buffer, 1024, 0);
-				if (valread < 0) {
-					std::cout << "No bytes to read" << std::endl;
-					close_conn = 1;
-					break;
-				}
-				if (valread == 0) {
-					std::cout << "Connection closed" << std::endl;
-					close_conn = 1;
-					break;
-				}
-				std::cout << buffer << std::endl;
-				/* At this point should parse the request 
-					from the browser and then
-				send appropriate response back */
-				
+				while (true) {
+					ssize_t valread = recv(new_fd, &buffer, 1024, 0);
+					if (valread < 0) {
+						std::cout << "No bytes to read" << std::endl;
+						// close_conn = 1;
+						break;
+					}
+					if (valread == 0) {
+						std::cout << "Connection closed" << std::endl;
+						close_conn = 1;
+						break;
+					}
+					std::cout << buffer << std::endl;
+					/* At this point should parse the request 
+						from the browser and then
+					send appropriate response back */
+					
 
-				// Reset
-				memset(buffer, 0, sizeof(buffer));
+					// Reset
+					memset(buffer, 0, sizeof(buffer));
 
-				std::cout << "You can write to the client on fd: " << new_fd << std::endl;
-				
-				// Respond to client
-				ret = first_response(new_fd);
-				if (ret < 0) {
-					perror ("   send() failed");
-					close_conn = 1;
-					break;
+					// std::cout << "You can write to the client on fd: " << new_fd << std::endl;
+					
+					// Respond to client
+					ret = first_response(new_fd);
+					if (ret < 0) {
+						perror ("   send() failed");
+						close_conn = 1;
+						break;
+					}
 				}
 			}
 			else if (poller.getConnections()[i].revents & POLLERR) {
