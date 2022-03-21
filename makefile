@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/03/16 20:44:24 by tmullan       ########   odam.nl          #
+#    Updated: 2022/03/21 16:01:27 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,8 +19,12 @@ OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
+# SEG = $(FLAGS) + -fsanitize=address -g
 INCLUDES = -Isrc/sockets -Isrc -Isrc/server
 
+ifdef DEBUG
+  FLAGS += -g -fsanitize=address
+endif
 
 
 all: $(NAME)
