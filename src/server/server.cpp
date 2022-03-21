@@ -6,13 +6,19 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/21 16:45:14 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 16:58:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 // #include "server.hpp"
 #include "server.hpp"
 #include "clientConnecter.hpp"
+
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <unistd.h>
 
 
 serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {}

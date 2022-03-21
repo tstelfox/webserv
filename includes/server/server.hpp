@@ -6,12 +6,14 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 17:24:35 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 16:57:43 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-#include "webserv.hpp"
+// #include "webserv.hpp"
+#include "socket.hpp"
+#include <string>
 
 class serverBoy {
 
