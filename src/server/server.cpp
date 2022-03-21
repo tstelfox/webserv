@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/21 14:33:06 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 15:37:28 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,21 +89,21 @@ void	serverBoy::runServer(int backlog) {
 				poller.getConnections().erase(poller.getConnections().begin() + i);
 				break;
 			}
-			if (poller.getConnections()[i].fd == socket_fd) {
-				socklen_t	addrlen;
-				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				if (new_fd < 0) {
-					if (errno != EWOULDBLOCK) {
-						perror("accept failed");
-						// close_conn = 1;
-					}
-					// perror("Here? ");
-					break;
-				}
-				poller.setPollFd(new_fd, (POLLIN|POLLOUT));
-			}
 			// else {
 			if (poller.getConnections()[i].revents & (POLLIN|POLLOUT)) {
+				if (poller.getConnections()[i].fd == socket_fd) {
+					socklen_t	addrlen;
+					new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+					if (new_fd < 0) {
+						if (errno != EWOULDBLOCK) {
+							perror("accept failed");
+							// close_conn = 1;
+						}
+						// perror("Here? ");
+						break;
+					}
+					poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+				}
 				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
 				close_conn = 0;
 				// std::cout << "accepted fd: " << new_fd << std::endl;
@@ -121,6 +121,10 @@ void	serverBoy::runServer(int backlog) {
 					ssize_t valread = recv(new_fd, &buffer, 200, 0);
 					if (valread < 0) {
 						std::cout << "No bytes to read" << std::endl;
+						if (EAGAIN) {
+							perror("Recv failed: ");
+							// break;
+						}
 						// close_conn = 1;
 						break;
 					}
