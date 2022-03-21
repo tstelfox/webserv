@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/21 16:15:49 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 16:18:48 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,7 @@
 #include "webserv.hpp"
 
 
-serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {
-	// _socket = &sock;
-}
+serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {}
 
 serverBoy::~serverBoy() {}
 
@@ -29,10 +27,7 @@ serverBoy::~serverBoy() {}
 void	serverBoy::runServer(int backlog) {
 	
 	clientConnecter		poller;
-	// struct pollfd poll_set[42]; // 42 is arbitrary - Just use a vector.push_back() fam of pointers to class
-	// int numfds = 1;
 	int socket_fd = _socket->getSock();
-	// memset(poll_set, 0, sizeof(poll_set));
 	int new_fd = -1;
 	int i;
 
@@ -43,9 +38,6 @@ void	serverBoy::runServer(int backlog) {
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
 
-	// poll_set[0].fd = socket_fd;
-	// poll_set[0].events = POLLIN | POLLOUT;
-	// int timeout = (60 * 1000); // Add this back in later
 
 	char buffer[1024] = {0};
 	int close_conn = 0;
