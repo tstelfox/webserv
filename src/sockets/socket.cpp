@@ -6,12 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/03 18:46:23 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 16:45:42 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "socket.hpp"
-#include "webserv.hpp"
+#include "socket.hpp"
+// #include "webserv.hpp"
 
 socketMan::socketMan(int domain, int service, int protocol, int port,
 		u_long interface) {

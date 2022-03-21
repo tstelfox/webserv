@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #pragma once
-#include "webserv.hpp"
+#include <vector>
+#include "sys/poll.h"
 
 class clientConnecter
 {

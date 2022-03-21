@@ -6,15 +6,17 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/01 16:46:28 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/21 16:46:34 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-// #include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/fcntl.h>
+#include <iostream>
 // #include "webserv.hpp"
+
 
 
 class socketMan
