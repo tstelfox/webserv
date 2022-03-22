@@ -25,7 +25,10 @@ class clientConnecter
 	private:
 		std::vector<struct pollfd> _connections;
 
-		// Also keep the buffers and catalogue them with their fds in a map, probably
+		/* Also keep the buffers and catalogue them with their fds in a map, probably
+			in order to be able to write to the correct buffer each time 
+			-------
+			Server class perhaps ought to have a clientConnecter as a member */
 
 };
 
