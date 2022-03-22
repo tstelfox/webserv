@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:11:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:24:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	serverBoy::runServer(int backlog) {
 		current_size = poller.getConnections().size();
 		std::cout << "Size of the connections: " << current_size << std::endl;
 		for (i = 0; i < current_size; i++) {
-			std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
+			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poller.getConnections()[i].revents == 0) {
 				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
@@ -114,7 +114,7 @@ void	serverBoy::runServer(int backlog) {
 					if (valread < 0) {
 						// std::cout << "No bytes to read" << std::endl;
 						if (EAGAIN) {
-							perror("Recv failed: ");
+							// perror("Recv failed: ");
 							// break;
 						}
 						// close_conn = 1;
@@ -138,7 +138,7 @@ void	serverBoy::runServer(int backlog) {
 					}
 				}
 			}
-			else if (poller.getConnections()[i].revents & POLLERR) {
+			if (poller.getConnections()[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
 			// if (close_conn) {
@@ -149,7 +149,6 @@ void	serverBoy::runServer(int backlog) {
 			// }
 			// } // End of current connection
 		} // End of loop through pollable connections
-		std::cout << "Just coming out here?" << std::endl;
 	}
 	std::cout << "Somehow making it out here outside the true loop?" << std::endl;
 }
