@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/21 16:57:43 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:00:11 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,6 @@ class serverBoy {
 	private:
 		serverBoy();
 		serverSock	*_socket;
-		int			ready_socket;
+		int			ready_socket; // What is the actual point of this though? I use it nowhere lol
 };
 
