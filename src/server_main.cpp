@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:53:43 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/22 18:11:34 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ int		main() {
 	serverBoy	serf(hello);
 
 	serf.runServer(3);
-	// std::cout << "Exiting via here?" << std::endl;
+	std::cout << "Exiting via here?" << std::endl;
 	return 0;
 }

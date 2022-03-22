@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:34:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/22 18:24:07 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,8 @@ void	serverBoy::runServer(int backlog) {
 				close_conn = 0;
 				
 				
-				// std::cout << "Trying to read from fd " << new_fd << std::endl;
 				while (true) {
-					ssize_t valread = recv(new_fd, buffer, 200, 0);
+					ssize_t valread = recv(new_fd, buffer, 1024, 0);
 					// std::cout << "Recv returned: " << valread << std::endl;
 					if (valread == 0) {
 						std::cout << "Connection closed" << std::endl;
@@ -162,6 +161,10 @@ int		serverBoy::first_response(int sock_fd) {
 		myfile.open("pages/other.html");
 	else
 		myfile.open("pages/index.html");
+	// if (!myfile) {
+	// 	std::cout << "ao" << std::endl;
+	// }
+
 	file_content << myfile.rdbuf();
 	std::string content = file_content.str();
 
@@ -174,12 +177,12 @@ int		serverBoy::first_response(int sock_fd) {
 	std::strcpy(hey, header.c_str());
 
 	int ret = send(sock_fd, hey, strlen(hey), 0);
-	// std::cout << "What" << std::endl;
+	std::cout << "SURELY" << std::endl;
 	delete[] hey;
 	return ret;
 }
 
-std::string	serverBoy::read_browser_request(char *buffer) {
+std::string	serverBoy::readBrowserRequest(char *buffer) {
 	
 	std::string	buff(buffer, buffer + 1024);
 	std::cout << buff << std::endl;
