@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 15:24:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/22 15:34:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,8 @@ void	serverBoy::runServer(int backlog) {
 					// std::cout << "Recv returned: " << valread << std::endl;
 					if (valread == 0) {
 						std::cout << "Connection closed" << std::endl;
-						close_conn = 1;
-						break;
+						// close_conn = 1;
+						break; // Had this as break but maybe let's see if this way we can wait on favicon
 					}
 					if (valread < 0) {
 						// std::cout << "No bytes to read" << std::endl;
