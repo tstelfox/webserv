@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 18:24:07 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 12:17:15 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,6 @@ void	serverBoy::runServer(int backlog) {
 						from the browser and then
 					send appropriate response back */
 					
-
 					// Reset
 					memset(buffer, 0, sizeof(buffer));
 					
@@ -177,7 +176,7 @@ int		serverBoy::first_response(int sock_fd) {
 	std::strcpy(hey, header.c_str());
 
 	int ret = send(sock_fd, hey, strlen(hey), 0);
-	std::cout << "SURELY" << std::endl;
+	// std::cout << "SURELY" << std::endl;
 	delete[] hey;
 	return ret;
 }
