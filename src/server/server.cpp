@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 12:17:15 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 13:06:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	serverBoy::runServer(int backlog) {
 		// std::cout << "What is poll returning yo: " << ret << std::endl;
 		if (ret < 0) {
 			perror("poll");
+			std::cout << "Ma qui mai scrive?" << std::endl;
 			break;
 		}
 		if (ret == 0) {
@@ -78,12 +79,13 @@ void	serverBoy::runServer(int backlog) {
 				poller.getConnections().erase(poller.getConnections().begin() + i);
 				break;
 			}
-			if (poller.getConnections()[i].revents != POLLIN && poller.getConnections()[i].revents != POLLOUT) {
-				std::cout << "Error: revents=" << std::hex << poller.getConnections()[i].revents << std::endl;
-				// close(poller.getConnections()[i].fd);
-				// poller.getConnections().erase(poller.getConnections().begin() + i);
-				break;
-			}
+			// if (poller.getConnections()[i].revents != POLLIN && poller.getConnections()[i].revents != POLLOUT) {
+			// 	std::cout << "Error: revents=" << std::hex << poller.getConnections()[i].revents << std::endl;
+			// 	// perror("Dunno: ");
+			// 	// close(poller.getConnections()[i].fd);
+			// 	// poller.getConnections().erase(poller.getConnections().begin() + i);
+			// 	break;
+			// }
 			// else {
 			if (poller.getConnections()[i].fd == socket_fd) {
 				socklen_t	addrlen;
@@ -103,37 +105,46 @@ void	serverBoy::runServer(int backlog) {
 				
 				
 				while (true) {
-					ssize_t valread = recv(new_fd, buffer, 1024, 0);
+					ssize_t valread;
+					
+					valread = recv(new_fd, buffer, 1024, 0);						
 					// std::cout << "Recv returned: " << valread << std::endl;
 					if (valread == 0) {
 						std::cout << "Connection closed" << std::endl;
-						// close_conn = 1;
+						// if (i != 0) {
+						// 	std::cout << "Deleting connection" << std::endl;
+						// 	close(poller.getConnections()[i].fd);
+						// 	poller.getConnections().erase(poller.getConnections().begin() + i);
+						// }
 						break; // Had this as break but maybe let's see if this way we can wait on favicon
 					}
 					if (valread < 0) {
 						// std::cout << "No bytes to read" << std::endl;
 						if (EAGAIN) {
-							// perror("Recv failed: ");
-							// break;
+							perror("Recv failed: ");
+							break;
 						}
 						// close_conn = 1;
-						continue;
+						break;
 					}
 					std::cout << buffer << std::endl;
+					memset(buffer, 0, sizeof(buffer));
+					// std::cout << buffer << std::endl;
 					/* At this point should parse the request 
 						from the browser and then
 					send appropriate response back */
 					
-					// Reset
-					memset(buffer, 0, sizeof(buffer));
 					
 					// Respond to client
-					ret = first_response(new_fd);
-					if (ret < 0) {
-						perror ("   send() failed");
-						close_conn = 1;
-						break;
-					}
+					// Reset
+				}
+			}
+			if (poller.getConnections()[i].revents & POLLOUT) {
+				ret = first_response(new_fd);
+				if (ret < 0) {
+					perror ("   send() failed");
+					// close_conn = 1;
+					break;
 				}
 			}
 			if (poller.getConnections()[i].revents & POLLERR) {
