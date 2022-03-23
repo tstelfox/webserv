@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:47:46 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 14:05:28 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,8 @@ serverSock::serverSock(int domain, int service, int protocol,
 					std::cout << "setsock fucked up" << std::endl;
 					exit(-1);
 				}
-				
-				
+
+
 				// ret = fcntl(getSock(), F_GETFL, 0);
 				ret = bindServer(sock, address);
 				testConnection(ret);

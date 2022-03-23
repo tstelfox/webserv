@@ -6,11 +6,10 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:40:30 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 14:51:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "server.hpp"
 #include "server.hpp"
 #include "clientConnecter.hpp"
 
@@ -19,6 +18,7 @@
 #include <fstream>
 #include <string>
 #include <unistd.h>
+#include <sys/socket.h>
 
 
 serverBoy::serverBoy(serverSock &sock) : _socket(&sock), ready_socket(-1) {}
@@ -41,7 +41,6 @@ void	serverBoy::runServer() {
 	int ret;
 	std::cout << "Socket fd is: " << socket_fd << std::endl;
 
-	// _socket->listenServer(backlog);
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
 
@@ -59,7 +58,6 @@ void	serverBoy::runServer() {
 		// std::cout << "What is poll returning yo: " << ret << std::endl;
 		if (ret < 0) {
 			perror("poll");
-			std::cout << "Ma qui mai scrive?" << std::endl;
 			break;
 		}
 		if (ret == 0) {
@@ -68,7 +66,6 @@ void	serverBoy::runServer() {
 		}
 		current_size = poller.getConnections().size();
 		for (i = 0; i < current_size; i++) {
-			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poller.getConnections()[i].revents == 0) {
 				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
@@ -94,12 +91,18 @@ void	serverBoy::runServer() {
 					if (errno != EWOULDBLOCK) {
 						perror("accept failed");
 					}
-					perror("Here? ");
+					// perror("Here? ");
+					break;
+				}
+				int on = 1;
+				int ret = setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on));
+				if (ret < 0) {
+					std::cout << "sockoptions got fucked" << std::endl;
 					break;
 				}
 				poller.setPollFd(new_fd, (POLLIN|POLLOUT));
 			}
-			if (poller.getConnections()[i].revents & (POLLIN|POLLOUT)) {
+			if (poller.getConnections()[i].revents & POLLIN) {
 				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
 				close_conn = 0;
 				
@@ -111,17 +114,18 @@ void	serverBoy::runServer() {
 					// std::cout << "Recv returned: " << valread << std::endl;
 					if (valread == 0) {
 						std::cout << "Connection closed" << std::endl;
-						// if (i != 0) {
-						// 	std::cout << "Deleting connection" << std::endl;
-						// 	close(poller.getConnections()[i].fd);
-						// 	poller.getConnections().erase(poller.getConnections().begin() + i);
-						// }
+						if (i != 0) {
+							std::cout << "Deleting connection" << std::endl;
+							close(poller.getConnections()[i].fd);
+							poller.getConnections().erase(poller.getConnections().begin() + i);
+						}
 						break; // Had this as break but maybe let's see if this way we can wait on favicon
 					}
 					if (valread < 0) {
 						// std::cout << "No bytes to read" << std::endl;
 						if (EAGAIN) {
 							// perror("Recv failed: ");
+							// std::cout << "After on: " << i << std::endl;
 							break;
 						}
 						// close_conn = 1;
@@ -141,8 +145,11 @@ void	serverBoy::runServer() {
 			}
 			if (poller.getConnections()[i].revents & POLLOUT) {
 				ret = first_response(new_fd);
+				// std::cout << "After on: " << i << std::endl;
 				if (ret < 0) {
 					perror ("   send() failed");
+					close(poller.getConnections()[i].fd);
+					poller.getConnections().erase(poller.getConnections().begin() + i);
 					// close_conn = 1;
 					break;
 				}
@@ -159,7 +166,6 @@ void	serverBoy::runServer() {
 			// } // End of current connection
 		} // End of loop through pollable connections
 	}
-	std::cout << "Somehow making it out here outside the true loop?" << std::endl;
 }
 
 serverSock*	serverBoy::getSocket() { return _socket; }
@@ -171,9 +177,9 @@ int		serverBoy::first_response(int sock_fd) {
 		myfile.open("pages/other.html");
 	else
 		myfile.open("pages/index.html");
-	// if (!myfile) {
-	// 	std::cout << "ao" << std::endl;
-	// }
+	if (!myfile) {
+		std::cout << "ao" << std::endl;
+	}
 
 	file_content << myfile.rdbuf();
 	std::string content = file_content.str();
@@ -187,6 +193,21 @@ int		serverBoy::first_response(int sock_fd) {
 	std::strcpy(hey, header.c_str());
 
 	int ret = send(sock_fd, hey, strlen(hey), 0);
+	// std::cout << "What the fuck" << std::endl;
+	// if (ret < 0) {
+	// 	perror ("   send() failed");
+	// 	// close_conn = 1;
+	// 	delete[] hey;
+	// 	return -1;
+	// }
+	// else {
+	// 	delete[] hey;
+	// 	return ret;
+	// }
+	// catch (SIGPIPE) {
+		
+	// }
+	// std::cout << "After on: " << std::endl;
 	// std::cout << "SURELY" << std::endl;
 	delete[] hey;
 	return ret;
