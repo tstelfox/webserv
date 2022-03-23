@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 14:51:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 19:57:48 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,11 @@ serverBoy::~serverBoy() {}
 					-something else?
 				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer() {
+
+
+	/* THE ISSUE SEEMS TO BE ABOUT HOW POLL() IS CALLED IN THE LOOP.
+		IT SHOULD BE CALLED ONCE BEFORE EVERY SINGLE RECV() AND SEND()
+		AND THIS MAY BE WHAT IS CAUSING THE FUCKED UP BEAHVIOUR */
 	
 	clientConnecter		poller;
 	int socket_fd = _socket->getSock();
