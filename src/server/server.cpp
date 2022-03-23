@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:06:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 13:40:30 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ serverBoy::~serverBoy() {}
 					-buffer of shit to read
 					-something else?
 				And then close it by deleting the item -----------*/ 
-void	serverBoy::runServer(int backlog) {
+void	serverBoy::runServer() {
 	
 	clientConnecter		poller;
 	int socket_fd = _socket->getSock();
@@ -41,7 +41,7 @@ void	serverBoy::runServer(int backlog) {
 	int ret;
 	std::cout << "Socket fd is: " << socket_fd << std::endl;
 
-	_socket->listenServer(backlog);
+	// _socket->listenServer(backlog);
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
 
@@ -54,6 +54,7 @@ void	serverBoy::runServer(int backlog) {
 		// if (poller.getConnections().empty())
 		// 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
 		std::cout << "<<------Waiting on poll()...------>>" << std::endl;
+		std::cout << "Amount of connections: " << poller.getConnections().size() << std::endl;
 		ret = poll(&poller.getConnections()[0], poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
 		// std::cout << "What is poll returning yo: " << ret << std::endl;
 		if (ret < 0) {
@@ -66,7 +67,6 @@ void	serverBoy::runServer(int backlog) {
 			break;
 		}
 		current_size = poller.getConnections().size();
-		std::cout << "Size of the connections: " << current_size << std::endl;
 		for (i = 0; i < current_size; i++) {
 			// std::cout << "current size: " << current_size << " and iteration no. " << i << std::endl;
 			if (poller.getConnections()[i].revents == 0) {
@@ -121,7 +121,7 @@ void	serverBoy::runServer(int backlog) {
 					if (valread < 0) {
 						// std::cout << "No bytes to read" << std::endl;
 						if (EAGAIN) {
-							perror("Recv failed: ");
+							// perror("Recv failed: ");
 							break;
 						}
 						// close_conn = 1;

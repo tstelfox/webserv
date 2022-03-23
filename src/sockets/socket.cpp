@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 19:19:15 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/21 16:55:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 13:47:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,29 +49,31 @@ serverSock::serverSock(int domain, int service, int protocol,
 				int ret;
 				int on = 1;
 				// Make socket reusable
-				ret = setsockopt(getSock(), SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
+				// (char *)&on
+				ret = setsockopt(getSock(), SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 				if (ret < 0) {
 					std::cout << "setsock fucked up" << std::endl;
 					exit(-1);
 				}
 				
-				//Set socket to be nonblocking
 				
 				// ret = fcntl(getSock(), F_GETFL, 0);
+				ret = bindServer(sock, address);
+				testConnection(ret);
+				listenServer(5);
 				/* The following is the fcntl version which must be used, as per subject */
+				//Set socket to be nonblocking
 				ret = fcntl(getSock(), F_SETFL, O_NONBLOCK);
 
 				if (ret < 0) {
 					std::cout << "ioctl failed" << std::endl;
 					exit(-1);
 				}
-				int connection = connectServer(sock, address);
-				testConnection(connection);
 }
 
 serverSock::~serverSock() {}
 
-int		serverSock::connectServer(int sock, struct sockaddr_in address) {
+int		serverSock::bindServer(int sock, struct sockaddr_in address) {
 	return bind(sock, (struct sockaddr *)&address, sizeof(address));
 }
 

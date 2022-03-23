@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/22 18:11:34 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/23 13:40:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int		main() {
 	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
 	serverBoy	serf(hello);
 
-	serf.runServer(3);
+	serf.runServer();
 	std::cout << "Exiting via here?" << std::endl;
 	return 0;
 }
