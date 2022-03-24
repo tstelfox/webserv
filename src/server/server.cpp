@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 19:57:48 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 14:41:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,20 @@ void	serverBoy::runServer() {
 	while (true) {
 		// if (poller.getConnections().empty())
 		// 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
-		std::cout << "<<------Waiting on poll()...------>>" << std::endl;
-		std::cout << "Amount of connections: " << poller.getConnections().size() << std::endl;
-		ret = poll(&poller.getConnections()[0], poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
-		// std::cout << "What is poll returning yo: " << ret << std::endl;
-		if (ret < 0) {
-			perror("poll");
-			break;
-		}
-		if (ret == 0) {
-			std::cout << "Poll timed out. End" << std::endl;
-			break;
-		}
 		current_size = poller.getConnections().size();
 		for (i = 0; i < current_size; i++) {
+			// std::cout << "<<------Waiting on poll()...------>>" << std::endl;
+			// std::cout << "Amount of connections: " << poller.getConnections().size() << std::endl;
+			ret = poll(&poller.getConnections()[0], poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
+			// std::cout << "What is poll returning yo: " << ret << std::endl;
+			if (ret < 0) {
+				perror("poll");
+				break;
+			}
+			if (ret == 0) {
+				std::cout << "Poll timed out. End" << std::endl;
+				break;
+			}
 			if (poller.getConnections()[i].revents == 0) {
 				// std::cout << "Nothing to report on " << i << std::endl;
 				continue;
