@@ -6,12 +6,13 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 14:06:51 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 17:56:57 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "socket.hpp"
+#include "clientConnecter.hpp"
 #include <string>
 
 class serverBoy {
@@ -25,10 +26,13 @@ class serverBoy {
 		serverSock		*getSocket();
 		std::string		readBrowserRequest(char *buffer);
 
-		int				first_response(int sock);
+		int				firstResponse(int sock); // This shit is temporary bollocks
+		int				connectionErr(short revents);
+		// int				newConnection(int fd_num); This is a work in progress
+		// void			closeConnection();
 	private:
 		serverBoy();
-		serverSock	*_socket;
-		int			ready_socket; // What is the actual point of this though? I use it nowhere lol
+		serverSock		*_socket;
+		clientConnecter	poller;
 };
 
