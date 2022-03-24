@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 18:21:12 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 18:35:25 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,19 +33,13 @@ serverBoy::~serverBoy() {}
 					-something else?
 				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer() {
-	
-	// clientConnecter		poller;
-	int socket_fd = _socket->getSock();
-	int new_fd = -1;
-	int i;
 
+	int socket_fd = _socket->getSock();
+	int i;
 	int ret;
-	std::cout << "Socket fd is: " << socket_fd << std::endl;
 
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
-
-
 	char buffer[1024] = {0};
 	int current_size;
 
@@ -59,10 +53,6 @@ void	serverBoy::runServer() {
 				perror("poll");
 				break;
 			}
-			if (ret == 0) {
-				std::cout << "Poll timed out. End" << std::endl;
-				break;
-			}
 			if (poller.getConnections()[i].revents == 0) {
 				continue;
 			}
@@ -71,33 +61,16 @@ void	serverBoy::runServer() {
 				break;
 			}
 			if (poller.getConnections()[i].revents & POLLIN) {
-				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
-				if (poller.getConnections()[i].fd == socket_fd) { // So try to move this into POLLIN
-					socklen_t	addrlen;
-					new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-					if (new_fd < 0) {
-						if (errno != EWOULDBLOCK) {
-							perror("accept failed");
-						}
+				std::cout << "Listening socket is readable and writeable on fd: " << poller.getConnections()[i].fd << std::endl;	
+				
+				if (poller.getConnections()[i].fd == socket_fd) {
+					if (!newConnection())
 						break;
-					}
-					int on = 1;
-					if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
-						std::cout << "sockoptions got fucked" << std::endl;
-						break;
-					}
-					if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
-						std::cout << "fcntl got fucked" << std::endl;
-						break;
-					}
-					poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+					continue;
 				}
 				
-				
 				ssize_t valread;
-				
-				valread = recv(new_fd, buffer, 1024, 0);						
-				// std::cout << "Recv returned: " << valread << std::endl;
+				valread = recv(poller.getConnections()[i].fd, buffer, 1024, 0);
 				if (valread > 0) {
 					std::cout << buffer << std::endl;
 					memset(buffer, 0, sizeof(buffer));
@@ -109,29 +82,15 @@ void	serverBoy::runServer() {
 						close(poller.getConnections()[i].fd);
 						poller.getConnections().erase(poller.getConnections().begin() + i);
 					}
-					break; // Had this as break but maybe let's see if this way we can wait on favicon
+					break;
 				}
 				if (valread < 0) {
 					std::cout << "No bytes to read" << std::endl;
-					if (EAGAIN) {
-						// perror("Recv failed: ");
-						// std::cout << "After on: " << i << std::endl;
-						break;
-					}
-					// close_conn = 1;
 					break;
 				}
-				// std::cout << buffer << std::endl;
-				/* At this point should parse the request 
-					from the browser and then
-				send appropriate response back */
-
-				// Respond to client
-				// Reset
-				// }
 			}
 			if (poller.getConnections()[i].revents & POLLOUT) {
-				ret = firstResponse(new_fd);
+				ret = firstResponse(poller.getConnections()[i].fd);
 				if (ret < 0) {
 					perror ("   send() failed");
 					break;
@@ -146,6 +105,28 @@ serverSock*	serverBoy::getSocket() { return _socket; }
 int		serverBoy::connectionErr(short revents) {
 	return revents & (POLLERR|POLLNVAL) ||
 			(!(revents & (POLLIN)) && revents & POLLHUP);
+}
+
+int		serverBoy::newConnection() {
+	socklen_t	addrlen;
+	int new_fd = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+	if (new_fd < 0) {
+		if (errno != EWOULDBLOCK) {
+			perror("accept failed");
+		}
+		return 0;
+	}
+	int on = 1;
+	if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+		std::cout << "sockoptions got fucked" << std::endl;
+		return 0;
+	}
+	if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
+		std::cout << "fcntl got fucked" << std::endl;
+		return 0; // Could define these to ERR
+	}
+	poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+	return 1;
 }
 
 int		serverBoy::firstResponse(int sock_fd) {
