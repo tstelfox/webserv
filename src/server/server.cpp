@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 15:00:02 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 15:45:59 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	serverBoy::runServer() {
 				continue;
 			}
 			if ((poller.getConnections()[i].revents & (POLLERR|POLLNVAL)) ||
-				(poller.getConnections()[i].revents != (POLLIN) && poller.getConnections()[i].revents & POLLHUP)) {
+				(!(poller.getConnections()[i].revents & (POLLIN)) && poller.getConnections()[i].revents & POLLHUP)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << poller.getConnections()[i].revents << std::endl;
 				close(poller.getConnections()[i].fd);
 				poller.getConnections().erase(poller.getConnections().begin() + i);
@@ -110,6 +110,10 @@ void	serverBoy::runServer() {
 				
 				valread = recv(new_fd, buffer, 1024, 0);						
 				// std::cout << "Recv returned: " << valread << std::endl;
+				if (valread > 0) {
+					std::cout << buffer << std::endl;
+					memset(buffer, 0, sizeof(buffer));
+				}
 				if (valread == 0) {
 					std::cout << "Connection closed" << std::endl;
 					if (i != 0) {
@@ -120,7 +124,7 @@ void	serverBoy::runServer() {
 					break; // Had this as break but maybe let's see if this way we can wait on favicon
 				}
 				if (valread < 0) {
-					// std::cout << "No bytes to read" << std::endl;
+					std::cout << "No bytes to read" << std::endl;
 					if (EAGAIN) {
 						// perror("Recv failed: ");
 						// std::cout << "After on: " << i << std::endl;
@@ -129,8 +133,6 @@ void	serverBoy::runServer() {
 					// close_conn = 1;
 					break;
 				}
-				std::cout << buffer << std::endl;
-				memset(buffer, 0, sizeof(buffer));
 				// std::cout << buffer << std::endl;
 				/* At this point should parse the request 
 					from the browser and then
@@ -146,8 +148,9 @@ void	serverBoy::runServer() {
 				// std::cout << "After on: " << i << std::endl;
 				if (ret < 0) {
 					perror ("   send() failed");
-					close(poller.getConnections()[i].fd);
-					poller.getConnections().erase(poller.getConnections().begin() + i);
+					// std::cout << "Deleting connection" << std::endl;
+					// close(poller.getConnections()[i].fd);
+					// poller.getConnections().erase(poller.getConnections().begin() + i);
 					// close_conn = 1;
 					break;
 				}
