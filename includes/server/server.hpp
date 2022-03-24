@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 18:27:02 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 18:37:04 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class serverBoy {
 
 		int				firstResponse(int sock); // This shit is temporary bollocks
 		int				connectionErr(short revents);
-		int				newConnection(); // This is a work in progress
+		int				newConnection();
 		// void			closeConnection();
 	private:
 		serverBoy();
