@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 15:58:40 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 16:25:30 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,6 @@ serverBoy::~serverBoy() {}
 					-something else?
 				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer() {
-
-
-	/* THE ISSUE SEEMS TO BE ABOUT HOW POLL() IS CALLED IN THE LOOP.
-		IT SHOULD BE CALLED ONCE BEFORE EVERY SINGLE RECV() AND SEND()
-		AND THIS MAY BE WHAT IS CAUSING THE FUCKED UP BEAHVIOUR */
 	
 	clientConnecter		poller;
 	int socket_fd = _socket->getSock();
@@ -130,8 +125,7 @@ void	serverBoy::runServer() {
 				/* At this point should parse the request 
 					from the browser and then
 				send appropriate response back */
-				
-				
+
 				// Respond to client
 				// Reset
 				// }
@@ -150,13 +144,6 @@ void	serverBoy::runServer() {
 			if (poller.getConnections()[i].revents & POLLERR) {
 				std::cout << "DIO PORCO MAIALE GANE" << std::endl;
 			}
-			// if (close_conn) {
-			// 	std::cout << "Closing connection: " << poller.getConnections()[i].fd << std::endl;
-			// 	close(poller.getConnections()[i].fd);
-			// 	// std::vector<struct pollfd>::iterator to_close = poller.getConnections().begin();
-			// 	poller.getConnections().erase(poller.getConnections().begin() + i);
-			// }
-			// } // End of current connection
 		} // End of loop through pollable connections
 	}
 }
