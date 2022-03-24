@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 15:45:59 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 15:58:40 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,14 @@ void	serverBoy::runServer() {
 
 
 	char buffer[1024] = {0};
-	int close_conn = 0;
 	int current_size;
 
 	while (true) {
-		// if (poller.getConnections().empty())
-		// 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
 		current_size = poller.getConnections().size();
 		for (i = 0; i < current_size; i++) {
 			// std::cout << "<<------Waiting on poll()...------>>" << std::endl;
 			// std::cout << "Amount of connections: " << poller.getConnections().size() << std::endl;
 			ret = poll(&poller.getConnections()[0], poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
-			// std::cout << "What is poll returning yo: " << ret << std::endl;
 			if (ret < 0) {
 				perror("poll");
 				break;
@@ -89,7 +85,6 @@ void	serverBoy::runServer() {
 					if (errno != EWOULDBLOCK) {
 						perror("accept failed");
 					}
-					// perror("Here? ");
 					break;
 				}
 				int on = 1;
@@ -102,10 +97,8 @@ void	serverBoy::runServer() {
 			}
 			if (poller.getConnections()[i].revents & POLLIN) {
 				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
-				close_conn = 0;
 				
 				
-				// while (true) {
 				ssize_t valread;
 				
 				valread = recv(new_fd, buffer, 1024, 0);						
@@ -151,7 +144,6 @@ void	serverBoy::runServer() {
 					// std::cout << "Deleting connection" << std::endl;
 					// close(poller.getConnections()[i].fd);
 					// poller.getConnections().erase(poller.getConnections().begin() + i);
-					// close_conn = 1;
 					break;
 				}
 			}
@@ -208,8 +200,6 @@ int		serverBoy::first_response(int sock_fd) {
 	// catch (SIGPIPE) {
 		
 	// }
-	// std::cout << "After on: " << std::endl;
-	// std::cout << "SURELY" << std::endl;
 	delete[] hey;
 	return ret;
 }
