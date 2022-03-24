@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 17:58:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/24 18:21:12 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,28 +70,28 @@ void	serverBoy::runServer() {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << poller.getConnections()[i].revents << std::endl;
 				break;
 			}
-			if (poller.getConnections()[i].fd == socket_fd) {
-				socklen_t	addrlen;
-				new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
-				if (new_fd < 0) {
-					if (errno != EWOULDBLOCK) {
-						perror("accept failed");
-					}
-					break;
-				}
-				int on = 1;
-				if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
-					std::cout << "sockoptions got fucked" << std::endl;
-					break;
-				}
-				if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
-					std::cout << "fcntl got fucked" << std::endl;
-					break;
-				}
-				poller.setPollFd(new_fd, (POLLIN|POLLOUT));
-			}
 			if (poller.getConnections()[i].revents & POLLIN) {
 				std::cout << "Listening socket is readable and writeable on fd: " << new_fd << std::endl;
+				if (poller.getConnections()[i].fd == socket_fd) { // So try to move this into POLLIN
+					socklen_t	addrlen;
+					new_fd = accept(socket_fd, (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
+					if (new_fd < 0) {
+						if (errno != EWOULDBLOCK) {
+							perror("accept failed");
+						}
+						break;
+					}
+					int on = 1;
+					if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+						std::cout << "sockoptions got fucked" << std::endl;
+						break;
+					}
+					if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
+						std::cout << "fcntl got fucked" << std::endl;
+						break;
+					}
+					poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+				}
 				
 				
 				ssize_t valread;
