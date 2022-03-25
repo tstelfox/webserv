@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 17:56:08 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 18:11:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,7 @@ void	serverBoy::runServer() {
 				std::cout << "Listening socket is readable and writeable on fd: " << poller.getConnections()[i].fd << std::endl;	
 				
 				if (poller.getConnections()[i].fd == socket_fd) {
-					if (!newConnection())
-						break;
+					newConnection();
 					continue;
 				}
 				
@@ -104,26 +103,32 @@ int		serverBoy::connectionError(short revents) {
 			(!(revents & (POLLIN)) && revents & POLLHUP);
 }
 
-int		serverBoy::newConnection() {
+void	serverBoy::closeConnection(int it) {
+	std::cout << "Deleting connection [" << poller.getConnections()[it].fd << "]" << std::endl;
+	close(poller.getConnections()[it].fd);
+	poller.getConnections().erase(poller.getConnections().begin() + it);
+}
+
+void		serverBoy::newConnection() {
 	socklen_t	addrlen;
 	int new_fd = accept(_socket->getSock(), (struct sockaddr *)&_socket->getAddr(), (socklen_t *)&addrlen);
 	if (new_fd < 0) {
 		if (errno != EWOULDBLOCK) {
 			perror("accept failed");
 		}
-		return 0;
+		return ;
 	}
 	int on = 1;
 	if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
 		std::cout << "sockoptions got fucked" << std::endl;
-		return 0;
+		return ;
 	}
 	if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
 		std::cout << "fcntl got fucked" << std::endl;
-		return 0; // Could define these to ERR
+		return ; // Could define these to ERR
 	}
 	poller.setPollFd(new_fd, (POLLIN|POLLOUT));
-	return 1;
+	// return ;
 }
 
 int		serverBoy::firstResponse(int sock_fd) {

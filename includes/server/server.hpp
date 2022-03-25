@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 17:41:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 18:10:36 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ class serverBoy {
 
 		int				firstResponse(int sock); // This shit is temporary bollocks
 		int				connectionError(short revents);
-		int				newConnection();
-		// void			closeConnection();
+		void			newConnection();
+		void			closeConnection(int it);
 	private:
 		serverBoy();
 		serverSock		*_socket;
