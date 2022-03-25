@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 18:11:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 18:14:07 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,10 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-
 serverBoy::serverBoy(serverSock &sock) : _socket(&sock) {}
 
 serverBoy::~serverBoy() {}
 
-
-	/*--------- Should just use a vector for every client connection which contains:
-					-socket
-					-buffer of shit to read
-					-something else?
-				And then close it by deleting the item -----------*/ 
 void	serverBoy::runServer() {
 
 	int socket_fd = _socket->getSock();
@@ -128,7 +121,6 @@ void		serverBoy::newConnection() {
 		return ; // Could define these to ERR
 	}
 	poller.setPollFd(new_fd, (POLLIN|POLLOUT));
-	// return ;
 }
 
 int		serverBoy::firstResponse(int sock_fd) {
@@ -158,10 +150,3 @@ int		serverBoy::firstResponse(int sock_fd) {
 	return ret;
 }
 
-std::string	serverBoy::readBrowserRequest(char *buffer) {
-	
-	std::string	buff(buffer, buffer + 1024);
-	std::cout << buff << std::endl;
-
-	return "fuck off";
-}
