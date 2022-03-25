@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 18:35:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 17:56:08 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,7 @@ void	serverBoy::runServer() {
 				perror("poll");
 				break;
 			}
-			if (poller.getConnections()[i].revents == 0) {
-				continue;
-			}
-			if (connectionErr(poller.getConnections()[i].revents)) {
+			if (connectionError(poller.getConnections()[i].revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << poller.getConnections()[i].revents << std::endl;
 				break;
 			}
@@ -102,7 +99,7 @@ void	serverBoy::runServer() {
 
 serverSock*	serverBoy::getSocket() { return _socket; }
 
-int		serverBoy::connectionErr(short revents) {
+int		serverBoy::connectionError(short revents) {
 	return revents & (POLLERR|POLLNVAL) ||
 			(!(revents & (POLLIN)) && revents & POLLHUP);
 }

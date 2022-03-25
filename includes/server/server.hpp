@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/24 18:37:04 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 17:41:47 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class serverBoy {
 		std::string		readBrowserRequest(char *buffer);
 
 		int				firstResponse(int sock); // This shit is temporary bollocks
-		int				connectionErr(short revents);
+		int				connectionError(short revents);
 		int				newConnection();
 		// void			closeConnection();
 	private:
