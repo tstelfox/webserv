@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 18:14:02 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 18:21:47 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class serverBoy {
 		int				firstResponse(int sock); // This shit is temporary bollocks
 		int				connectionError(short revents);
 		void			newConnection();
-		void			closeConnection(int it);
+		void			closeConnection(std::vector<struct pollfd>::iterator it);
 	private:
 		serverBoy();
 		serverSock		*_socket;
