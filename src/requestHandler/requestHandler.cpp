@@ -1,34 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   clientConnecter.hpp                               :+:    :+:            */
+/*   requestHandler.cpp                                 :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/03/16 17:24:04 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/16 19:04:58 by tmullan       ########   odam.nl         */
+/*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
+/*   Updated: 2022/03/25 19:13:37 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-#include <vector>
-#include <map>
-#include "sys/poll.h"
 #include "requestHandler.hpp"
 
-class clientConnecter
-{
-	public:
-		clientConnecter();
-		~clientConnecter();
+requestHandler::requestHandler() : _requestString(0), _keepAlive(true), _method(0) {
+	(void)_keepAlive;
+	(void)_method;
+}
 
-		void	setPollFd(int fd, short events);
-		std::vector<struct pollfd>& getConnections();
-	private:
-		// Vector of the poll structs and events
-		std::vector<struct pollfd> 		_connections;
-		// Map of the requestHandlers key-bound by the connection fd
-		std::map<int, requestHandler>	_requests;
-
-};
+requestHandler::~requestHandler() {}
 

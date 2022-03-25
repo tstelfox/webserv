@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 18:21:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/25 18:57:14 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,6 @@ class serverBoy {
 		serverBoy();
 		serverSock		*_socket;
 		clientConnecter	poller;
+		// requestHandler	handler;
 };
 

@@ -6,20 +6,21 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/03/24 16:38:45 by tmullan       ########   odam.nl          #
+#    Updated: 2022/03/25 19:11:39 by tmullan       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = c++
-SRC = server_main.cpp sockets/socket.cpp $(SERVER_PREFIX)
+SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp $(SERVER_PREFIX)
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 SERV = clientConnecter.cpp server.cpp
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
-INCLUDES = -Iincludes -Iincludes/server -Iincludes/socket -Iincludes/utils
+INCLUDES = -Iincludes -Iincludes/server -Iincludes/socket -Iincludes/utils \
+			-Iincludes/requestHandler
 
 ifdef DEBUG
   FLAGS += -g -fsanitize=address
