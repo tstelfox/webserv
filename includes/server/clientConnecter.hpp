@@ -23,7 +23,10 @@ class clientConnecter
 		~clientConnecter();
 
 		void	setPollFd(int fd, short events);
-		std::vector<struct pollfd>& getConnections();
+		void	newRequest(int fd); //Take as params anything needed for requestHandler class
+
+		std::vector<struct pollfd>& 	getConnections();
+		std::map<int, requestHandler>&	getRequests();
 	private:
 		// Vector of the poll structs and events
 		std::vector<struct pollfd> 		_connections;

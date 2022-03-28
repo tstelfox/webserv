@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/25 19:01:31 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/28 14:05:47 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,18 @@ void	serverBoy::runServer() {
 					continue;
 				}
 				
-				// requestHandler	handler;
+				// Create a new Request class in the map container
+				// The below shouldn't overwrite any existing requests.
+				// When deleting a connection I should also delete the request though
+				poller.newRequest(it->fd);
+
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					
-					std::cout << buffer << std::endl;
+					// std::cout << buffer << std::endl;
+					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+					std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 				if (valread == 0) {

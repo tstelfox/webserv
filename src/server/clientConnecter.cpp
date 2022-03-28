@@ -24,4 +24,11 @@ void	 clientConnecter::setPollFd(int fd, short events) {
 	_connections.push_back(newPollFd);
 }
 
+void	clientConnecter::newRequest(int fd) {
+	requestHandler	new_request;
+	_requests.insert(std::make_pair(fd, new_request));
+}
+
+std::map<int, requestHandler>&	clientConnecter::getRequests() { return _requests; }
+
 std::vector<struct pollfd>&	clientConnecter::getConnections() { return _connections; }
