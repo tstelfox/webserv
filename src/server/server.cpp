@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 15:10:45 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/28 16:10:35 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,12 @@ void	serverBoy::runServer() {
 
 	while (true) {
 		ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
+		if (ret < 0) {
+			perror("poll");
+			break;
+		}
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
 			// std::cout << "<<------Waiting on poll()...------>>" << std::endl;
-			if (ret < 0) {
-				perror("poll");
-				break;
-			}
 			if (connectionError(it->revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents << std::endl;
 				break;
@@ -63,6 +63,7 @@ void	serverBoy::runServer() {
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					
+					// std::cout << "[" << buffer << "]" << std::endl;
 					std::cout << buffer << std::endl;
 					// poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
