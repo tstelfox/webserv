@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 14:05:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/28 15:10:45 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ void	serverBoy::runServer() {
 	char buffer[1024] = {0};
 
 	while (true) {
-		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it < poller.getConnections().end(); it++) {
+		ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
+		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
 			// std::cout << "<<------Waiting on poll()...------>>" << std::endl;
-			ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
 			if (ret < 0) {
 				perror("poll");
 				break;
@@ -51,21 +51,21 @@ void	serverBoy::runServer() {
 				
 				if (it->fd == socket_fd) {
 					newConnection();
-					continue;
+					break;
 				}
 				
 				// Create a new Request class in the map container
 				// The below shouldn't overwrite any existing requests.
 				// When deleting a connection I should also delete the request though
-				poller.newRequest(it->fd);
+				// poller.newRequest(it->fd);
 
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					
-					// std::cout << buffer << std::endl;
-					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
-					std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
+					std::cout << buffer << std::endl;
+					// poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+					// std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 				if (valread == 0) {
