@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 16:10:35 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/28 17:04:11 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	serverBoy::runServer() {
 				break;
 			}
 			if (it->revents & POLLIN) {
-				std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;	
+				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;	
 				
 				if (it->fd == socket_fd) {
 					newConnection();
@@ -62,16 +62,21 @@ void	serverBoy::runServer() {
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
-					
-					// std::cout << "[" << buffer << "]" << std::endl;
-					std::cout << buffer << std::endl;
-					// poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+					// std::cout << buffer << std::endl;
+					// std::cout << "Read this amount of bytes " << valread << std::endl;
+					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
+					// std::cout << "Size of requests map " << poller.getRequests().size() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
-				if (valread == 0) {
-					std::cout << "Connection closed by client" << std::endl;
-					closeConnection(it);
+					/* Leave the connections open for now perhaps */
+				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
+					poller.getRequests()[it->fd].bufferIsFull();
+					std::cout << "The buffer is full" << std::endl;
+					poller.getRequests()[it->fd].parseRequest();
+					// Actually start processing the buffer
+					// std::cout << "Connection closed by client" << std::endl;
+					// closeConnection(it);
 					break;
 				}
 				if (valread < 0) {
@@ -100,6 +105,7 @@ int		serverBoy::connectionError(short revents) {
 void	serverBoy::closeConnection(std::vector<struct pollfd>::iterator it) {
 	std::cout << "Deleting connection [" << it->fd << "]" << std::endl;
 	close(it->fd);
+	// Also gotta delete the request class
 	poller.getConnections().erase(it);
 }
 
