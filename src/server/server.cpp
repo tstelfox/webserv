@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 17:04:11 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/29 15:45:29 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,6 @@ void	serverBoy::runServer() {
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
-					// std::cout << buffer << std::endl;
-					// std::cout << "Read this amount of bytes " << valread << std::endl;
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
 					// std::cout << "Size of requests map " << poller.getRequests().size() << std::endl;
@@ -72,9 +70,8 @@ void	serverBoy::runServer() {
 					/* Leave the connections open for now perhaps */
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
-					std::cout << "The buffer is full" << std::endl;
+					// std::cout << "The buffer is full" << std::endl;
 					poller.getRequests()[it->fd].parseRequest();
-					// Actually start processing the buffer
 					// std::cout << "Connection closed by client" << std::endl;
 					// closeConnection(it);
 					break;

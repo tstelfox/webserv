@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 17:01:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/29 16:17:17 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ class requestHandler {
 		bool	getFullState();
 
 		void	parseRequest();
+
+	public:
+		enum	methodTypes { GET, POST, DELETE };
 
 	private:
 		char		_buffer[1024];
