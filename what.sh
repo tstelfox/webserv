@@ -26,3 +26,9 @@
 
 
 # https://beej.us/guide/bgnet/html/#pollman
+
+# Relevant RFCs - Also test with nginx and telnet
+
+# https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
+
+# https://www.rfc-editor.org/rfc/rfc7231#section-4.3.1
