@@ -6,12 +6,14 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/28 17:03:41 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/29 16:38:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "requestHandler.hpp"
 #include <iostream>
+// #include <string>
+#include <sstream>
 
 requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _keepAlive(true), _method(0) {
 	memset(_buffer, 0, 1024);
@@ -32,7 +34,22 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 void	requestHandler::parseRequest() {
 	std::string request;
 	request = _buffer;
-	std::cout << "Parsing the following request:\n" << request << std::endl;
+	// std::cout << "Parsing the following request:\n" << request << std::endl;
+	std::stringstream	ss(request);
+	std::string word;
+	ss >> word;
+	if (!word.compare("POST")) {
+		_method = POST;
+		std::cout << "POST method" << std::endl;
+	}
+	else if (!word.compare("DELETE")) {
+		_method = DELETE;
+		std::cout << "DELETE method" << std::endl;
+	}
+	else if (!word.compare("GET")) {
+		_method = GET;
+		std::cout << "GET method" << std::endl;
+	}
 }
 
 char*	requestHandler::getBuffer() {
