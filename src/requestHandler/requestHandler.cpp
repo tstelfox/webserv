@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/29 16:38:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/29 20:04:20 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 void	requestHandler::parseRequest() {
 	std::string request;
 	request = _buffer;
-	// std::cout << "Parsing the following request:\n" << request << std::endl;
+	std::cout << "Parsing the following request:\n" << request << std::endl;
 	std::stringstream	ss(request);
 	std::string word;
 	ss >> word;
@@ -48,8 +48,11 @@ void	requestHandler::parseRequest() {
 	}
 	else if (!word.compare("GET")) {
 		_method = GET;
+		// Possibly call a function here to do the rest of the parsing but also nah
+		// It may be best to do the generic parsing first though
 		std::cout << "GET method" << std::endl;
 	}
+	// I think if there is no specific method then it's a GET
 }
 
 char*	requestHandler::getBuffer() {
