@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/29 20:04:20 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 13:57:02 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ void	requestHandler::parseRequest() {
 		// It may be best to do the generic parsing first though
 		std::cout << "GET method" << std::endl;
 	}
+	ss >> _uri;
+	// _uri = word;
+	std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	// I think if there is no specific method then it's a GET
 }
 

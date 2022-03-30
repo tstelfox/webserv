@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/29 16:23:04 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 13:55:48 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,10 @@ class requestHandler {
 		char		_buffer[1024];
 		int			_buffSize;
 		bool		_fullBuffer;
-		// std::string	_requestString;
+
+		
+		std::string	_uri;
+		std::string	_host;
 		bool		_keepAlive;
 		int			_method;
 };
