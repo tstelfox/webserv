@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 14:28:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 16:56:23 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 // #include <string>
 #include <sstream>
 
-requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _keepAlive(true), _method(0) {
+requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), _keepAlive(true) {
 	memset(_buffer, 0, 1024);
 	(void)_keepAlive;
 	(void)_method;
@@ -54,6 +54,13 @@ void	requestHandler::parseRequest() {
 	std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion; // If this is incorrect --- 505 HTTP VERSION NOT SUPPORTED
 	std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
+
+	// std::getline(ss, _host, '\n');
+	ss >> _host;
+	std::string hostname;
+	ss >> hostname;
+	_host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
+	std::cout << "host is: [" << _host << "]" << std::endl; 
 	// _uri = word;
 	// I think if there is no specific method then it's a GET
 }
