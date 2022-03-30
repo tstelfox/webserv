@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 13:57:02 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 14:28:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ void	requestHandler::parseRequest() {
 	}
 	else if (!word.compare("GET")) {
 		_method = GET;
-		// Possibly call a function here to do the rest of the parsing but also nah
-		// It may be best to do the generic parsing first though
 		std::cout << "GET method" << std::endl;
 	}
-	ss >> _uri;
-	// _uri = word;
+	ss >> _uri; // If this doesn't start with a '/' it's a -- 400 BAD REQUEST
 	std::cout << "_uri is: [" << _uri << "]" << std::endl;
+	ss >> _httpVersion; // If this is incorrect --- 505 HTTP VERSION NOT SUPPORTED
+	std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
+	// _uri = word;
 	// I think if there is no specific method then it's a GET
 }
 
