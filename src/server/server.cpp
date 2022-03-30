@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/29 15:45:29 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 16:58:25 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,9 @@ void	serverBoy::runServer() {
 				}
 			}
 			if (it->revents & POLLOUT) {
+				/* So I want to make a response class which takes 
+					a pointer to the requestHandler of the relevant
+					client connection */
 				ret = firstResponse(it->fd);
 				if (ret < 0) {
 					perror ("   send() failed");
