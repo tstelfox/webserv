@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 16:58:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 18:11:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,15 +63,13 @@ void	serverBoy::runServer() {
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
-					// std::cout << poller.getRequests()[it->fd].getBuffer() << std::endl;
-					// std::cout << "Size of requests map " << poller.getRequests().size() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 					/* Leave the connections open for now perhaps */
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
-					// std::cout << "The buffer is full" << std::endl;
 					poller.getRequests()[it->fd].parseRequest();
+
 					// std::cout << "Connection closed by client" << std::endl;
 					// closeConnection(it);
 					break;

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 17:48:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 17:53:23 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ void	requestHandler::parseRequest() {
 	// _host = hostname
 	std::cout << "host is: [" << _host << "]" << std::endl;
 }
+
 
 char*	requestHandler::getBuffer() {
 	return _buffer;
