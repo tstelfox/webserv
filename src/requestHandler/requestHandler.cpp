@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 16:56:23 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 17:48:10 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 // #include <string>
 #include <sstream>
 
-requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), _keepAlive(true) {
+requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), 
+				_keepAlive(true), _status(200) {
 	memset(_buffer, 0, 1024);
 	(void)_keepAlive;
 	(void)_method;
@@ -50,19 +51,27 @@ void	requestHandler::parseRequest() {
 		_method = GET;
 		std::cout << "GET method" << std::endl;
 	}
-	ss >> _uri; // If this doesn't start with a '/' it's a -- 400 BAD REQUEST
+	// else {
+	// 	// 400 BAD REQUEST
+	// }
+	ss >> _uri;
+	if (_uri[0] != '/') // This'll segfault if there's nothign there of course
+		_status = 400; // BAD REQUEST
 	std::cout << "_uri is: [" << _uri << "]" << std::endl;
-	ss >> _httpVersion; // If this is incorrect --- 505 HTTP VERSION NOT SUPPORTED
+	ss >> _httpVersion;
+	if (_httpVersion.compare("HTTP/1.1"))
+		_status = 505; // HTTP VERSION NOT SUPPORTED
 	std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
 
-	// std::getline(ss, _host, '\n');
 	ss >> _host;
 	std::string hostname;
-	ss >> hostname;
-	_host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
-	std::cout << "host is: [" << _host << "]" << std::endl; 
-	// _uri = word;
-	// I think if there is no specific method then it's a GET
+	if (_host.compare("Host:")) { // Actually it's case insensitive cause of course it is
+		_status = 400; // BAD REQUST
+	}
+	ss >> _host; // Gotta check that there's actually some content here before the newline
+	// _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
+	// _host = hostname
+	std::cout << "host is: [" << _host << "]" << std::endl;
 }
 
 char*	requestHandler::getBuffer() {

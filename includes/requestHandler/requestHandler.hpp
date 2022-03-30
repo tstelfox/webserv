@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 16:46:41 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/03/30 17:43:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,7 @@ class requestHandler {
 		/* "Optional" Request Header Info */
  		std::string	_host;
 		bool		_keepAlive;
+
+		/* Status Code and response info */
+		int			_status;
 };
