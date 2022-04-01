@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 17:53:23 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 14:40:41 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ void	requestHandler::parseRequest() {
 		_method = GET;
 		std::cout << "GET method" << std::endl;
 	}
-	// else {
-	// 	// 400 BAD REQUEST
-	// }
+	else {
+		_status = 400; // 400 BAD REQUEST
+	}
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course
 		_status = 400; // BAD REQUEST
