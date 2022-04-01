@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 16:18:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 16:28:10 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	serverBoy::runServer() {
 					poller.getRequests()[it->fd].parseRequest();
 
 					/* Ok create a response but this might need to also be in a map */
-					responseHandler	response(poller.getRequests()[it->fd]);
+					// responseHandler	response(poller.getRequests()[it->fd]);
 
 					/* Leave the connections open for now */
 					// std::cout << "Connection closed by client" << std::endl;
