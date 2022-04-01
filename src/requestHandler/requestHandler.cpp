@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 17:16:03 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 17:55:11 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <iostream>
 // #include <string>
 #include <sstream>
+#include <fstream>
 
 requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
@@ -31,6 +32,10 @@ requestHandler::requestHandler() {}
 
 int		requestHandler::getFd() const {
 	return this->_clientFd;
+}
+
+std::string	requestHandler::getResponse() const {
+	return this->_response;
 }
 
 void	requestHandler::fillBuffer(char *buff, int valread) {
@@ -66,7 +71,7 @@ void	requestHandler::parseRequest() {
 		_status = 400; // 400 BAD REQUEST
 	}
 	ss >> _uri;
-	if (_uri[0] != '/') // This'll segfault if there's nothign there of course
+	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
 		_status = 400; // BAD REQUEST
 	std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
@@ -91,6 +96,32 @@ void	requestHandler::parseRequest() {
 }
 
 void	requestHandler::formulateResponse() {
+	std::cout << "Yes this is the response hi on fd: " << _clientFd << std::endl;
+
+	if (_status != 200) {
+		// Error responses and sheet
+	}
+	if (_method == GET) { // Function for get responses
+		std::string requestedFile("pages");
+		if (!_uri.compare("/")) {
+			_uri += "index.html";
+		}
+		requestedFile += _uri;
+		std::ifstream myfile;
+		myfile.open(requestedFile); // Protect it later
+		std::ostringstream fileContent;
+		fileContent << myfile.rdbuf();
+		_response = fileContent.str();
+
+		std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+		int len = _response.size();
+		header.append(std::to_string(len));
+		header.append("\n\n");
+		header.append(_response);
+
+		_response = header;
+		// std::cout << "Respones gonna be [" << _response << "]" << std::endl;
+	}
 	// Gonna need the fd in order to send the response.
 }
 

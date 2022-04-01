@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 17:12:35 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 17:52:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,6 @@ void	serverBoy::runServer() {
 					newConnection();
 					break;
 				}
-				
-				// Create a new Request class in the map container
-				// The below shouldn't overwrite any existing requests.
-				// When deleting a connection I should also delete the request though
-				// poller.newRequest(it->fd);
-				// std::cout << "Is there anything " << poller.getRequests().size() << std::endl;
-
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
@@ -71,9 +64,6 @@ void	serverBoy::runServer() {
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
-
-					/* Ok create a response but this might need to also be in a map */
-					// responseHandler	response(poller.getRequests()[it->fd]);
 
 					/* Leave the connections open for now */
 					// std::cout << "Connection closed by client" << std::endl;
@@ -89,9 +79,11 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes 
 					a pointer to the requestHandler of the relevant
 					client connection */
+				std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
 				ret = firstResponse(it->fd);
 				if (ret < 0) {
 					perror ("   send() failed");
+					// while (1) {}
 					break;
 				}
 			}
@@ -132,6 +124,8 @@ void		serverBoy::newConnection() {
 		return ; // Could define these to ERR
 	}
 	poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+
+	// Create a new Request class in the map container
 	poller.newRequest(new_fd);
 }
 
@@ -157,8 +151,16 @@ int		serverBoy::firstResponse(int sock_fd) {
 	char *hey = new char[header.length() + 1];
 	std::strcpy(hey, header.c_str());
 
+	// std::cout << "the friggin fd is: " >>
+	// std::string response = poller.getRequests()[sock_fd].getResponse();
+	// std::cout << "Respones gonna be [" << response << "]" << std::endl;
+	
+	// char *hey = new char[response.length() + 1];
+	// std::strcpy(hey, response.c_str());
+
 	int ret = send(sock_fd, hey, strlen(hey), 0);
 	delete[] hey;
+	// ret = -1;
 	return ret;
 }
 
