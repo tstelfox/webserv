@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 18:16:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 18:21:21 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ void	serverBoy::runServer() {
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
 
+					// std::cout << "jesus" << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
+
 					/* Leave the connections open for now */
 					// std::cout << "Connection closed by client" << std::endl;
 					// closeConnection(it);
@@ -80,7 +82,7 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes 
 					a pointer to the requestHandler of the relevant
 					client connection */
-				std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
+				// std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
 				if (poller.getRequests()[it->fd].getFullState()) {
 					std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
 					ret = firstResponse(it->fd);
