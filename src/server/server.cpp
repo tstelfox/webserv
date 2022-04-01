@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 18:21:21 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 18:22:25 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	serverBoy::runServer() {
 				break;
 			}
 			if (it->revents & POLLIN) {
-				std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
+				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
 				if (it->fd == socket_fd) {
 					newConnection();
 					break;
@@ -83,15 +83,15 @@ void	serverBoy::runServer() {
 					a pointer to the requestHandler of the relevant
 					client connection */
 				// std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
-				if (poller.getRequests()[it->fd].getFullState()) {
-					std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
-					ret = firstResponse(it->fd);
-					if (ret < 0) {
-						perror ("   send() failed");
-						// while (1) {}
-						break;
-					}
+				// if (poller.getRequests()[it->fd].getFullState()) {
+				std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
+				ret = firstResponse(it->fd);
+				if (ret < 0) {
+					perror ("   send() failed");
+					// while (1) {}
+					break;
 				}
+				// }
 			}
 		} // End of loop through pollable connections
 	}
