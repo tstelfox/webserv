@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 14:40:41 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 17:16:03 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,22 @@
 // #include <string>
 #include <sstream>
 
-requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), 
+requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
 	memset(_buffer, 0, 1024);
+	std::cout << "Request for client no fd: [" << _clientFd << "] created." << std::endl;
 	(void)_keepAlive;
 	(void)_method;
+}
+
+requestHandler::requestHandler() {}
+
+// void	requestHandler::setFd(int fd) {
+// 	_clientFd = fd;
+// }
+
+int		requestHandler::getFd() const {
+	return this->_clientFd;
 }
 
 void	requestHandler::fillBuffer(char *buff, int valread) {
@@ -72,8 +83,16 @@ void	requestHandler::parseRequest() {
 	// _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
 	// _host = hostname
 	std::cout << "host is: [" << _host << "]" << std::endl;
+
+
+	/* When we're done here with the Parsing */
+	formulateResponse();
+
 }
 
+void	requestHandler::formulateResponse() {
+	// Gonna need the fd in order to send the response.
+}
 
 char*	requestHandler::getBuffer() {
 	return _buffer;

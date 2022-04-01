@@ -12,6 +12,7 @@
 
 // #include "clientConnecter.hpp"
 #include "clientConnecter.hpp"
+#include <iostream>
 
 clientConnecter::clientConnecter() {}
 
@@ -25,7 +26,7 @@ void	 clientConnecter::setPollFd(int fd, short events) {
 }
 
 void	clientConnecter::newRequest(int fd) {
-	requestHandler	new_request;
+	requestHandler	new_request(fd);
 	_requests.insert(std::make_pair(fd, new_request));
 }
 

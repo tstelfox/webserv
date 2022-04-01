@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 16:28:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 17:12:35 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,11 +57,13 @@ void	serverBoy::runServer() {
 				// The below shouldn't overwrite any existing requests.
 				// When deleting a connection I should also delete the request though
 				// poller.newRequest(it->fd);
+				// std::cout << "Is there anything " << poller.getRequests().size() << std::endl;
 
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+					std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 				/* The full request has been registered ---
@@ -130,6 +132,7 @@ void		serverBoy::newConnection() {
 		return ; // Could define these to ERR
 	}
 	poller.setPollFd(new_fd, (POLLIN|POLLOUT));
+	poller.newRequest(new_fd);
 }
 
 int		serverBoy::firstResponse(int sock_fd) {
