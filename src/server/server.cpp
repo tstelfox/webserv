@@ -6,12 +6,13 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/30 18:11:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 16:10:48 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 #include "clientConnecter.hpp"
+#include "responseHandler.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -41,14 +42,12 @@ void	serverBoy::runServer() {
 			break;
 		}
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
-			// std::cout << "<<------Waiting on poll()...------>>" << std::endl;
 			if (connectionError(it->revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents << std::endl;
 				break;
 			}
 			if (it->revents & POLLIN) {
-				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;	
-				
+				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
 				if (it->fd == socket_fd) {
 					newConnection();
 					break;
@@ -69,7 +68,7 @@ void	serverBoy::runServer() {
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
-
+					responseHandler(poller.getRequests()[it->fd]);
 					// std::cout << "Connection closed by client" << std::endl;
 					// closeConnection(it);
 					break;
@@ -83,6 +82,9 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes 
 					a pointer to the requestHandler of the relevant
 					client connection */
+
+				// Should the responseHandler also be in a map?
+				// responseHandler(poller.getRequests()[it->fd]); No this can't be created here
 				ret = firstResponse(it->fd);
 				if (ret < 0) {
 					perror ("   send() failed");
