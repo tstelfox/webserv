@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 16:10:48 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 16:18:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,16 @@ void	serverBoy::runServer() {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					memset(buffer, 0, sizeof(buffer));
 				}
-					/* Leave the connections open for now perhaps */
+				/* The full request has been registered ---
+					proceed to parse it and construct the response */
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
-					responseHandler(poller.getRequests()[it->fd]);
+
+					/* Ok create a response but this might need to also be in a map */
+					responseHandler	response(poller.getRequests()[it->fd]);
+
+					/* Leave the connections open for now */
 					// std::cout << "Connection closed by client" << std::endl;
 					// closeConnection(it);
 					break;
@@ -82,9 +87,6 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes 
 					a pointer to the requestHandler of the relevant
 					client connection */
-
-				// Should the responseHandler also be in a map?
-				// responseHandler(poller.getRequests()[it->fd]); No this can't be created here
 				ret = firstResponse(it->fd);
 				if (ret < 0) {
 					perror ("   send() failed");
