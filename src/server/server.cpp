@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 17:52:27 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/01 18:16:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@ void	serverBoy::runServer() {
 			break;
 		}
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
+			// std::cout << "Diocane" << std::hex << it->revents << std::endl;
 			if (connectionError(it->revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents << std::endl;
 				break;
 			}
 			if (it->revents & POLLIN) {
-				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
+				std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
 				if (it->fd == socket_fd) {
 					newConnection();
 					break;
@@ -56,7 +57,7 @@ void	serverBoy::runServer() {
 				valread = recv(it->fd, buffer, 1024, 0);
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
-					std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
+					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 				/* The full request has been registered ---
@@ -79,12 +80,15 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes 
 					a pointer to the requestHandler of the relevant
 					client connection */
-				std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
-				ret = firstResponse(it->fd);
-				if (ret < 0) {
-					perror ("   send() failed");
-					// while (1) {}
-					break;
+				std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
+				if (poller.getRequests()[it->fd].getFullState()) {
+					std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
+					ret = firstResponse(it->fd);
+					if (ret < 0) {
+						perror ("   send() failed");
+						// while (1) {}
+						break;
+					}
 				}
 			}
 		} // End of loop through pollable connections
