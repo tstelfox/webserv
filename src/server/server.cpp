@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/05 15:39:43 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/05 15:56:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void	serverBoy::runServer() {
 			perror("poll");
 			break;
 		}
+		// std::cout << "Well?" << std::endl;
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
 			// std::cout << "Diocane" << std::hex << it->revents << std::endl;
 			if (connectionError(it->revents)) {
@@ -60,9 +61,9 @@ void	serverBoy::runServer() {
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
-				/* The full request has been registered ---
-					proceed to parse it and construct the response */
-				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) {
+				/* THIS CAN'T BE THE CONDITION FOR RESPONDING BECAUSE WITHOUT THE RESPONSE
+					THE CLIENT NEVER CLOSES THE CONNECTION */
+				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) { // I think I never get the closed connection without sending the response
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
 
@@ -79,7 +80,7 @@ void	serverBoy::runServer() {
 				}
 			}
 			if (it->revents & POLLOUT) {
-				/* So I want to make a response class which takes 
+				/* So I want to make a response class which takes
 					a pointer to the requestHandler of the relevant
 					client connection */
 				// std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
@@ -161,11 +162,11 @@ int		serverBoy::firstResponse(int sock_fd) {
 
 	// std::cout << "the friggin fd is: " << std::endl;
 	std::string response = poller.getRequests()[sock_fd].getResponse();
-	if (response.size() == 0) {
-		std::cout << "Response not ready yet" << std::endl;
-		return 0;
-	}
-	std::cout << "Respones gonna be [" << response << "]" << std::endl;
+	// if (response.size() == 0) {
+	// 	std::cout << "Response not ready yet" << std::endl;
+	// 	return 0;
+	// }
+	// std::cout << "Respones gonna be [" << response << "]" << std::endl;
 	
 	char *hey = new char[response.length() + 1];
 	std::strcpy(hey, response.c_str());

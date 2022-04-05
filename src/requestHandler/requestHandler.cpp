@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 17:55:11 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/05 15:47:44 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
 	memset(_buffer, 0, 1024);
-	std::cout << "Request for client no fd: [" << _clientFd << "] created." << std::endl;
+	// std::cout << "Request for client no fd: [" << _clientFd << "] created." << std::endl;
 	(void)_keepAlive;
 	(void)_method;
 }
