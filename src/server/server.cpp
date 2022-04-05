@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 18:22:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/05 15:39:43 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,13 +84,15 @@ void	serverBoy::runServer() {
 					client connection */
 				// std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
 				// if (poller.getRequests()[it->fd].getFullState()) {
-				std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
+				// std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
+				// if (poller.getRequests()[it->fd].getResponse().size()) {
 				ret = firstResponse(it->fd);
 				if (ret < 0) {
 					perror ("   send() failed");
 					// while (1) {}
 					break;
 				}
+				// }
 				// }
 			}
 		} // End of loop through pollable connections
@@ -136,33 +138,37 @@ void		serverBoy::newConnection() {
 }
 
 int		serverBoy::firstResponse(int sock_fd) {
-	std::ostringstream file_content;
-	std::ifstream myfile;
-	if (sock_fd % 2)
-		myfile.open("pages/other.html");
-	else
-		myfile.open("pages/index.html");
-	if (!myfile) {
-		std::cout << "ao" << std::endl;
+	// std::ostringstream file_content;
+	// std::ifstream myfile;
+	// if (sock_fd % 2)
+	// 	myfile.open("pages/other.html");
+	// else
+	// 	myfile.open("pages/index.html");
+	// if (!myfile) {
+	// 	std::cout << "ao" << std::endl;
+	// }
+
+	// file_content << myfile.rdbuf();
+	// std::string content = file_content.str();
+
+	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+	// int len = file_content.str().size();
+	// header.append(std::to_string(len));
+	// header.append("\n\n");
+	// header.append(content);
+	// char *hey = new char[header.length() + 1];
+	// std::strcpy(hey, header.c_str());
+
+	// std::cout << "the friggin fd is: " << std::endl;
+	std::string response = poller.getRequests()[sock_fd].getResponse();
+	if (response.size() == 0) {
+		std::cout << "Response not ready yet" << std::endl;
+		return 0;
 	}
-
-	file_content << myfile.rdbuf();
-	std::string content = file_content.str();
-
-	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-	int len = file_content.str().size();
-	header.append(std::to_string(len));
-	header.append("\n\n");
-	header.append(content);
-	char *hey = new char[header.length() + 1];
-	std::strcpy(hey, header.c_str());
-
-	// std::cout << "the friggin fd is: " >>
-	// std::string response = poller.getRequests()[sock_fd].getResponse();
-	// std::cout << "Respones gonna be [" << response << "]" << std::endl;
+	std::cout << "Respones gonna be [" << response << "]" << std::endl;
 	
-	// char *hey = new char[response.length() + 1];
-	// std::strcpy(hey, response.c_str());
+	char *hey = new char[response.length() + 1];
+	std::strcpy(hey, response.c_str());
 
 	int ret = send(sock_fd, hey, strlen(hey), 0);
 	delete[] hey;
