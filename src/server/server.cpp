@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/05 15:56:46 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/05 15:57:57 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	serverBoy::runServer() {
 					memset(buffer, 0, sizeof(buffer));
 				}
 				/* THIS CAN'T BE THE CONDITION FOR RESPONDING BECAUSE WITHOUT THE RESPONSE
-					THE CLIENT NEVER CLOSES THE CONNECTION */
+					THE CLIENT NEVER CLOSES THE CONNECTION	  */
 				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) { // I think I never get the closed connection without sending the response
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
