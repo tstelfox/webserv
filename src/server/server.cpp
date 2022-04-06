@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/06 12:37:33 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/06 12:52:18 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,13 @@ void	serverBoy::runServer() {
 		}
 		// std::cout << "Well?" << std::endl;
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
-			// std::cout << "Diocane" << std::hex << it->revents << std::endl;
+			// std::cout << "Diocane " << std::hex << it->revents << std::endl;
 			if (connectionError(it->revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents << std::endl;
 				break;
 			}
 			if (it->revents & POLLIN) {
-				// std::cout << "Listening socket is readable and writeable on fd: " << it->fd << std::endl;
+				std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
 				if (it->fd == socket_fd) {
 					newConnection();
 					break;
@@ -62,8 +62,6 @@ void	serverBoy::runServer() {
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
-				/* THIS CAN'T BE THE CONDITION FOR RESPONDING BECAUSE WITHOUT THE RESPONSE
-					THE CLIENT NEVER CLOSES THE CONNECTION	  */
 				
 				// if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) { // I think I never get the closed connection without sending the response
 				if (!valread) {
@@ -75,8 +73,8 @@ void	serverBoy::runServer() {
 					// std::cout << "jesus" << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
 
 					/* Leave the connections open for now */
-					// std::cout << "Connection ended by client" << std::endl;
-					// closeConnection(it);
+					std::cout << "Connection ended by client" << std::endl;
+					closeConnection(it);
 					break;
 				}
 				if (valread < 0) {
@@ -123,6 +121,7 @@ void	serverBoy::closeConnection(std::vector<struct pollfd>::iterator it) {
 	std::cout << "Deleting connection [" << it->fd << "]" << std::endl;
 	close(it->fd);
 	// Also gotta delete the request class
+	poller.getRequests().erase(it->fd);
 	poller.getConnections().erase(it);
 }
 

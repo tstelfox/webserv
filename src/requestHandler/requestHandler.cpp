@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/06 12:15:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/06 12:43:44 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,15 @@ void	requestHandler::parseRequest() {
 	ss >> word;
 	if (!word.compare("POST")) {
 		_method = POST;
-		std::cout << "POST method" << std::endl;
+		// std::cout << "POST method" << std::endl;
 	}
 	else if (!word.compare("DELETE")) {
 		_method = DELETE;
-		std::cout << "DELETE method" << std::endl;
+		// std::cout << "DELETE method" << std::endl;
 	}
 	else if (!word.compare("GET")) {
 		_method = GET;
-		std::cout << "GET method" << std::endl;
+		// std::cout << "GET method" << std::endl;
 	}
 	else {
 		_status = 400; // 400 BAD REQUEST
@@ -72,11 +72,11 @@ void	requestHandler::parseRequest() {
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
 		_status = 400; // BAD REQUEST
-	std::cout << "_uri is: [" << _uri << "]" << std::endl;
+	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
 	if (_httpVersion.compare("HTTP/1.1"))
 		_status = 505; // HTTP VERSION NOT SUPPORTED
-	std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
+	// std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
 
 	ss >> _host;
 	std::string hostname;
@@ -86,7 +86,7 @@ void	requestHandler::parseRequest() {
 	ss >> _host; // Gotta check that there's actually some content here before the newline
 	// _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
 	// _host = hostname
-	std::cout << "host is: [" << _host << "]" << std::endl;
+	// std::cout << "host is: [" << _host << "]" << std::endl;
 
 
 	/* When we're done here with the Parsing */
@@ -95,7 +95,7 @@ void	requestHandler::parseRequest() {
 }
 
 void	requestHandler::formulateResponse() {
-	std::cout << "Yes this is the response hi on fd: " << _clientFd << std::endl;
+	// std::cout << "Yes this is the response hi on fd: " << _clientFd << std::endl;
 
 	if (_status != 200) {
 		// Error responses and sheet
