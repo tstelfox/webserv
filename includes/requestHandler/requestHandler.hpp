@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/01 17:38:33 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/06 12:17:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class requestHandler {
 		char	*getBuffer();
 		void	bufferIsFull();
 		bool	getFullState();
-		
+
 		int		getFd() const;
 		void	parseRequest();
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/05 15:57:57 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/06 12:37:33 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ void	serverBoy::runServer() {
 				}
 				ssize_t valread;
 				valread = recv(it->fd, buffer, 1024, 0);
+				// std::cout << "valread contains: [" << valread << "]" << std::endl;
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
@@ -63,14 +64,18 @@ void	serverBoy::runServer() {
 				}
 				/* THIS CAN'T BE THE CONDITION FOR RESPONDING BECAUSE WITHOUT THE RESPONSE
 					THE CLIENT NEVER CLOSES THE CONNECTION	  */
-				if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) { // I think I never get the closed connection without sending the response
-					poller.getRequests()[it->fd].bufferIsFull();
-					poller.getRequests()[it->fd].parseRequest();
+				
+				// if (valread == 0 && !poller.getRequests()[it->fd].getFullState()) { // I think I never get the closed connection without sending the response
+				if (!valread) {
+
+					/* Realistically Don't actually need this here */
+					// poller.getRequests()[it->fd].bufferIsFull();
+					// poller.getRequests()[it->fd].parseRequest();
 
 					// std::cout << "jesus" << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
 
 					/* Leave the connections open for now */
-					// std::cout << "Connection closed by client" << std::endl;
+					// std::cout << "Connection ended by client" << std::endl;
 					// closeConnection(it);
 					break;
 				}
@@ -83,7 +88,14 @@ void	serverBoy::runServer() {
 				/* So I want to make a response class which takes
 					a pointer to the requestHandler of the relevant
 					client connection */
-				// std::cout << "diocane maiale bastardo" << " " << it->fd << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
+
+				
+				/* This may not always work. Loop may need a wee bit more work
+				--- it presumes that we'll never have an incomplete request
+				--- by the time poll gives us POLLOUT */
+				if (!(it->revents & POLLIN))
+					poller.getRequests()[it->fd].parseRequest();
+
 				// if (poller.getRequests()[it->fd].getFullState()) {
 				// std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
 				// if (poller.getRequests()[it->fd].getResponse().size()) {
