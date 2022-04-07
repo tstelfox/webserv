@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/06 12:43:44 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 15:45:14 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 void	requestHandler::parseRequest() {
 	std::string request;
 	request = _buffer;
-	std::cout << "Parsing the following request:\n" << request << std::endl;
+	// std::cout << "Parsing the following request:\n" << request << std::endl;
 	std::stringstream	ss(request);
 	std::string word;
 	ss >> word;
@@ -119,7 +119,8 @@ void	requestHandler::formulateResponse() {
 		header.append(_response);
 
 		_response = header;
-		// std::cout << "Respones gonna be [" << _response << "]" << std::endl;
+		// std::cout << "Response is gonna be [" << _response << "]" << std::endl;
+		// _sent = true;
 	}
 	// Gonna need the fd in order to send the response.
 }
@@ -132,7 +133,7 @@ void	requestHandler::bufferIsFull() {
 	_fullBuffer = true;
 }
 
-bool	requestHandler::getFullState() {
+bool	requestHandler::getFullState() const {
 	return _fullBuffer;
 }
 
