@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 15:45:14 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 17:13:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,12 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 	}
 	_buffer[temp] = '\0';
 }
+
+
+	/* Quickly check for the double \n\n delimiter of header
+	and then parse it after that */
+
+
 
 void	requestHandler::parseRequest() {
 	std::string request;

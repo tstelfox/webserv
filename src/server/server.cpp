@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 15:44:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 17:08:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	serverBoy::runServer() {
 		}
 		// std::cout << "Well?" << std::endl;
 		for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin(); it != poller.getConnections().end(); it++) {
-			// std::cout << "Diocane " << std::hex << it->revents << std::endl;
+			// std::cout << "Diocane " << it->revents << std::endl;
 			if (connectionError(it->revents)) {
 				std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents << std::endl;
 				break;
@@ -72,6 +72,14 @@ void	serverBoy::runServer() {
 					/* Leave the connections open for now */
 					// std::cout << "Connection ended by client" << std::endl;
 					// closeConnection(it);
+
+
+					/* Receieve until the end mark
+					then parse the header -
+					Determine if there is a body or not
+					and then parse and respond */
+
+
 					break;
 				}
 				if (valread < 0) {
@@ -87,11 +95,11 @@ void	serverBoy::runServer() {
 				--- it presumes that we'll never have an incomplete request
 				--- by the time poll gives us POLLOUT */
 				// poller.getRequests()[it->fd].parseRequest();
-				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
-					poller.getRequests()[it->fd].bufferIsFull();
-					std::cout << "Parsing the following:\n" << poller.getRequests()[it->fd].getBuffer() << std::endl;
-					poller.getRequests()[it->fd].parseRequest();
-				}
+				// if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
+				// 	poller.getRequests()[it->fd].bufferIsFull();
+				// 	std::cout << "Parsing the following:\n" << poller.getRequests()[it->fd].getBuffer() << std::endl;
+				// 	poller.getRequests()[it->fd].parseRequest();
+				// }
 
 				// std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
 				if (poller.getRequests()[it->fd].getFullState()) {
