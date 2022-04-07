@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 18:08:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 18:20:10 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,19 +91,11 @@ void	serverBoy::runServer() {
 			}
 			if (it->revents & POLLOUT) {
 
-				// std::cout << "Socket is writeable on fd: " << it->fd << std::endl;
-				/* This may not always work. Loop may need a wee bit more work
-				--- it presumes that we'll never have an incomplete request
-				--- by the time poll gives us POLLOUT */
 				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
 					poller.getRequests()[it->fd].bufferIsFull();
 					poller.getRequests()[it->fd].parseRequest();
 				}
-				// 	std::cout << "Parsing the following:\n" << poller.getRequests()[it->fd].getBuffer() << std::endl;
-				// 	poller.getRequests()[it->fd].parseRequest();
-				// }
 
-				// std::cout << "Bro, fd is: " << it->fd << "\nAnd the response is: " << poller.getRequests()[it->fd].getResponse() << std::endl;
 				if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
 					ret = firstResponse(it->fd);
 					if (ret < 0) {
