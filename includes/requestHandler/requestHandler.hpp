@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 15:45:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 17:29:34 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ class requestHandler {
 
 		void		formulateResponse();
 		std::string	getResponse() const;
+
+		void		resetHandler();
 
 	public:
 		enum	methodTypes { EMPTY, GET, POST, DELETE };

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 17:13:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/07 17:50:24 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,8 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 	_buffer[temp] = '\0';
 }
 
-
 	/* Quickly check for the double \n\n delimiter of header
 	and then parse it after that */
-
-
 
 void	requestHandler::parseRequest() {
 	std::string request;
@@ -126,7 +123,6 @@ void	requestHandler::formulateResponse() {
 
 		_response = header;
 		// std::cout << "Response is gonna be [" << _response << "]" << std::endl;
-		// _sent = true;
 	}
 	// Gonna need the fd in order to send the response.
 }
@@ -141,6 +137,18 @@ void	requestHandler::bufferIsFull() {
 
 bool	requestHandler::getFullState() const {
 	return _fullBuffer;
+}
+
+	// is this really the best way to do this?
+void	requestHandler::resetHandler() {
+	// std::cout << "Called how many times?" << std::endl;
+	memset(_buffer, 0, sizeof(_buffer));
+	_response.clear();
+	_status = 200;
+	_host.clear();
+	_method = EMPTY;
+	_httpVersion.clear();
+	_fullBuffer = false;
 }
 
 // requestHandler::requestHandler(char *buffer) : _keepAlive(true), _method(0) {
