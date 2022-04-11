@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 16:42:58 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 16:55:11 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <algorithm>
 
 requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
@@ -74,6 +75,10 @@ void	requestHandler::requestLine(std::string request) {
 	// std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
 }
 
+void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
+	(void)fields;
+}
+
 void	requestHandler::parseRequest() {
 	std::string request(_buffer);
 	std::istringstream	ss(request);
@@ -85,28 +90,24 @@ void	requestHandler::parseRequest() {
 		formulateResponse();
 		return ;
 	}
-	std::map<std::string, std::string>	requestFields;
+	std::map<std::string, std::string>	fields;
 	while (std::getline(ss, line)) {
-		/* Need to implement a checker for the /r/n/r/n */
 		if (!line.compare("\r")) {
 			std::cout << "You have reached the end of the header" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
 		std::stringstream stream(line);
-		std::string field;
-		stream >> field;
+		std::string key;
+		stream >> key;
 		std::string	value;
 		stream >> value;
-		requestFields[field] = value;
-		// if (!field.compare("\r\n"))
-		// 	std::cout << "First here" << std::endl;
-		// if (!value.compare("\r\n"))
-		// 	std::cout << "Second here" << std::endl;
+		transform(key.begin(), key.end(), key.begin(), ::tolower);
+		fields[key] = value;
 	}
-	for (std::map<std::string, std::string>::iterator it = requestFields.begin(); it != requestFields.end(); it++)
+	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
-	
+	requestFields(fields);
 	// std::string word;
 	
 	// ss >> word;
