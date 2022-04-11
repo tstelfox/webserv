@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 13:33:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 14:19:43 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <map>
 
 requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
@@ -78,13 +79,23 @@ void	requestHandler::parseRequest() {
 	std::istringstream	ss(request);
 	std::string	line;
 	
-	requestLine(std::getline(ss, line));
+	std::getline(ss, line);
+	requestLine(line);
 	if (_status != 200) {
 		formulateResponse();
 		return ;
 	}
+	std::map<std::string, std::string>	requestFields;
 	while (std::getline(ss, line)) {
-		
+		/* Need to implement a checker for the /r/n/r/n */
+		std::replace(line.begin(), line.end(), ':', ' ');
+		std::stringstream stream(line);
+		std::string field;
+		stream >> field;
+		std::string	value;
+		stream >> value;
+		std::cout << "Field is: " << field << " and value is: " << value << std::endl;
+		// std::cout << "Shouldn't contain the request Line: " << line << std::endl;
 	}
 	// std::string word;
 	
@@ -106,19 +117,19 @@ void	requestHandler::parseRequest() {
 	// 	_status = 505; // HTTP VERSION NOT SUPPORTED
 	// // std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
 
-	ss >> _host;
-	std::string hostname;
-	if (_host.compare("Host:")) { // Actually it's case insensitive cause of course it is
-		_status = 400; // BAD REQUST
-	}
-	ss >> _host; // Gotta check that there's actually some content here before the newline
-	// _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
-	// _host = hostname
-	// std::cout << "host is: [" << _host << "]" << std::endl;
+	// ss >> _host;
+	// std::string hostname;
+	// if (_host.compare("Host:")) { // Actually it's case insensitive cause of course it is
+	// 	_status = 400; // BAD REQUST
+	// }
+	// ss >> _host; // Gotta check that there's actually some content here before the newline
+	// // _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
+	// // _host = hostname
+	// // std::cout << "host is: [" << _host << "]" << std::endl;
 
 
-	/* When we're done here with the Parsing */
-	formulateResponse();
+	// /* When we're done here with the Parsing */
+	// formulateResponse();
 
 }
 
