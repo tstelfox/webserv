@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 12:15:18 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 17:09:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,14 +161,8 @@ int		serverBoy::firstResponse(int sock_fd) {
 	// char *hey = new char[header.length() + 1];
 	// std::strcpy(hey, header.c_str());
 
-	// std::cout << "the friggin fd is: " << std::endl;
 	std::string response = poller.getRequests()[sock_fd].getResponse();
-	// if (response.size() == 0) {
-	// 	std::cout << "Response not ready yet" << std::endl;
-	// 	return 0;
-	// }
-	// std::cout << "Respones gonna be [" << response << "]" << std::endl;
-	
+
 	char *hey = new char[response.length() + 1];
 	std::strcpy(hey, response.c_str());
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 17:05:13 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 17:11:25 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ void	requestHandler::requestLine(std::string request) {
 	if (_httpVersion.compare("HTTP/1.1"))
 		_status = 505; // HTTP VERSION NOT SUPPORTED
 	// std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
+	// std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
 }
 
 void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
@@ -92,7 +93,7 @@ void	requestHandler::parseRequest() {
 	std::string request(_buffer);
 	std::istringstream	ss(request);
 	std::string	line;
-	
+
 	std::getline(ss, line);
 	requestLine(line);
 	if (_status != 200) {
@@ -100,6 +101,7 @@ void	requestHandler::parseRequest() {
 		return ;
 	}
 	std::map<std::string, std::string>	fields;
+	std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			std::cout << "You have reached the end of the header" << std::endl;
