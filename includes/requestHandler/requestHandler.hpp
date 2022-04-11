@@ -6,14 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 15:36:09 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 16:27:53 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <string>
-
-	/* Ye this is all very hypothetical */
 
 class requestHandler {
 
@@ -31,7 +29,7 @@ class requestHandler {
 		int		getFd() const;
 
 		void	requestLine(std::string request);
-		// void	requestFields()
+		// void	requestFields(std::map<std::string, std::string> field);
 		void	parseRequest();
 
 

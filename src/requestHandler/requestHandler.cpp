@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 15:39:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 16:42:58 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,18 +88,25 @@ void	requestHandler::parseRequest() {
 	std::map<std::string, std::string>	requestFields;
 	while (std::getline(ss, line)) {
 		/* Need to implement a checker for the /r/n/r/n */
+		if (!line.compare("\r")) {
+			std::cout << "You have reached the end of the header" << std::endl;
+			break;
+		}
 		std::replace(line.begin(), line.end(), ':', ' ');
 		std::stringstream stream(line);
 		std::string field;
 		stream >> field;
 		std::string	value;
 		stream >> value;
-		std::cout << "Field is: " << field << " and value is: " << value << std::endl;
 		requestFields[field] = value;
-		// std::cout << "Shouldn't contain the request Line: " << line << std::endl;
+		// if (!field.compare("\r\n"))
+		// 	std::cout << "First here" << std::endl;
+		// if (!value.compare("\r\n"))
+		// 	std::cout << "Second here" << std::endl;
 	}
 	for (std::map<std::string, std::string>::iterator it = requestFields.begin(); it != requestFields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
+	
 	// std::string word;
 	
 	// ss >> word;
