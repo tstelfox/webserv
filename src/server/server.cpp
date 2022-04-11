@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 18:20:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 12:15:18 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,17 +62,8 @@ void	serverBoy::runServer() {
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 					std::cout << buffer << std::endl;
 					memset(buffer, 0, sizeof(buffer));
-					// std::cout << "Request is purely this:\n" << poller.getRequests()[it->fd].getBuffer() << std::endl;
 				}
 				if (!valread) {
-					// std::cout << "In here?" << std::endl;
-					/* Realistically Don't actually need this here */
-					// poller.getRequests()[it->fd].bufferIsFull();
-					// poller.getRequests()[it->fd].parseRequest();
-					// std::cout << "jesus" << " " << poller.getRequests()[it->fd].getFullState() << std::boolalpha << std::endl;
-
-
-
 					/* Receieve until the end mark
 					then parse the header -
 					Determine if there is a body or not
