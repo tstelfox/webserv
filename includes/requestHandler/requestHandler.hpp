@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 16:51:10 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 18:47:17 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class requestHandler {
 		enum	methodTypes { EMPTY, GET, POST, DELETE };
 
 	private:
-		int			_clientFd;
+		int			_clientFd; // Not entirely sure I need to have this info within the class
 
 		/* Buffer variables */
 		char		_buffer[1024];

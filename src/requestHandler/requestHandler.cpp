@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 17:11:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 19:11:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,25 @@ void	requestHandler::requestLine(std::string request) {
 }
 
 void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
+	
+		/* Check that there is a valid Host */
 	std::map<std::string, std::string>::iterator	it;
 	it = fields.find("host");
 	if (it == fields.end()) {
 		_status = 400;
 		return ;
 	}
-		/* Test the following with no host */
+		/* Test the following with no host
+			It may be that if the Uri is an absolute path then
+			host can actually be omitted (?) */
 	if (fields["host"].empty())
 		std::cout << "No host" << std::endl;
 	_host = fields["host"];
+	// std::cout << "Host: " << _host << std::endl;
+
+	// for (it = fields.begin(); it != fields.end(); it++) {
+		
+	// }
 }
 
 void	requestHandler::parseRequest() {
@@ -114,7 +123,7 @@ void	requestHandler::parseRequest() {
 		std::string	value;
 		stream >> value;
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
-		fields[key] = value;
+		fields[key] = value; // Yea so this only actually adds the first value lol fmls
 	}
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;

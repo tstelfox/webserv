@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 17:09:27 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 18:47:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,6 @@ void	serverBoy::runServer() {
 					memset(buffer, 0, sizeof(buffer));
 				}
 				if (!valread) {
-					/* Receieve until the end mark
-					then parse the header -
-					Determine if there is a body or not
-					and then parse and respond */
 
 					/* Leave the connections open for now */
 					// std::cout << "Connection ended by client" << std::endl;
