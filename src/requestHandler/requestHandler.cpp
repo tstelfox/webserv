@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 19:11:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 21:32:01 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,13 +117,21 @@ void	requestHandler::parseRequest() {
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
+		// std::cout << "The line has: " << line << std::endl;
 		std::stringstream stream(line);
 		std::string key;
 		stream >> key;
 		std::string	value;
-		stream >> value;
+		while (stream) {
+			std::string rcodio;
+			stream >> rcodio;
+			value += rcodio + " ";
+		}
+		// std::cout << "Before resize [" << value << "]" << std::endl;
+		value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething
+		// std::cout << "After resize [" << value << "]" << std::endl;
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
-		fields[key] = value; // Yea so this only actually adds the first value lol fmls
+		fields[key] = value; // Yea so this only actually adds the first value lol fml
 	}
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
