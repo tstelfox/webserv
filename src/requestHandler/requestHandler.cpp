@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 16:55:11 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 17:05:13 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,16 @@ void	requestHandler::requestLine(std::string request) {
 }
 
 void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
-	(void)fields;
+	std::map<std::string, std::string>::iterator	it;
+	it = fields.find("host");
+	if (it == fields.end()) {
+		_status = 400;
+		return ;
+	}
+		/* Test the following with no host */
+	if (fields["host"].empty())
+		std::cout << "No host" << std::endl;
+	_host = fields["host"];
 }
 
 void	requestHandler::parseRequest() {
@@ -108,40 +117,13 @@ void	requestHandler::parseRequest() {
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
 	requestFields(fields);
-	// std::string word;
-	
-	// ss >> word;
-	// if (!word.compare("POST"))
-	// 	_method = POST;
-	// else if (!word.compare("DELETE"))
-	// 	_method = DELETE;
-	// else if (!word.compare("GET"))
-	// 	_method = GET;
-	// else
-	// 	_status = 400; // 400 BAD REQUEST
-	// ss >> _uri;
-	// if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
-	// 	_status = 400; // BAD REQUEST
-	// // std::cout << "_uri is: [" << _uri << "]" << std::endl;
-	// ss >> _httpVersion;
-	// if (_httpVersion.compare("HTTP/1.1"))
-	// 	_status = 505; // HTTP VERSION NOT SUPPORTED
-	// // std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
-
-	// ss >> _host;
-	// std::string hostname;
-	// if (_host.compare("Host:")) { // Actually it's case insensitive cause of course it is
-	// 	_status = 400; // BAD REQUST
-	// }
-	// ss >> _host; // Gotta check that there's actually some content here before the newline
-	// // _host += " " + hostname; // If there is no Host --- 400 BAD REQUEST
-	// // _host = hostname
-	// // std::cout << "host is: [" << _host << "]" << std::endl;
-
+	if (_status != 200) {
+		formulateResponse();
+		return ;
+	}
 
 	// /* When we're done here with the Parsing */
-	// formulateResponse();
-
+	formulateResponse();
 }
 
 void	requestHandler::formulateResponse() {
@@ -152,7 +134,7 @@ void	requestHandler::formulateResponse() {
 	}
 	if (_method == GET) { // Function for get responses
 		std::string requestedFile("pages");
-		if (!_uri.compare("/")) {
+		if (!_uri.compare("/")) { // Ok lol this is still set to default hahaha
 			_uri += "index.html";
 		}
 		requestedFile += _uri;
