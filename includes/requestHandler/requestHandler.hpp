@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 13:26:28 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 15:36:09 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class requestHandler {
 		int		getFd() const;
 
 		void	requestLine(std::string request);
+		// void	requestFields()
 		void	parseRequest();
 
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 14:19:43 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 15:39:10 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,11 @@ void	requestHandler::parseRequest() {
 		std::string	value;
 		stream >> value;
 		std::cout << "Field is: " << field << " and value is: " << value << std::endl;
+		requestFields[field] = value;
 		// std::cout << "Shouldn't contain the request Line: " << line << std::endl;
 	}
+	for (std::map<std::string, std::string>::iterator it = requestFields.begin(); it != requestFields.end(); it++)
+		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
 	// std::string word;
 	
 	// ss >> word;
