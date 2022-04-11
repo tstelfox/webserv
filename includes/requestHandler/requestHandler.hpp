@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 17:29:34 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 13:26:28 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,17 @@ class requestHandler {
 		char	*getBuffer();
 		void	bufferIsFull();
 		bool	getFullState() const;
-
 		int		getFd() const;
+
+		void	requestLine(std::string request);
 		void	parseRequest();
+
 
 		void		formulateResponse();
 		std::string	getResponse() const;
 
 		void		resetHandler();
+
 
 	public:
 		enum	methodTypes { EMPTY, GET, POST, DELETE };

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 17:50:24 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/11 13:33:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,28 +50,19 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 	/* Quickly check for the double \n\n delimiter of header
 	and then parse it after that */
 
-void	requestHandler::parseRequest() {
-	std::string request;
-	request = _buffer;
-	// std::cout << "Parsing the following request:\n" << request << std::endl;
+void	requestHandler::requestLine(std::string request) {
 	std::stringstream	ss(request);
-	std::string word;
-	ss >> word;
-	if (!word.compare("POST")) {
+	std::string			field;
+	
+	ss >> field;
+	if (!field.compare("POST"))
 		_method = POST;
-		// std::cout << "POST method" << std::endl;
-	}
-	else if (!word.compare("DELETE")) {
+	else if (!field.compare("DELETE"))
 		_method = DELETE;
-		// std::cout << "DELETE method" << std::endl;
-	}
-	else if (!word.compare("GET")) {
+	else if (!field.compare("GET"))
 		_method = GET;
-		// std::cout << "GET method" << std::endl;
-	}
-	else {
+	else
 		_status = 400; // 400 BAD REQUEST
-	}
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
 		_status = 400; // BAD REQUEST
@@ -80,6 +71,40 @@ void	requestHandler::parseRequest() {
 	if (_httpVersion.compare("HTTP/1.1"))
 		_status = 505; // HTTP VERSION NOT SUPPORTED
 	// std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
+}
+
+void	requestHandler::parseRequest() {
+	std::string request(_buffer);
+	std::istringstream	ss(request);
+	std::string	line;
+	
+	requestLine(std::getline(ss, line));
+	if (_status != 200) {
+		formulateResponse();
+		return ;
+	}
+	while (std::getline(ss, line)) {
+		
+	}
+	// std::string word;
+	
+	// ss >> word;
+	// if (!word.compare("POST"))
+	// 	_method = POST;
+	// else if (!word.compare("DELETE"))
+	// 	_method = DELETE;
+	// else if (!word.compare("GET"))
+	// 	_method = GET;
+	// else
+	// 	_status = 400; // 400 BAD REQUEST
+	// ss >> _uri;
+	// if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
+	// 	_status = 400; // BAD REQUEST
+	// // std::cout << "_uri is: [" << _uri << "]" << std::endl;
+	// ss >> _httpVersion;
+	// if (_httpVersion.compare("HTTP/1.1"))
+	// 	_status = 505; // HTTP VERSION NOT SUPPORTED
+	// // std::cout << "http version is: [" << _httpVersion << "]" << std::endl;
 
 	ss >> _host;
 	std::string hostname;
