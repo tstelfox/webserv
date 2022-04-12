@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 18:47:17 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 14:20:38 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,25 @@ class requestHandler {
 		requestHandler();
 		~requestHandler();
 
-		// void	setFd(int fd);
 
+		/* Management of request retrieval */
 		void	fillBuffer(char *buff, int valread);
 		char	*getBuffer();
-		void	bufferIsFull();
+		void	setBufferAsFull();
 		bool	getFullState() const;
 		int		getFd() const;
+		void	resetHandler();
 
+		/* Request parsing */
 		void	requestLine(std::string request);
 		void	requestFields(std::map<std::string, std::string> fields);
 		void	parseRequest();
 
-
+		/* Response formulation */
+		void		respondGet();
 		void		formulateResponse();
 		std::string	getResponse() const;
 
-		void		resetHandler();
 
 
 	public:

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 12:02:27 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 14:20:16 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,9 @@ void	serverBoy::runServer() {
 			if (it->revents & POLLOUT) {
 
 				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
-					poller.getRequests()[it->fd].bufferIsFull();
+						/* Possibly will need to parse when reading buffer and then set finished when /r is found
+						So that here we can directly send the response */
+					poller.getRequests()[it->fd].setBufferAsFull();
 					poller.getRequests()[it->fd].parseRequest();
 				}
 
