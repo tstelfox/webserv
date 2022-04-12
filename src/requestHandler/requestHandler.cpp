@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 21:32:01 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 12:06:23 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void	requestHandler::parseRequest() {
 	std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
-			std::cout << "You have reached the end of the header" << std::endl;
+			// std::cout << "You have reached the end of the header" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
@@ -135,6 +135,7 @@ void	requestHandler::parseRequest() {
 	}
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
+	std::cout << std::endl;
 	requestFields(fields);
 	if (_status != 200) {
 		formulateResponse();

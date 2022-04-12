@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/11 18:47:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 12:02:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	serverBoy::runServer() {
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
-					std::cout << buffer << std::endl;
+					std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
 					memset(buffer, 0, sizeof(buffer));
 				}
 				if (!valread) {
