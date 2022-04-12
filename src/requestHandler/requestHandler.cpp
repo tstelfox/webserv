@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 14:52:40 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 16:06:45 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,11 +140,15 @@ void	requestHandler::respondGet() {
 	}
 	requestedFile += _uri;
 	std::ifstream myfile;
-	myfile.open(requestedFile); // Protect it later
+	myfile.open(requestedFile);
+	if (myfile.fail()) {
+		_status = 404; // File not Found
+		myfile.open("pages/errorPages/fileNotFound.html");
+	}
 	std::ostringstream fileContent;
 	fileContent << myfile.rdbuf();
 	_response = fileContent.str();
-	// std::cout << "What about error files? " << requestedFile << std::endl;
+	myfile.close();
 
 	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 	int len = _response.size();
