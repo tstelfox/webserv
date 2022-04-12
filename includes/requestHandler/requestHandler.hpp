@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 16:20:25 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 18:18:50 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ class requestHandler {
 		void		formulateResponse();
 		std::string	getResponse() const;
 
-
+	private:
+		// Private funcs
 
 	public:
 		enum	methodTypes { EMPTY, GET, POST, DELETE };
@@ -67,6 +68,7 @@ class requestHandler {
 
 		/* Status Code and response info */
 		int			_status;
+		std::string	_name;
 		// std::string	_statusCode; Just add them in the formulator?
 
 		/* Final response string to be sent */

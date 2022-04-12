@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 16:17:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 18:27:55 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,13 +134,35 @@ void	requestHandler::parseRequest() {
 }
 
 void	requestHandler::buildHeader() {
-	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+
+		/* Actually constructs on the base of the request 
+			Although this map solution is a bit stupid lol*/
+	std::map<int, std::string> statusCodes;
+	statusCodes[200] = "OK";
+	statusCodes[400] = "Bad Request";
+	statusCodes[404] = "Not Found";
+	statusCodes[505] = "HTTP Version Not Supported";
+
+	std::string header = "HTTP/1.1 ";
+	header += std::to_string(_status) + " ";
+	header += statusCodes[_status] + "\n";
+
+	// Server name
+	if (_name.empty())
+		header += "Server: Mumyer and Moederje's Server\n";
+	// Date
+
+		/* The following is still simplified */
+	header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
 	int len = _response.size();
 	header.append(std::to_string(len));
 	header.append("\n\n");
 	header.append(_response);
 
+	std::cout << "The full response is:\n" << header << std::endl;
 	_response = header;
+
 }
 
 void	requestHandler::respondGet() {
