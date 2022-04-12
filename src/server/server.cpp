@@ -6,13 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 14:20:16 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 18:00:02 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 #include "clientConnecter.hpp"
-#include "responseHandler.hpp"
 
 #include <iostream>
 #include <sstream>

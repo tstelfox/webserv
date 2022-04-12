@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 16:15:15 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 16:20:25 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ class requestHandler {
 		requestHandler();
 		~requestHandler();
 
+
+		/* A lot of these functions should realistically be made private */
 
 		/* Management of request retrieval */
 		void	fillBuffer(char *buff, int valread);
