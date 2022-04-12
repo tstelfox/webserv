@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 16:06:45 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 16:17:47 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,16 @@ void	requestHandler::parseRequest() {
 	// formulateResponse();
 }
 
+void	requestHandler::buildHeader() {
+	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+	int len = _response.size();
+	header.append(std::to_string(len));
+	header.append("\n\n");
+	header.append(_response);
+
+	_response = header;
+}
+
 void	requestHandler::respondGet() {
 	std::string requestedFile("pages");
 	if (!_uri.compare("/")) { // Ok lol this is still set to default hahaha
@@ -150,13 +160,14 @@ void	requestHandler::respondGet() {
 	_response = fileContent.str();
 	myfile.close();
 
-	std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-	int len = _response.size();
-	header.append(std::to_string(len));
-	header.append("\n\n");
-	header.append(_response);
+	buildHeader();
+	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
+	// int len = _response.size();
+	// header.append(std::to_string(len));
+	// header.append("\n\n");
+	// header.append(_response);
 
-	_response = header;
+	// _response = header;
 }
 
 void	requestHandler::formulateResponse() {

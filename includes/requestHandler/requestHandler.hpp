@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 14:20:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/12 16:15:15 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class requestHandler {
 		void	parseRequest();
 
 		/* Response formulation */
+		void		buildHeader();
 		void		respondGet();
 		void		formulateResponse();
 		std::string	getResponse() const;
@@ -64,6 +65,7 @@ class requestHandler {
 
 		/* Status Code and response info */
 		int			_status;
+		// std::string	_statusCode; Just add them in the formulator?
 
 		/* Final response string to be sent */
 		std::string	_response;
