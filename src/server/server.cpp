@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 17:37:34 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 17:40:26 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,9 @@ void	serverBoy::runServer() {
 				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
 						/* Possibly will need to parse when reading buffer and then set finished when /r is found
 						So that here we can directly send the response */
-					// poller.getRequests()[it->fd].setBufferAsFull();
-					poller.getRequests()[it->fd].parseRequest();
 					std::cout << "How many times you actually in here and friggin why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
+					poller.getRequests()[it->fd].setBufferAsFull();
+					poller.getRequests()[it->fd].parseRequest();
 				}
 
 				if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
@@ -91,7 +91,7 @@ void	serverBoy::runServer() {
 						perror ("   send() failed");
 						break;
 					}
-					poller.getRequests()[it->fd].resetHandler();
+					// poller.getRequests()[it->fd].resetHandler();
 				}
 			}
 		} // End of loop through pollable connections

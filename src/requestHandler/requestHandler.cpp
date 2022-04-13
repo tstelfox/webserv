@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 17:36:58 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 17:39:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ void	requestHandler::buildHeader() {
 	// }
 
 	_response = header;
-	// resetHandler();
+	resetHandler();
 
 }
 
@@ -250,12 +250,13 @@ bool	requestHandler::getFullState() const {
 void	requestHandler::resetHandler() {
 	// std::cout << "Called how many times?" << std::endl;
 	memset(_buffer, 0, sizeof(_buffer));
-	_response.clear();
+	// _response.clear();
 	_status = 200;
 	_host.clear();
 	_method = EMPTY;
 	_httpVersion.clear();
 	_fullBuffer = false;
+	std::cout << "Handler cleared" << std::endl;
 }
 
 requestHandler::~requestHandler() {}
