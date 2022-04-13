@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 14:48:23 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 14:52:05 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ void	requestHandler::formulateResponse() {
 		buildHeader();
 		// Error responses and sheet - Should this be method-specific? According to nginx and Telnet no
 	}
-	if (_method == GET) { // Function for get responses
+	else if (_method == GET) { // Function for get responses
 		respondGet();
 	}
 	else if (_method == POST) {
