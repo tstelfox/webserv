@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 14:52:05 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 17:36:58 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,10 @@ void	requestHandler::requestLine(std::string request) {
 		_status = 400; // BAD REQUEST
 	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
-	if (_httpVersion.compare("HTTP/1.1"))
+	if (!_httpVersion.empty() && _httpVersion.compare("HTTP/1.1")) {
+		std::cout << "What is going on in here? " << _httpVersion << std::endl;
 		_status = 505; // HTTP VERSION NOT SUPPORTED
+	}
 }
 
 void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
@@ -91,6 +93,12 @@ void	requestHandler::parseRequest() {
 	std::istringstream	ss(request);
 	std::string	line;
 
+	// if (getFullState())
+	// {
+	// 	std::cout << "Miami" << std::endl;
+	// 	return ;
+	// }
+	setBufferAsFull();
 	std::getline(ss, line);
 	requestLine(line);
 	if (_status != 200) {
@@ -160,6 +168,7 @@ void	requestHandler::buildHeader() {
 	// }
 
 	_response = header;
+	// resetHandler();
 
 }
 
@@ -210,7 +219,8 @@ void	requestHandler::respondGet() {
 void	requestHandler::formulateResponse() {
 
 	if (_status != 200) {
-		buildHeader();
+		// std::cout << "How many times you actually in here and with what status? " << _status << std::endl;
+		// buildHeader(); This is causing weird looping (?)
 		// Error responses and sheet - Should this be method-specific? According to nginx and Telnet no
 	}
 	else if (_method == GET) { // Function for get responses
