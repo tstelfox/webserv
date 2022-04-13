@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 18:27:55 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 13:48:59 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,9 +114,7 @@ void	requestHandler::parseRequest() {
 			stream >> rcodio;
 			value += rcodio + " ";
 		}
-		// std::cout << "Before resize [" << value << "]" << std::endl;
-		value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething
-		// std::cout << "After resize [" << value << "]" << std::endl;
+		value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
 		fields[key] = value;
 	}
@@ -124,10 +122,6 @@ void	requestHandler::parseRequest() {
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
 	std::cout << std::endl;
 	requestFields(fields);
-	// if (_status != 200) {
-	// 	formulateResponse();
-	// 	return ;
-	// }
 
 	// /* When we're done here with the Parsing */
 	// formulateResponse();
@@ -137,7 +131,7 @@ void	requestHandler::buildHeader() {
 	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 
 		/* Actually constructs on the base of the request 
-			Although this map solution is a bit stupid lol*/
+			Although this map solution is a bit stupid lol but whatevs*/
 	std::map<int, std::string> statusCodes;
 	statusCodes[200] = "OK";
 	statusCodes[400] = "Bad Request";
