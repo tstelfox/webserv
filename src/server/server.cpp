@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 17:40:26 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 20:05:24 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	serverBoy::runServer() {
 				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
 						/* Possibly will need to parse when reading buffer and then set finished when /r is found
 						So that here we can directly send the response */
-					std::cout << "How many times you actually in here and friggin why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
+					std::cout << "How many times you actually in here and FUCKING why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
 					poller.getRequests()[it->fd].setBufferAsFull();
 					poller.getRequests()[it->fd].parseRequest();
 				}
