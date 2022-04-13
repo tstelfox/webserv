@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 13:48:59 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 14:48:23 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,6 @@ void	requestHandler::parseRequest() {
 }
 
 void	requestHandler::buildHeader() {
-	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 
 		/* Actually constructs on the base of the request 
 			Although this map solution is a bit stupid lol but whatevs*/
@@ -147,16 +146,38 @@ void	requestHandler::buildHeader() {
 		header += "Server: Mumyer and Moederje's Server\n";
 	// Date
 
-		/* The following is still simplified */
 	header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
+	if (_status != 200) {
+		extractErrorFile();
+	}
+	// else {
+			/* The following is still simplified */
 	int len = _response.size();
+	std::cout << "The response header is:\n" << header << std::endl;
 	header.append(std::to_string(len));
 	header.append("\n\n");
 	header.append(_response);
+	// }
 
-	std::cout << "The full response is:\n" << header << std::endl;
 	_response = header;
 
+}
+
+void	requestHandler::extractErrorFile() {
+	std::ifstream errFile;
+	if (_status == 505) {
+		errFile.open("pages/errorPages/httpVersionError.html");
+	}
+	if (_status == 400) {
+		errFile.open("pages/errorPages/badRequest.html");
+	}
+	if (errFile.fail()) {
+		//I honestly dunno lel
+	}
+	std::ostringstream fileContent;
+	fileContent << errFile.rdbuf();
+	_response = fileContent.str();
+	errFile.close();
 }
 
 void	requestHandler::respondGet() {
@@ -189,6 +210,7 @@ void	requestHandler::respondGet() {
 void	requestHandler::formulateResponse() {
 
 	if (_status != 200) {
+		buildHeader();
 		// Error responses and sheet - Should this be method-specific? According to nginx and Telnet no
 	}
 	if (_method == GET) { // Function for get responses

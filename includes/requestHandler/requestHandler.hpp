@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/12 18:18:50 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/13 14:42:44 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class requestHandler {
 		std::string	getResponse() const;
 
 	private:
+		void		extractErrorFile();
 		// Private funcs
 
 	public:
