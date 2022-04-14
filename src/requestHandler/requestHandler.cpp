@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/14 16:39:38 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/14 16:51:38 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,15 +163,17 @@ void	requestHandler::buildHeader() {
 	// else {
 			/* The following is still simplified */
 	int len = _response.size();
-	std::cout << "The response header is:\n" << header << std::endl;
+	// std::cout << "The response header is:\n" << header << std::endl;
 	header.append(std::to_string(len));
 	header.append("\n\n");
 	header.append(_response);
 	// }
 
 	_response = header;
+	std::cout << "Full response is:\n" << _response << std::endl;
 	// resetHandler();
 	memset(_buffer, 0, sizeof(_buffer));
+	_buffSize = 0; // Don't forget this you idiot
 }
 
 void	requestHandler::extractErrorFile() {
@@ -182,12 +184,17 @@ void	requestHandler::extractErrorFile() {
 	if (_status == 400) {
 		errFile.open("pages/errorPages/badRequest.html");
 	}
+	if (_status == 404) {
+		std::cout << "In ehre?" << std::endl;
+		errFile.open("pages/errorPages/fileNotFound.html");
+	}
 	if (errFile.fail()) {
 		//I honestly dunno lel
 	}
 	std::ostringstream fileContent;
 	fileContent << errFile.rdbuf();
 	_response = fileContent.str();
+	std::cout << "Error reponse:\n" << _response << std::endl;
 	errFile.close();
 }
 
@@ -201,13 +208,16 @@ void	requestHandler::respondGet() {
 	myfile.open(requestedFile);
 	if (myfile.fail()) {
 		_status = 404; // File not Found
-		myfile.open("pages/errorPages/fileNotFound.html");
+		buildHeader();
+		return ;
+		// myfile.open("pages/errorPages/fileNotFound.html");
 	}
 	std::ostringstream fileContent;
 	fileContent << myfile.rdbuf();
 	_response = fileContent.str();
 	myfile.close();
 
+	std::cout << "Yo where is the 404 not found shit?" << _response << std::endl;
 	buildHeader();
 	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
 	// int len = _response.size();
@@ -222,7 +232,7 @@ void	requestHandler::formulateResponse() {
 
 	if (_status != 200) {
 		// std::cout << "How many times you actually in here and with what status? " << _status << std::endl;
-		// buildHeader(); This is causing weird looping (?)
+		buildHeader();
 		// Error responses and sheet - Should this be method-specific? According to nginx and Telnet no
 	}
 	else if (_method == GET) { // Function for get responses
