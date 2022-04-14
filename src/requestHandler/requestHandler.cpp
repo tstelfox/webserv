@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 17:39:27 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/14 16:39:38 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ void	requestHandler::parseRequest() {
 	// 	std::cout << "Miami" << std::endl;
 	// 	return ;
 	// }
+	std::cout << "Parse another thing:\n" << _buffer << std::endl;
 	setBufferAsFull();
 	std::getline(ss, line);
 	requestLine(line);
@@ -109,6 +110,7 @@ void	requestHandler::parseRequest() {
 	std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
+			_fullBuffer = true;
 			// std::cout << "You have reached the end of the header" << std::endl;
 			break;
 		}
@@ -168,8 +170,8 @@ void	requestHandler::buildHeader() {
 	// }
 
 	_response = header;
-	resetHandler();
-
+	// resetHandler();
+	memset(_buffer, 0, sizeof(_buffer));
 }
 
 void	requestHandler::extractErrorFile() {

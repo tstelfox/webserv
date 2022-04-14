@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/13 20:05:24 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/14 16:40:35 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,9 @@ void	serverBoy::runServer() {
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
 					// std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
-					std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
+					// std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
+					// if (!poller.getRequests()[it->fd].getFullState())
+					poller.getRequests()[it->fd].parseRequest(); // Why is this empty on the second call?
 					memset(buffer, 0, sizeof(buffer));
 				}
 				if (!valread) {
@@ -77,13 +79,13 @@ void	serverBoy::runServer() {
 			}
 			if (it->revents & POLLOUT) {
 
-				if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
-						/* Possibly will need to parse when reading buffer and then set finished when /r is found
-						So that here we can directly send the response */
-					std::cout << "How many times you actually in here and FUCKING why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
-					poller.getRequests()[it->fd].setBufferAsFull();
-					poller.getRequests()[it->fd].parseRequest();
-				}
+				// if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
+				// 		/* Possibly will need to parse when reading buffer and then set finished when /r is found
+				// 		So that here we can directly send the response */
+				// 	std::cout << "How many times you actually in here and FUCKING why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
+				// 	poller.getRequests()[it->fd].setBufferAsFull();
+				// 	poller.getRequests()[it->fd].parseRequest();
+				// }
 
 				if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
 					ret = firstResponse(it->fd);
@@ -91,7 +93,7 @@ void	serverBoy::runServer() {
 						perror ("   send() failed");
 						break;
 					}
-					// poller.getRequests()[it->fd].resetHandler();
+					poller.getRequests()[it->fd].resetHandler();
 				}
 			}
 		} // End of loop through pollable connections
