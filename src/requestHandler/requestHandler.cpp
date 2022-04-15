@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/15 17:48:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/15 18:19:20 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,15 @@ void	requestHandler::buildHeader() {
 	statusCodes[400] = "Bad Request";
 	statusCodes[404] = "Not Found";
 	statusCodes[505] = "HTTP Version Not Supported";
+	/* Full list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#server_error_responses
+	399-399 Redirection messages
+	301 Moved permanently
+	401 Unauthorised
+	403 Forbidden
+	405 method not allowed 
+	406 not acceptable
+	*/
+
 
 	std::string header = "HTTP/1.1 ";
 	header += std::to_string(_status) + " ";
