@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/15 17:23:31 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/15 17:48:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,12 @@ void	requestHandler::buildHeader() {
 	if (_name.empty())
 		header += "Server: Mumyer and Moederje's Server\n";
 	// Date
+	time_t now = time(0);
+	char *date = ctime(&now);
+	std::string stringDate = date;
+	stringDate.insert(3, ",");
+	stringDate.resize(stringDate.size() - 1);
+	header += "Date: " + stringDate + " GMT\n";
 
 	header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
 	if (_status != 200) {
