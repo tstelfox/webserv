@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/14 17:00:47 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/15 16:42:52 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void	requestHandler::parseRequest() {
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			_fullBuffer = true;
-			// std::cout << "You have reached the end of the header" << std::endl;
+			std::cout << "---- UE BRO END OF HEADER -----" << std::endl; // This doesn't ever happen for some reason?
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');

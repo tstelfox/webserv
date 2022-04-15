@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/14 16:40:35 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/15 16:43:03 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	serverBoy::runServer() {
 					newConnection();
 					break;
 				}
-				
+
 				valread = recv(it->fd, buffer, 1024, 0);
 				// std::cout << "valread contains: [" << valread << "]" << std::endl;
 				if (valread > 0) {
