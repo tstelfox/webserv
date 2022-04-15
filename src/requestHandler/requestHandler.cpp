@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/15 16:42:52 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/15 17:23:31 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	requestHandler::requestLine(std::string request) {
 		_method = DELETE;
 	else if (!field.compare("GET"))
 		_method = GET;
-	else
+	else // There is a 501 error Method NOt Implemented
 		_status = 400; // BAD REQUEST
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
@@ -111,7 +111,8 @@ void	requestHandler::parseRequest() {
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			_fullBuffer = true;
-			std::cout << "---- UE BRO END OF HEADER -----" << std::endl; // This doesn't ever happen for some reason?
+			// This doesn't ever happen for some reason whenever the request arrives in more parts?
+			std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
