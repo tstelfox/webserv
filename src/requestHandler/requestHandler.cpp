@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/18 16:44:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/18 17:00:40 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,9 @@ void	requestHandler::parseRequest() {
 	// 	return ;
 	// }
 	std::cout << "Parse another thing:\n" << _buffer << std::endl;
-	setBufferAsFull();
+	
+	// Need to work out how to not parse the first line like this if we haven't got the complete header
+	// isHeaderComplete(); perhaps?
 	std::getline(ss, line);
 	requestLine(line);
 	if (_status != 200) {
@@ -111,7 +113,7 @@ void	requestHandler::parseRequest() {
 	std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
-			_fullBuffer = true;
+			setBufferAsFull();
 			// This doesn't ever happen for some reason whenever the request arrives in more parts?
 			std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
 			break;
