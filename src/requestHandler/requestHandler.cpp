@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/18 16:25:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/18 16:44:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ void	requestHandler::requestLine(std::string request) {
 	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
 	if (!_httpVersion.empty() && _httpVersion.compare("HTTP/1.1")) {
-		// std::cout << "What is going on in here? " << _httpVersion << std::endl;
 		_status = 505; // HTTP VERSION NOT SUPPORTED
 	}
 }
@@ -81,10 +80,12 @@ void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
 		/* Test the following with no host
 			It may be that if the Uri is an absolute path then
 			host can actually be omitted (?) */
-	if (fields["host"].empty())
+	if (fields["host"].empty()) {
 		std::cout << "No host" << std::endl;
-	_host = fields["host"];
-
+		_status = 400;
+	}
+	else
+		_host = fields["host"];
 	formulateResponse();
 }
 
