@@ -6,7 +6,11 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
+<<<<<<< HEAD
 /*   Updated: 2022/04/18 16:19:12 by tmullan       ########   odam.nl         */
+=======
+/*   Updated: 2022/04/15 18:19:20 by tmullan       ########   odam.nl         */
+>>>>>>> 13743ff714c664003c64b1f0ceb76568193666af
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +59,7 @@ void	requestHandler::requestLine(std::string request) {
 		_method = DELETE;
 	else if (!field.compare("GET"))
 		_method = GET;
-	else
+	else // There is a 501 error Method NOt Implemented
 		_status = 400; // BAD REQUEST
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
@@ -111,7 +115,8 @@ void	requestHandler::parseRequest() {
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			_fullBuffer = true;
-			// std::cout << "You have reached the end of the header" << std::endl;
+			// This doesn't ever happen for some reason whenever the request arrives in more parts?
+			std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
@@ -146,6 +151,15 @@ void	requestHandler::buildHeader() {
 	statusCodes[400] = "Bad Request";
 	statusCodes[404] = "Not Found";
 	statusCodes[505] = "HTTP Version Not Supported";
+	/* Full list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#server_error_responses
+	399-399 Redirection messages
+	301 Moved permanently
+	401 Unauthorised
+	403 Forbidden
+	405 method not allowed 
+	406 not acceptable
+	*/
+
 
 	std::string header = "HTTP/1.1 ";
 	header += std::to_string(_status) + " ";
@@ -155,6 +169,12 @@ void	requestHandler::buildHeader() {
 	if (_name.empty())
 		header += "Server: Mumyer and Moederje's Server\n";
 	// Date
+	time_t now = time(0);
+	char *date = ctime(&now);
+	std::string stringDate = date;
+	stringDate.insert(3, ",");
+	stringDate.resize(stringDate.size() - 1);
+	header += "Date: " + stringDate + " GMT\n";
 
 	header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
 	if (_status != 200) {
