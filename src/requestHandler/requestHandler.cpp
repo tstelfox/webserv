@@ -6,11 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-<<<<<<< HEAD
-/*   Updated: 2022/04/18 16:19:12 by tmullan       ########   odam.nl         */
-=======
-/*   Updated: 2022/04/15 18:19:20 by tmullan       ########   odam.nl         */
->>>>>>> 13743ff714c664003c64b1f0ceb76568193666af
+/*   Updated: 2022/04/18 16:25:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +63,7 @@ void	requestHandler::requestLine(std::string request) {
 	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
 	if (!_httpVersion.empty() && _httpVersion.compare("HTTP/1.1")) {
-		std::cout << "What is going on in here? " << _httpVersion << std::endl;
+		// std::cout << "What is going on in here? " << _httpVersion << std::endl;
 		_status = 505; // HTTP VERSION NOT SUPPORTED
 	}
 }
