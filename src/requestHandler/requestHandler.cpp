@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 12:07:06 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 12:28:26 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,10 @@ void	requestHandler::buildHeader() {
 	stringDate.resize(stringDate.size() - 1);
 	header += "Date: " + stringDate + " GMT\n";
 
-	header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
+	if (!_uri.compare("/favicon.ico"))
+		header += "Content-type: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8\nContent-Length:";
+	else
+		header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
 	if (_status != 200) {
 		extractErrorFile();
 	}
