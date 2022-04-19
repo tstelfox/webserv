@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/18 17:00:40 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 11:38:44 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,20 @@ void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
 	formulateResponse();
 }
 
+int		requestHandler::fullHeaderReceived() {
+	std::string request(_buffer);
+	std::istringstream ss(request);
+	std::string line;
+	while (std::getline(ss, line)) {
+		if(!line.compare("\r")) {
+			// setBufferAsFull();
+			std::cout << "It's full" << std::endl;
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void	requestHandler::parseRequest() {
 	std::string request(_buffer);
 	std::istringstream	ss(request);
@@ -102,7 +116,9 @@ void	requestHandler::parseRequest() {
 	std::cout << "Parse another thing:\n" << _buffer << std::endl;
 	
 	// Need to work out how to not parse the first line like this if we haven't got the complete header
-	// isHeaderComplete(); perhaps?
+	if (!fullHeaderReceived())
+		return ;
+
 	std::getline(ss, line);
 	requestLine(line);
 	if (_status != 200) {

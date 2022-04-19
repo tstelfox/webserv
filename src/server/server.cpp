@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/18 16:58:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 11:33:12 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	serverBoy::runServer() {
 	ssize_t valread = -1;
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
-	char buffer[1024] = {0};
+	char buffer[100] = {0};
 
 	while (true) {
 		ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
@@ -54,7 +54,7 @@ void	serverBoy::runServer() {
 					break;
 				}
 
-				valread = recv(it->fd, buffer, 1024, 0);
+				valread = recv(it->fd, buffer, 100, 0);
 				// std::cout << "valread contains: [" << valread << "]" << std::endl;
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
