@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 17:27:49 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 18:11:44 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ void	requestHandler::requestLine(std::string request) {
 	std::string			field;
 	
 	ss >> field;
-	// std::cout << "Method: " << field << std::endl;
+	// 405 Method not allowed will be about the config allowed methods
+	// Otherwise all others are 400 Bad Request
 	if (!field.compare("POST"))
 		_method = POST;
 	else if (!field.compare("DELETE"))
@@ -62,8 +63,10 @@ void	requestHandler::requestLine(std::string request) {
 	// 	_status = 405; // Method Not Allowed
 	// }
 	ss >> _uri;
-	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
+	if (_uri[0] != '/') { // This'll segfault if there's nothign there of course PLUS so much other shit
+		// Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
 		_status = 400; // BAD REQUEST
+	}
 	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
 	if (!_httpVersion.empty() && _httpVersion.compare("HTTP/1.1")) {
@@ -202,14 +205,14 @@ void	requestHandler::buildHeader() {
 	// else {
 			/* The following is still simplified */
 	int len = _response.size();
-	std::cout << "The response header is:\n" << header << std::endl;
+	// std::cout << "The response header is:\n" << header << std::endl;
 	header.append(std::to_string(len));
 	header.append("\n\n");
 	header.append(_response);
 	// }
 
 	_response = header;
-	// std::cout << "Full response is:\n" << _response << std::endl;
+	std::cout << "Full response is:\n" << _response << std::endl;
 	// resetHandler();
 	memset(_buffer, 0, sizeof(_buffer));
 	_buffSize = 0; // Don't forget this you idiot
@@ -226,8 +229,7 @@ void	requestHandler::extractErrorFile() {
 	if (_status == 404) {
 		errFile.open("pages/errorPages/fileNotFound.html");
 	}
-	if (_status == 405) {
-		// std::cout << "Not here?" << std::endl;
+	if (_status == 405) { // This'll be dependent on configuration
 		errFile.open("pages/errorPages/methodNotAllowed.html");
 	}
 	if (errFile.fail()) {
