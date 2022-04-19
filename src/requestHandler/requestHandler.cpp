@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 16:18:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 17:10:32 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,16 @@ void	requestHandler::requestLine(std::string request) {
 	std::string			field;
 	
 	ss >> field;
+	// std::cout << "Method: " << field << std::endl;
 	if (!field.compare("POST"))
 		_method = POST;
 	else if (!field.compare("DELETE"))
 		_method = DELETE;
 	else if (!field.compare("GET"))
 		_method = GET;
-	else if (!std::isupper(field[0]))
-		_status = 501; // Method Not Implemented
+	else if (std::isupper(field[0])) {
+		_status = 405; // Method Not Allowed
+	}
 	else
 		_status = 400; // BAD REQUEST
 	ss >> _uri;
@@ -70,7 +72,7 @@ void	requestHandler::requestLine(std::string request) {
 }
 
 void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
-	
+
 		/* Check that there is a valid Host */
 	std::map<std::string, std::string>::iterator	it;
 	it = fields.find("host");
@@ -163,7 +165,7 @@ void	requestHandler::buildHeader() {
 	statusCodes[200] = "OK";
 	statusCodes[400] = "Bad Request";
 	statusCodes[404] = "Not Found";
-	statusCodes[501] = "Method Not Implemented";
+	statusCodes[405] = "Method Not Allowed";
 	statusCodes[505] = "HTTP Version Not Supported";
 	/* Full list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#server_error_responses
 	300-399 Redirection messages
@@ -224,6 +226,10 @@ void	requestHandler::extractErrorFile() {
 	if (_status == 404) {
 		errFile.open("pages/errorPages/fileNotFound.html");
 	}
+	if (_status == 405) {
+		// std::cout << "Not here?" << std::endl;
+		errFile.open("pages/errorPages/methodNotAllowed.html");
+	}
 	if (errFile.fail()) {
 		//I honestly dunno lel
 	}
@@ -252,15 +258,7 @@ void	requestHandler::respondGet() {
 	_response = fileContent.str();
 	myfile.close();
 
-	// std::cout << "Yo where is the 404 not found shit?" << _response << std::endl;
 	buildHeader();
-	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-	// int len = _response.size();
-	// header.append(std::to_string(len));
-	// header.append("\n\n");
-	// header.append(_response);
-
-	// _response = header;
 }
 
 void	requestHandler::formulateResponse() {
