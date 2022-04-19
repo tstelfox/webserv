@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 11:33:12 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 11:50:40 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	serverBoy::runServer() {
 	ssize_t valread = -1;
 
 	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
-	char buffer[100] = {0};
+	char buffer[999] = {0};
 
 	while (true) {
 		ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(), -1); // Could use std::vector::data() but that's c++11
@@ -54,7 +54,7 @@ void	serverBoy::runServer() {
 					break;
 				}
 
-				valread = recv(it->fd, buffer, 100, 0);
+				valread = recv(it->fd, buffer, 999, 0);
 				// std::cout << "valread contains: [" << valread << "]" << std::endl;
 				if (valread > 0) {
 					poller.getRequests()[it->fd].fillBuffer(buffer, valread);
@@ -88,7 +88,7 @@ void	serverBoy::runServer() {
 				// }
 
 				if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
-					ret = firstResponse(it->fd);
+					ret = respondToClient(it->fd);
 					if (ret < 0) {
 						perror ("   send() failed");
 						break;
@@ -139,27 +139,7 @@ void		serverBoy::newConnection() {
 	poller.newRequest(new_fd);
 }
 
-int		serverBoy::firstResponse(int sock_fd) {
-	// std::ostringstream file_content;
-	// std::ifstream myfile;
-	// if (sock_fd % 2)
-	// 	myfile.open("pages/other.html");
-	// else
-	// 	myfile.open("pages/index.html");
-	// if (!myfile) {
-	// 	std::cout << "ao" << std::endl;
-	// }
-
-	// file_content << myfile.rdbuf();
-	// std::string content = file_content.str();
-
-	// std::string	header = "HTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nContent-Length:";
-	// int len = file_content.str().size();
-	// header.append(std::to_string(len));
-	// header.append("\n\n");
-	// header.append(content);
-	// char *hey = new char[header.length() + 1];
-	// std::strcpy(hey, header.c_str());
+int		serverBoy::respondToClient(int sock_fd) {
 
 	std::string response = poller.getRequests()[sock_fd].getResponse();
 
@@ -168,7 +148,6 @@ int		serverBoy::firstResponse(int sock_fd) {
 
 	int ret = send(sock_fd, hey, strlen(hey), 0);
 	delete[] hey;
-	// ret = -1;
 	return ret;
 }
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 11:41:50 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 12:07:06 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,9 @@ void	requestHandler::requestLine(std::string request) {
 		_method = DELETE;
 	else if (!field.compare("GET"))
 		_method = GET;
-	else // There is a 501 error Method NOt Implemented
+	else if (!std::isupper(field[0]))
+		_status = 501; // Method Not Implemented
+	else
 		_status = 400; // BAD REQUEST
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
@@ -108,11 +110,6 @@ void	requestHandler::parseRequest() {
 	std::istringstream	ss(request);
 	std::string	line;
 
-	// if (getFullState())
-	// {
-	// 	std::cout << "Miami" << std::endl;
-	// 	return ;
-	// }
 	std::cout << "Parse another thing:\n" << _buffer << std::endl;
 	
 	// Need to work out how to not parse the first line like this if we haven't got the complete header
@@ -165,12 +162,13 @@ void	requestHandler::buildHeader() {
 	statusCodes[200] = "OK";
 	statusCodes[400] = "Bad Request";
 	statusCodes[404] = "Not Found";
+	statusCodes[501] = "Method Not Implemented";
 	statusCodes[505] = "HTTP Version Not Supported";
 	/* Full list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#server_error_responses
-	399-399 Redirection messages
+	300-399 Redirection messages
 	301 Moved permanently
 	401 Unauthorised
-	403 Forbidden
+	403 Forbidden - Tied into directoy listing perhaps
 	405 method not allowed 
 	406 not acceptable
 	*/
