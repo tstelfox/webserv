@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 11:38:44 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 11:41:50 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int		requestHandler::fullHeaderReceived() {
 	std::string line;
 	while (std::getline(ss, line)) {
 		if(!line.compare("\r")) {
-			// setBufferAsFull();
+			// setBufferAsFull(); Request might have a body so not ready for this
 			std::cout << "It's full" << std::endl;
 			return 1;
 		}
