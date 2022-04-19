@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 17:10:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 17:27:49 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ void	requestHandler::requestLine(std::string request) {
 		_method = DELETE;
 	else if (!field.compare("GET"))
 		_method = GET;
-	else if (std::isupper(field[0])) {
-		_status = 405; // Method Not Allowed
-	}
 	else
 		_status = 400; // BAD REQUEST
+	// else if (std::isupper(field[0])) {
+	// 	_status = 405; // Method Not Allowed
+	// }
 	ss >> _uri;
 	if (_uri[0] != '/') // This'll segfault if there's nothign there of course PLUS so much other shit
 		_status = 400; // BAD REQUEST
