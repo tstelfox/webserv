@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 12:28:26 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/19 16:18:54 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
 		/* Test the following with no host
 			It may be that if the Uri is an absolute path then
 			host can actually be omitted (?) */
-	if (fields["host"].empty()) {
+	if (fields["host"].empty() || !fields["host"].compare(" ")) {
 		std::cout << "No host" << std::endl;
 		_status = 400;
 	}
@@ -141,7 +141,8 @@ void	requestHandler::parseRequest() {
 			stream >> rcodio;
 			value += rcodio + " ";
 		}
-		value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
+		if (value.size() > 2)
+			value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
 		fields[key] = value;
 	}
@@ -221,7 +222,6 @@ void	requestHandler::extractErrorFile() {
 		errFile.open("pages/errorPages/badRequest.html");
 	}
 	if (_status == 404) {
-		std::cout << "In ehre?" << std::endl;
 		errFile.open("pages/errorPages/fileNotFound.html");
 	}
 	if (errFile.fail()) {
