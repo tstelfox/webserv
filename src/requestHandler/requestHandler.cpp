@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 16:25:13 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 17:23:27 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,7 +255,7 @@ void	requestHandler::buildHeader() {
 	header.append("\n\n");
 	std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << header << std::endl;
 
-	std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
+	// std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
 	header.append(_response);
 	header.append("\n");
 	_response = header;
