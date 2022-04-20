@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 15:48:11 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 15:59:13 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <map>
 #include <algorithm>
 
+	/* < --------- Constructor / Destructor ----------> */
+
 // requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0),
 requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
@@ -26,15 +28,9 @@ requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0),
 	(void)_method;
 }
 
-// requestHandler::requestHandler() {}
+requestHandler::~requestHandler() {}
 
-// int		requestHandler::getFd() const {
-// 	return this->_clientFd;
-// }
-
-std::string	requestHandler::getResponse() const {
-	return this->_response;
-}
+		/* < ---------- Manage Incoming Request Buffer ----------- > */
 
 void	requestHandler::fillBuffer(char *buff, int valread) {
 	int temp = _buffSize;
@@ -44,6 +40,36 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 		temp++;
 	}
 	_buffer[temp] = '\0';
+}
+
+void	requestHandler::setBufferAsFull() {
+	_fullBuffer = true;
+}
+
+void	requestHandler::resetHandler() { // is this really the best way to do this?
+	memset(_buffer, 0, sizeof(_buffer));
+	// _response.clear();
+	_status = 200;
+	_host.clear();
+	_method = EMPTY;
+	_httpVersion.clear();
+	_fullBuffer = false;
+	std::cout << "Handler cleared" << std::endl;
+}
+
+		/* < --------- Parse Received Request ------ > */
+
+int		requestHandler::fullHeaderReceived() {
+	std::string request(_buffer);
+	std::istringstream ss(request);
+	std::string line;
+	while (std::getline(ss, line)) {
+		if(!line.compare("\r")) {
+			// setBufferAsFull(); Request might have a body so not ready for this
+			return 1;
+		}
+	}
+	return 0;
 }
 
 void	requestHandler::parseRequestLine(std::string request) {
@@ -76,7 +102,7 @@ void	requestHandler::parseRequestLine(std::string request) {
 	}
 }
 
-void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
+void	requestHandler::requestFields(std::map<std::string, std::string> &fields) {
 
 		/* Check that there is a valid Host */
 	std::map<std::string, std::string>::iterator	it;
@@ -98,24 +124,10 @@ void	requestHandler::requestFields(std::map<std::string, std::string> fields) {
 	formulateResponse();
 }
 
-int		requestHandler::fullHeaderReceived() {
-	std::string request(_buffer);
-	std::istringstream ss(request);
-	std::string line;
-	while (std::getline(ss, line)) {
-		if(!line.compare("\r")) {
-			// setBufferAsFull(); Request might have a body so not ready for this
-			// std::cout << "It's full" << std::endl;
-			return 1;
-		}
-	}
-	return 0;
-}
-
 void	requestHandler::parseRequest() {
-	std::string request(_buffer);
+	std::string 		request(_buffer);
 	std::istringstream	ss(request);
-	std::string	line;
+	std::string			line;
 
 	// std::cout << "Parse another thing:\n" << _buffer << std::endl;
 	if (!fullHeaderReceived())
@@ -128,7 +140,8 @@ void	requestHandler::parseRequest() {
 		return ;
 	}
 	std::map<std::string, std::string>	fields;
-	std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << _method << " " << _uri << " " << _httpVersion << std::endl << std::endl;
+	std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
+			_method << " " << _uri << " " << _httpVersion << std::endl << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			setBufferAsFull();
@@ -150,6 +163,7 @@ void	requestHandler::parseRequest() {
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
 		fields[key] = value;
 	}
+
 	std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
@@ -276,29 +290,18 @@ void	requestHandler::formulateResponse() {
 	}
 }
 
+		/* <---------- Getter functions ---------> */
+
 char*	requestHandler::getBuffer() {
 	return _buffer;
-}
-
-void	requestHandler::setBufferAsFull() {
-	_fullBuffer = true;
 }
 
 bool	requestHandler::getFullState() const {
 	return _fullBuffer;
 }
 
-	// is this really the best way to do this?
-void	requestHandler::resetHandler() {
-	memset(_buffer, 0, sizeof(_buffer));
-	// _response.clear();
-	_status = 200;
-	_host.clear();
-	_method = EMPTY;
-	_httpVersion.clear();
-	_fullBuffer = false;
-	std::cout << "Handler cleared" << std::endl;
+std::string	requestHandler::getResponse() const {
+	return this->_response;
 }
 
-requestHandler::~requestHandler() {}
 
