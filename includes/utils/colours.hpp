@@ -1,5 +1,5 @@
 #pragma once
-#define RESET_COLOR		"\033[0m"
+#define RESET_COLOUR	"\033[0m"
 
 #define BLACK   		"\033[30m"
 #define RED     		"\033[31m"

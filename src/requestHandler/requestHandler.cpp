@@ -6,11 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 11:31:09 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 11:48:59 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "requestHandler.hpp"
+#include "colours.hpp"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -50,8 +51,8 @@ void	requestHandler::requestLine(std::string request) {
 	std::string			field;
 	
 	ss >> field;
-	// 405 Method not allowed will be about the config allowed methods
-	// Otherwise all others are 400 Bad Request
+	/* 405 Method not allowed will be about the config allowed methods
+	Otherwise all others are 400 Bad Request */
 	if (!field.compare("POST"))
 		_method = POST;
 	else if (!field.compare("DELETE"))
@@ -66,7 +67,7 @@ void	requestHandler::requestLine(std::string request) {
 	ss >> _uri;
 	if (_uri[0] != '/') { // This'll segfault if there's nothign there of course PLUS so much other shit
 		// Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
-		_status = 400; // BAD REQUEST
+		_status = 400;
 	}
 	// std::cout << "_uri is: [" << _uri << "]" << std::endl;
 	ss >> _httpVersion;
@@ -104,7 +105,7 @@ int		requestHandler::fullHeaderReceived() {
 	while (std::getline(ss, line)) {
 		if(!line.compare("\r")) {
 			// setBufferAsFull(); Request might have a body so not ready for this
-			std::cout << "It's full" << std::endl;
+			// std::cout << "It's full" << std::endl;
 			return 1;
 		}
 	}
@@ -116,7 +117,7 @@ void	requestHandler::parseRequest() {
 	std::istringstream	ss(request);
 	std::string	line;
 
-	std::cout << "Parse another thing:\n" << _buffer << std::endl;
+	// std::cout << "Parse another thing:\n" << _buffer << std::endl;
 	
 	// Need to work out how to not parse the first line like this if we haven't got the complete header
 	if (!fullHeaderReceived())
@@ -129,12 +130,11 @@ void	requestHandler::parseRequest() {
 		return ;
 	}
 	std::map<std::string, std::string>	fields;
-	std::cout << "Request line is: " << _method << " " << _uri << " " << _httpVersion << std::endl;
+	std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << _method << " " << _uri << " " << _httpVersion << std::endl << std::endl;
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			setBufferAsFull();
-			// This doesn't ever happen for some reason whenever the request arrives in more parts?
-			std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
+			// std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
@@ -152,6 +152,7 @@ void	requestHandler::parseRequest() {
 		transform(key.begin(), key.end(), key.begin(), ::tolower);
 		fields[key] = value;
 	}
+	std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
 	for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 		std::cout << "Field: [" << it->first <<"] " << "- " << "Value [" << it->second << "]" << std::endl;
 	std::cout << std::endl;
@@ -206,14 +207,15 @@ void	requestHandler::buildHeader() {
 	// else {
 			/* The following is still simplified */
 	int len = _response.size();
-	// std::cout << "The response header is:\n" << header << std::endl;
 	header.append(std::to_string(len));
 	header.append("\n\n");
+	std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << header << std::endl;
+
+	// std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
 	header.append(_response);
 	// }
 
 	_response = header;
-	std::cout << "Full response is:\n" << _response << std::endl;
 	// resetHandler();
 	memset(_buffer, 0, sizeof(_buffer));
 	_buffSize = 0; // Don't forget this you idiot
@@ -295,7 +297,6 @@ bool	requestHandler::getFullState() const {
 
 	// is this really the best way to do this?
 void	requestHandler::resetHandler() {
-	// std::cout << "Called how many times?" << std::endl;
 	memset(_buffer, 0, sizeof(_buffer));
 	// _response.clear();
 	_status = 200;
