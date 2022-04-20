@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 11:48:59 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 15:48:11 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	requestHandler::fillBuffer(char *buff, int valread) {
 	_buffer[temp] = '\0';
 }
 
-void	requestHandler::requestLine(std::string request) {
+void	requestHandler::parseRequestLine(std::string request) {
 	std::stringstream	ss(request);
 	std::string			field;
 	
@@ -118,13 +118,11 @@ void	requestHandler::parseRequest() {
 	std::string	line;
 
 	// std::cout << "Parse another thing:\n" << _buffer << std::endl;
-	
-	// Need to work out how to not parse the first line like this if we haven't got the complete header
 	if (!fullHeaderReceived())
 		return ;
 
 	std::getline(ss, line);
-	requestLine(line);
+	parseRequestLine(line);
 	if (_status != 200) {
 		formulateResponse();
 		return ;
@@ -181,7 +179,6 @@ void	requestHandler::buildHeader() {
 	406 not acceptable
 	*/
 
-
 	std::string header = "HTTP/1.1 ";
 	header += std::to_string(_status) + " ";
 	header += statusCodes[_status] + "\n";
@@ -204,8 +201,7 @@ void	requestHandler::buildHeader() {
 	if (_status != 200) {
 		extractErrorFile();
 	}
-	// else {
-			/* The following is still simplified */
+		/* The following is still simplified */
 	int len = _response.size();
 	header.append(std::to_string(len));
 	header.append("\n\n");
@@ -213,10 +209,8 @@ void	requestHandler::buildHeader() {
 
 	// std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
 	header.append(_response);
-	// }
-
 	_response = header;
-	// resetHandler();
+
 	memset(_buffer, 0, sizeof(_buffer));
 	_buffSize = 0; // Don't forget this you idiot
 }
@@ -232,7 +226,7 @@ void	requestHandler::extractErrorFile() {
 	if (_status == 404) {
 		errFile.open("pages/errorPages/fileNotFound.html");
 	}
-	if (_status == 405) { // This'll be dependent on configuration
+	if (_status == 405) { // This'll be dependent on location accepted methods
 		errFile.open("pages/errorPages/methodNotAllowed.html");
 	}
 	if (errFile.fail()) {
@@ -241,7 +235,6 @@ void	requestHandler::extractErrorFile() {
 	std::ostringstream fileContent;
 	fileContent << errFile.rdbuf();
 	_response = fileContent.str();
-	// std::cout << "Error response:\n" << _response << std::endl;
 	errFile.close();
 }
 

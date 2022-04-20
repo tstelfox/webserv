@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 11:30:31 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 15:48:21 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class requestHandler {
 
 		/* Request parsing */
 		int		fullHeaderReceived();
-		void	requestLine(std::string request);
+		void	parseRequestLine(std::string request);
 		void	requestFields(std::map<std::string, std::string> fields);
 
 		/* Response formulation */
