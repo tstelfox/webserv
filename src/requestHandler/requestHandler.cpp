@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 15:59:13 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 16:25:13 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,12 +130,15 @@ void	requestHandler::parseRequest() {
 	std::string			line;
 
 	// std::cout << "Parse another thing:\n" << _buffer << std::endl;
-	if (!fullHeaderReceived())
+	if (!fullHeaderReceived()) {
+		// std::cout << "Not full yet" << std::endl;
 		return ;
+	}
 
 	std::getline(ss, line);
 	parseRequestLine(line);
 	if (_status != 200) {
+		setBufferAsFull();
 		formulateResponse();
 		return ;
 	}
@@ -145,7 +148,7 @@ void	requestHandler::parseRequest() {
 	while (std::getline(ss, line)) {
 		if (!line.compare("\r")) {
 			setBufferAsFull();
-			// std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
+			std::cout << "---- UE BRO END OF HEADER -----" << std::endl;
 			break;
 		}
 		std::replace(line.begin(), line.end(), ':', ' ');
@@ -172,6 +175,31 @@ void	requestHandler::parseRequest() {
 
 	// /* When we're done here with the Parsing */
 	// formulateResponse();
+}
+
+		/* < ------- Build Response Header ------ > */
+
+void	requestHandler::extractErrorFile() {
+	std::ifstream errFile;
+	if (_status == 505) {
+		errFile.open("pages/errorPages/httpVersionError.html");
+	}
+	if (_status == 400) {
+		errFile.open("pages/errorPages/badRequest.html");
+	}
+	if (_status == 404) {
+		errFile.open("pages/errorPages/fileNotFound.html");
+	}
+	if (_status == 405) { // This'll be dependent on location accepted methods
+		errFile.open("pages/errorPages/methodNotAllowed.html");
+	}
+	if (errFile.fail()) {
+		//I honestly dunno lel
+	}
+	std::ostringstream fileContent;
+	fileContent << errFile.rdbuf();
+	_response = fileContent.str();
+	errFile.close();
 }
 
 void	requestHandler::buildHeader() {
@@ -213,44 +241,29 @@ void	requestHandler::buildHeader() {
 	else
 		header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
 	if (_status != 200) {
+		// std::cout << "Extracting error file: " << _status << std::endl;
 		extractErrorFile();
 	}
 		/* The following is still simplified */
 	int len = _response.size();
 	header.append(std::to_string(len));
+
+	if (_status != 200) { // Need to check if this is always the case
+		header += "\nConnection: close";
+	}
+
 	header.append("\n\n");
 	std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << header << std::endl;
 
-	// std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
+	std::cout << YELLOW << "<-------- Response Body ------->\n" << RESET_COLOUR << _response << std::endl;
 	header.append(_response);
+	header.append("\n");
 	_response = header;
 
 	memset(_buffer, 0, sizeof(_buffer));
 	_buffSize = 0; // Don't forget this you idiot
 }
 
-void	requestHandler::extractErrorFile() {
-	std::ifstream errFile;
-	if (_status == 505) {
-		errFile.open("pages/errorPages/httpVersionError.html");
-	}
-	if (_status == 400) {
-		errFile.open("pages/errorPages/badRequest.html");
-	}
-	if (_status == 404) {
-		errFile.open("pages/errorPages/fileNotFound.html");
-	}
-	if (_status == 405) { // This'll be dependent on location accepted methods
-		errFile.open("pages/errorPages/methodNotAllowed.html");
-	}
-	if (errFile.fail()) {
-		//I honestly dunno lel
-	}
-	std::ostringstream fileContent;
-	fileContent << errFile.rdbuf();
-	_response = fileContent.str();
-	errFile.close();
-}
 
 void	requestHandler::respondGet() {
 	std::string requestedFile("pages");
