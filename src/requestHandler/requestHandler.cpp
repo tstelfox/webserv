@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 18:11:44 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 11:31:09 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,19 @@
 #include <map>
 #include <algorithm>
 
-requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0), 
+// requestHandler::requestHandler(int fd) : _clientFd(fd), _buffSize(0), _fullBuffer(false), _method(0),
+requestHandler::requestHandler() : _buffSize(0), _fullBuffer(false), _method(0), 
 				_keepAlive(true), _status(200) {
 	memset(_buffer, 0, 1024);
 	(void)_keepAlive;
 	(void)_method;
 }
 
-requestHandler::requestHandler() {}
+// requestHandler::requestHandler() {}
 
-int		requestHandler::getFd() const {
-	return this->_clientFd;
-}
+// int		requestHandler::getFd() const {
+// 	return this->_clientFd;
+// }
 
 std::string	requestHandler::getResponse() const {
 	return this->_response;

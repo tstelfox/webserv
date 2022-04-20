@@ -26,7 +26,7 @@ void	 clientConnecter::setPollFd(int fd, short events) {
 }
 
 void	clientConnecter::newRequest(int fd) {
-	requestHandler	new_request(fd);
+	requestHandler	new_request;
 	_requests.insert(std::make_pair(fd, new_request));
 }
 

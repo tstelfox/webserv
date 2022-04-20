@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 11:37:41 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/20 11:30:31 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,39 +21,38 @@ class requestHandler {
 		requestHandler();
 		~requestHandler();
 
-
-		/* A lot of these functions should realistically be made private */
-
-		/* Management of request retrieval */
+		/* Management of incoming request */
 		void	fillBuffer(char *buff, int valread);
-		char	*getBuffer();
 		void	setBufferAsFull();
 		bool	getFullState() const;
-		int		getFd() const;
 		void	resetHandler();
+		void	parseRequest();
+
+		/* Retrieve response */
+		std::string	getResponse() const;
+
+		/* Testing */
+		char	*getBuffer();
+		// int		getFd() const;
+
+	private:
 
 		/* Request parsing */
+		int		fullHeaderReceived();
 		void	requestLine(std::string request);
 		void	requestFields(std::map<std::string, std::string> fields);
-		void	parseRequest();
 
 		/* Response formulation */
 		void		buildHeader();
 		void		respondGet();
-		void		formulateResponse();
-		std::string	getResponse() const;
-
-	private:
 		void		extractErrorFile();
-
-		int			fullHeaderReceived();
-		// Private funcs
+		void		formulateResponse();
 
 	public:
 		enum	methodTypes { EMPTY, GET, POST, DELETE };
 
 	private:
-		int			_clientFd; // Not entirely sure I need to have this info within the class
+		// int			_clientFd; // Not entirely sure I need to have this info within the class
 
 		/* Buffer variables */
 		char		_buffer[1024];
