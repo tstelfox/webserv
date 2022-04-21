@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 17:24:48 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 15:49:24 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,7 @@ void	requestHandler::buildHeader() {
 
 void	requestHandler::respondGet() {
 	std::string requestedFile("pages");
-	if (!_uri.compare("/")) { // Ok lol this is still set to default hahaha
+	if (!_uri.compare("/")) { // This part is gonna be dependent on the location
 		_uri += "index.html";
 	}
 	requestedFile += _uri;
