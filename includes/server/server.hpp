@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/19 11:50:26 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 17:06:04 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class serverBoy {
 		~serverBoy();
 
 		void			runServer();
-		serverSock		*getSocket();
+		serverSock		*getSocket() const;
 
 		int				respondToClient(int sock); // This shit is temporary bollocks
 		int				connectionError(short revents);
@@ -41,5 +41,8 @@ class serverBoy {
 		serverBoy();
 		serverSock		*_socket;
 		clientConnecter	poller;
+
+		// This is how we tie this shit in
+		// std::vector<openPort>	_openPorts;
 };
 

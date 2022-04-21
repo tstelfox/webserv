@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 16:11:18 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 17:06:22 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	serverBoy::runServer() {
 	}
 }
 
-serverSock*	serverBoy::getSocket() { return _socket; }
+serverSock*	serverBoy::getSocket() const { return _socket; }
 
 int		serverBoy::connectionError(short revents) {
 	return revents & (POLLERR|POLLNVAL) ||
