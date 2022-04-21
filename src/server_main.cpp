@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:40:32 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 18:18:13 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,23 @@
 
 int		main() {
 
-    // Parse config file and from there build servers/sockets and sheet
-	// Write a config file
-	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
-	serverBoy	serf(hello);
+    // Parse config file and then use that info to count serverBlocks and give specificatons
+	// int serverBlocksNum = 1;
+	// std::vector<openPort>	serverBlocks;
+	// for (int i = 0; i < serverBlocks; i++) {
+	// 	// Retrieve the info to create the openPort class
+	// 	openPort	newPort(8080);
+	// 	serverBlocks.push_back(newPort);
+	// }
+	
+	// serverBoy		littyServer(serverBlocks);
 
-	serf.runServer();
+
+	serverSock	hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
+	serverBoy	littyServer(hello);
+
+
+	littyServer.runServer();
 	std::cout << "Exiting via here?" << std::endl;
 	return 0;
 }
