@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 20:12:20 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 20:42:38 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 class poller {
 
 	public:
-		poller();
+		poller(std::vector<server> serverBlocks);
 
 		~poller();
 
@@ -34,8 +34,9 @@ class poller {
 
 		// This is how we tie this shit in
 		std::vector<struct pollfd>	_sockets;
-		std::vector<server>			_serverConfigs;
+		std::vector<server>			_serverConfigs; // Should have a socket in each
 
-		int							configNum;
+		std::map<int, clientConnecter>	_clients;
+
 };
 

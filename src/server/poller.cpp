@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 20:10:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 20:44:09 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,48 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector<openPort> serverBlocks) : _openPorts(serverBlocks) {}
+poller::poller(std::vector<server> serverBlocks) : _serverConfigs(serverBlocks) {}
 
 poller::~poller() {}
 
+void	 poller::setPollFd(int fd, short events) {
+	struct pollfd	newPollFd;
+	newPollFd.fd = fd;
+	newPollFd.events = events;
+	_sockets.push_back(newPollFd);
+}
+
 void	poller::pollConnections() {
+	// Set up the sockets for each port
+	for (int i = 0; i < _serverConfigs.size(); i++) {
+		// Create the pollfd structs and then push them into the vector
+		int newSocket = _serverConfigs[i].getSocket();
+		setPollFd(newSocket, (POLLIN | POLLOUT));
+	}
+
+	
+
+	/* 
+		while true
+		poll through all these connections
+		while loop through the vector of pollfds structs
+			if the connection matches one of those in the server _serverConfigs
+				accept the connection and save the serverconfig to it. - But how?
+			if POLLIN
+				stuff
+			if POLLOUT
+				you know it
+	
+	When accepting a new connection create a Client class and save to it the index of the serverConfigs
+	Contents of the Client class? Pass it the appropriate serverConfig and the fd to read/write to.
+	Maybe keep a map of Client classes in the poller and then can keep the polling loop similar in functioning
+	 */
+		
+
+
+
+
+
 
 	int listening_socket = _socket->getSock(); // Should create an openPort class
 	int ret;
