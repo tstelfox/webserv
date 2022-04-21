@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   server.cpp                                         :+:    :+:            */
+/*   poller.cpp                                         :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 17:53:36 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 20:10:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-serverBoy::serverBoy(std::vector<openPort> serverBlocks) : _openPorts(serverBlocks) {}
+poller::poller(std::vector<openPort> serverBlocks) : _openPorts(serverBlocks) {}
 
-serverBoy::~serverBoy() {}
+poller::~poller() {}
 
-void	serverBoy::runServer() {
+void	poller::pollConnections() {
 
 	int listening_socket = _socket->getSock(); // Should create an openPort class
 	int ret;
