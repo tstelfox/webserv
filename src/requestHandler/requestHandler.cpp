@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 15:49:24 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 15:56:39 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,10 +296,10 @@ void	requestHandler::formulateResponse() {
 		respondGet();
 	}
 	else if (_method == POST) {
-
+		//respondPost();
 	}
 	else if (_method == DELETE) {
-		
+		//respondDelete();
 	}
 }
 

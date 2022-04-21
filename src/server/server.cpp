@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 16:17:24 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 16:11:18 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ serverBoy::~serverBoy() {}
 
 void	serverBoy::runServer() {
 
-	int socket_fd = _socket->getSock();
+	int listening_socket = _socket->getSock(); // Should create an openPort class
 	int ret;
 	ssize_t valread = -1;
 
-	poller.setPollFd(socket_fd, (POLLIN|POLLOUT));
+	poller.setPollFd(listening_socket, (POLLIN|POLLOUT));
 	char buffer[999] = {0};
 
 	while (true) {
@@ -49,7 +49,7 @@ void	serverBoy::runServer() {
 			}
 			if (it->revents & POLLIN) {
 				// std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-				if (it->fd == socket_fd) {
+				if (it->fd == listening_socket) {
 					newConnection();
 					break;
 				}
@@ -78,14 +78,6 @@ void	serverBoy::runServer() {
 				}
 			}
 			if (it->revents & POLLOUT) {
-
-				// if (!(it->revents & POLLIN) && !poller.getRequests()[it->fd].getFullState()) {
-				// 		/* Possibly will need to parse when reading buffer and then set finished when /r is found
-				// 		So that here we can directly send the response */
-				// 	std::cout << "How many times you actually in here and FUCKING why? fd = " << it->fd << " [" << poller.getRequests()[it->fd].getFullState() << std::endl;
-				// 	poller.getRequests()[it->fd].setBufferAsFull();
-				// 	poller.getRequests()[it->fd].parseRequest();
-				// }
 
 				if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
 					ret = respondToClient(it->fd);
