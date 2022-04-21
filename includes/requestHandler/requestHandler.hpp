@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 15:57:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/21 23:59:46 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,15 @@ class requestHandler {
 	private:
 
 		/* Request parsing */
-		int		fullHeaderReceived();
+		int		fullHeaderReceived() const;
 		void	parseRequestLine(std::string request);
 		void	requestFields(std::map<std::string, std::string> &fields);
 
 		/* Response formulation */
-		void		buildHeader();
-		void		respondGet();
-		void		extractErrorFile();
-		void		formulateResponse();
+		void	buildHeader();
+		void	respondGet();
+		void	extractErrorFile();
+		void	formulateResponse();
 
 	public:
 		enum	methodTypes { EMPTY, GET, POST, DELETE };
