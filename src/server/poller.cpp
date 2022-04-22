@@ -6,11 +6,12 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 20:44:09 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/22 12:37:00 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
+#include "serverBlock.hpp"
 #include "clientConnecter.hpp"
 
 #include <iostream>
@@ -21,7 +22,7 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector<server> serverBlocks) : _serverConfigs(serverBlocks) {}
+poller::poller(std::vector<serverBlock> serverBlocks) : _serverConfigs(serverBlocks) {}
 
 poller::~poller() {}
 
