@@ -12,6 +12,7 @@
 
 #include "webserv.hpp"
 #include "serverBlock.hpp"
+#include "poller.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -31,7 +32,7 @@ int main() {
 
      poller littyServer(openPorts);
 
-
+     littyServer.pollConnections();
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

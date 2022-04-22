@@ -22,15 +22,17 @@ public:
 
     typedef std::vector<struct pollfd> socketVector;
 
-    poller(std::vector<server> serverBlocks);
+    poller(std::vector<serverBlock> serverBlocks);
 
     ~poller();
 
     void pollConnections();
 
-    int newConnection(int index);
+    void setPollFd(int fd, short events);
 
-    int connectionError(short revents);
+    int newConnection(int fd, int index);
+
+    int connectionError(short revents) const;
 
     // serverSock		*getSocket() const;
 

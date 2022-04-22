@@ -23,3 +23,7 @@ serverBlock::serverBlock(int port) : _port(port) {
 }
 
 serverBlock::~serverBlock() {}
+
+int serverBlock::getSockFd() const {
+    return _socketFd;
+}

@@ -15,7 +15,7 @@ CXX = c++
 SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp \
 		$(SERVER_PREFIX)
 SERVER_PREFIX = $(addprefix server/, $(SERV))
-SERV = clientConnecter.cpp server.cpp serverBlock.cpp
+SERV = clientConnecter.cpp server.cpp serverBlock.cpp poller.cpp
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))

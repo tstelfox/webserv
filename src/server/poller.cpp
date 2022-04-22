@@ -10,9 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+//#include "server.hpp"
 #include "serverBlock.hpp"
-#include "clientConnecter.hpp"
+//#include "clientConnecter.hpp"
+#include "poller.hpp"
+#include "colours.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -33,41 +35,48 @@ void poller::setPollFd(int fd, short events) {
     _sockets.push_back(newPollFd);
 }
 
-void poller::newConnection(int index) {
+int poller::connectionError(short revents) const {
+    return revents & (POLLERR | POLLNVAL) ||
+           (!(revents & (POLLIN)) && revents & POLLHUP);
+};
+
+int poller::newConnection(int fd, int index) {
     socklen_t addrLen;
-    int new_fd = accept(_socket->getSock(), (struct sockaddr *) &_socket->getAddr(), (socklen_t * ) & addrlen);
+    int new_fd = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
     if (new_fd < 0) {
         if (errno != EWOULDBLOCK) {
             perror("accept failed");
         }
-        return;
+        return 0;
     }
     int on = 1;
     if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
         std::cout << "sockoptions got fucked" << std::endl;
-        return;
+        return 0;
     }
     if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
         std::cout << "fcntl got fucked" << std::endl;
-        return;
+        return 0;
     }
-    _sockets.setPollFd(new_fd, (POLLIN | POLLOUT));
-
+    setPollFd(new_fd, (POLLIN | POLLOUT));
     // Create a new Request class that takes the server configs at the index in the map container
+    (void)index;
+    std::cout << RED << "New accepted client connection: " << new_fd << RESET_COLOUR << std::endl;
+    return 1;
 }
 
 void poller::pollConnections() {
     // Set up the sockets for each port
     std::map<int, int> indexToConfig;
-    for (int i = 0; i < _serverConfigs.size(); i++) {
+    for (size_t i = 0; i < _serverConfigs.size(); i++) {
         // Create the pollfd structs and then push them into the vector
-        int newSocket = _serverConfigs[i].getSocket();
+        int newSocket = _serverConfigs[i].getSockFd();
         indexToConfig[newSocket] = i;
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
-    char buffer[1024] = {0};
+//    char buffer[1024] = {0};
     while (true) {
-        if (poll(&(*_sockets.begin()), _sockets->size(), -1) < 0) {
+        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
             perror("poll");
             break;
         }
@@ -77,9 +86,9 @@ void poller::pollConnections() {
                 break;
             }
             if (it->revents & POLLIN) {
-                // std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 if (indexToConfig.count(it->fd)) { // This should check that it's one of the listening sockets
-                    newConnection(indexToConfig[it->fd]);
+                    newConnection(it->fd, indexToConfig[it->fd]);
                     break;
                 }
                 // Otherwise the actual reading
@@ -104,69 +113,69 @@ void poller::pollConnections() {
      */
 
 
-    int ret;
-    ssize_t valread = -1;
-
-    poller.setPollFd(listening_socket, (POLLIN | POLLOUT));
-    char buffer[999] = {0};
-
-    while (true) {
-        ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(),
-                   -1); // Could use std::vector::data() but that's c++11
-        if (ret < 0) {
-            perror("poll");
-            break;
-        }
-        // std::cout << "Well? " << poller.getConnections().size() << std::endl;
-        for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin();
-             it != poller.getConnections().end(); it++) {
-            // std::cout << "Diocane " << std::hex << it->revents << std::endl;
-            if (connectionError(it->revents)) {
-                std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents
-                          << std::endl;
-                break;
-            }
-            if (it->revents & POLLIN) {
-                // std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                if (it->fd == listening_socket) {
-                    newConnection();
-                    break;
-                }
-
-                valread = recv(it->fd, buffer, 999, 0);
-                // std::cout << "valread contains: [" << valread << "]" << std::endl;
-                if (valread > 0) {
-                    poller.getRequests()[it->fd].fillBuffer(buffer, valread);
-                    // std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
-                    // std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
-                    // if (!poller.getRequests()[it->fd].getFullState())
-                    poller.getRequests()[it->fd].parseRequest(); // Why is this empty on the second call?
-                    memset(buffer, 0, sizeof(buffer));
-                }
-                if (!valread) {
-
-                    /* Leave the connections open for now */
-                    // std::cout << "Connection ended by client" << std::endl;
-                    // closeConnection(it);
-                    continue;
-                }
-                if (valread < 0) {
-                    std::cout << "No bytes to read" << std::endl;
-                    perror("What ");
-                    break;
-                }
-            }
-            if (it->revents & POLLOUT) {
-
-                if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
-                    ret = respondToClient(it->fd);
-                    if (ret < 0) {
-                        perror("   send() failed");
-                        break;
-                    }
-                    poller.getRequests()[it->fd].resetHandler();
-                }
-            }
-        } // End of loop through pollable connections
-    }
+//    int ret;
+//    ssize_t valread = -1;
+//
+//    poller.setPollFd(listening_socket, (POLLIN | POLLOUT));
+//    char buffer[999] = {0};
+//
+//    while (true) {
+//        ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(),
+//                   -1); // Could use std::vector::data() but that's c++11
+//        if (ret < 0) {
+//            perror("poll");
+//            break;
+//        }
+//        // std::cout << "Well? " << poller.getConnections().size() << std::endl;
+//        for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin();
+//             it != poller.getConnections().end(); it++) {
+//            // std::cout << "Diocane " << std::hex << it->revents << std::endl;
+//            if (connectionError(it->revents)) {
+//                std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents
+//                          << std::endl;
+//                break;
+//            }
+//            if (it->revents & POLLIN) {
+//                // std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+//                if (it->fd == listening_socket) {
+//                    newConnection();
+//                    break;
+//                }
+//
+//                valread = recv(it->fd, buffer, 999, 0);
+//                // std::cout << "valread contains: [" << valread << "]" << std::endl;
+//                if (valread > 0) {
+//                    poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+//                    // std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
+//                    // std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
+//                    // if (!poller.getRequests()[it->fd].getFullState())
+//                    poller.getRequests()[it->fd].parseRequest(); // Why is this empty on the second call?
+//                    memset(buffer, 0, sizeof(buffer));
+//                }
+//                if (!valread) {
+//
+//                    /* Leave the connections open for now */
+//                    // std::cout << "Connection ended by client" << std::endl;
+//                    // closeConnection(it);
+//                    continue;
+//                }
+//                if (valread < 0) {
+//                    std::cout << "No bytes to read" << std::endl;
+//                    perror("What ");
+//                    break;
+//                }
+//            }
+//            if (it->revents & POLLOUT) {
+//
+//                if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
+//                    ret = respondToClient(it->fd);
+//                    if (ret < 0) {
+//                        perror("   send() failed");
+//                        break;
+//                    }
+//                    poller.getRequests()[it->fd].resetHandler();
+//                }
+//            }
+//        } // End of loop through pollable connections
+//    }
 }

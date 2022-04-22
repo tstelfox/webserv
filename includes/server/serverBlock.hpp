@@ -24,6 +24,8 @@ public:
 
     ~serverBlock();
 
+    int getSockFd() const;
+
 
 private:
     serverBlock();
