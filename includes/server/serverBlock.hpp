@@ -17,12 +17,21 @@
 class serverBlock {
 
 public:
-    serverBlock();
+    serverBlock(serverSock &listeningSocket);
+
     ~serverBlock();
 
 
 private:
-    int port;
+    serverBlock();
+
+    /*Server Block specifications*/
+    int _port;
+    std::string _serverName;
+
+    /*Actual Socket or Socket fd*/
+//    serverSock *_socket;
+//    int _socketFd;
 
 
 };
