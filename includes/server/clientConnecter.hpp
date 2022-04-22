@@ -11,27 +11,31 @@
 /* ************************************************************************** */
 
 #pragma once
+
 #include <vector>
 #include <map>
 #include "sys/poll.h"
 #include "requestHandler.hpp"
 
-class clientConnecter
-{
-	public:
-		clientConnecter();
-		~clientConnecter();
+class clientConnecter {
+public:
+    clientConnecter();
 
-		void	setPollFd(int fd, short events);
-		void	newRequest(int fd); //Take as params anything needed for requestHandler class
+    ~clientConnecter();
 
-		std::vector<struct pollfd>& 	getConnections();
-		std::map<int, requestHandler>&	getRequests();
-	private:
-		// Vector of the poll structs and events
-		std::vector<struct pollfd> 		_connections;
-		// Map of the requestHandlers key-bound by the connection fd
-		std::map<int, requestHandler>	_requests;
+    void setPollFd(int fd, short events);
+
+    void newRequest(int fd); //Take as params anything needed for requestHandler class
+
+    std::vector<struct pollfd> &getConnections();
+
+    std::map<int, requestHandler> &getRequests();
+
+private:
+    // Vector of the poll structs and events
+    std::vector<struct pollfd> _connections;
+    // Map of the requestHandlers key-bound by the connection fd
+    std::map<int, requestHandler> _requests;
 
 };
 

@@ -11,47 +11,52 @@
 /* ************************************************************************** */
 
 #pragma once
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 // #include <sys/fcntl.h>
 // #include <iostream>
 // #include "webserv.hpp"
 
-class socketMan
-{
-	public:
-		socketMan(int domain, int service, int protocol,
-			int port, u_long interface);
+class socketMan {
+public:
+    socketMan(int domain, int service, int protocol,
+              int port, u_long interface);
 
-		virtual ~socketMan(); // This means inherited classes don't need to have a destructor
+    virtual ~socketMan(); // This means inherited classes don't need to have a destructor
 
-		virtual int bindServer(int sock, struct sockaddr_in	address) = 0;
-		void		testConnection(int);
+    virtual int bindServer(int sock, struct sockaddr_in address) = 0;
 
-		int	getSock();
-		struct sockaddr_in&	getAddr();
+    void testConnection(int);
 
-	protected:
-		int sock;
-		struct sockaddr_in	address;
+    int getSock();
+
+    struct sockaddr_in &getAddr();
+
+protected:
+    int sock;
+    struct sockaddr_in address;
 };
 
-class	serverSock : public socketMan {
-	
-	public:
-		serverSock(int domain, int service, int protocol,
-			int port, u_long interface);
-		virtual ~serverSock();
-		// serverSock(serverSock const &x);
+class serverSock : public socketMan {
 
-		virtual int	bindServer(int sock, struct sockaddr_in address);
-		void		listenServer(int bcklg);
+public:
+    serverSock(int domain, int service, int protocol,
+               int port, u_long interface);
 
-	private:
-		socklen_t	addrlen;
-		int			backlog;
-		serverSock();
-		
+    virtual ~serverSock();
+    // serverSock(serverSock const &x);
+
+    virtual int bindServer(int sock, struct sockaddr_in address);
+
+    void listenServer(int bcklg);
+
+private:
+    socklen_t addrlen;
+    int backlog;
+
+    serverSock();
+
 };
 
 

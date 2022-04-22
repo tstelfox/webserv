@@ -6,12 +6,13 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/22 12:37:11 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/22 12:37:23 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/22 13:39:21 by tmullan       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 class serverBlock {
-	
+public:
+
 };

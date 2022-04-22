@@ -11,40 +11,46 @@
 /* ************************************************************************** */
 
 #pragma once
+
 #include "socket.hpp"
 #include "clientConnecter.hpp"
 #include <string>
 
-	/* Fixing the issues of the following older comment */
-	/* The structure is incorrect.
-		- Polling cannot occur within the server object
-			because if there are multiple servers there must be a single poll()
-			to handle all of the listening sockets on the various ports.
-		- A poller general function will probably have to be called and have
-			a vector or map of servers passed to it for it to loop through the
-			listening socket for each of them. */
+/* Fixing the issues of the following older comment */
+/* The structure is incorrect.
+    - Polling cannot occur within the server object
+        because if there are multiple servers there must be a single poll()
+        to handle all of the listening sockets on the various ports.
+    - A poller general function will probably have to be called and have
+        a vector or map of servers passed to it for it to loop through the
+        listening socket for each of them. */
 
 class serverBoy {
 
-	public:
-		serverBoy(serverSock &sock);
-		// serverBoy(std::vector<openPort>	serverBlocks);
+public:
+    serverBoy(serverSock &sock);
+    // serverBoy(std::vector<openPort>	serverBlocks);
 
-		~serverBoy();
+    ~serverBoy();
 
-		void			runServer();
-		serverSock		*getSocket() const;
+    void runServer();
 
-		int				respondToClient(int sock); // This shit is temporary bollocks
-		int				connectionError(short revents);
-		void			newConnection();
-		void			closeConnection(std::vector<struct pollfd>::iterator it);
-	private:
-		serverBoy();
-		serverSock		*_socket;
-		clientConnecter	poller;
+    serverSock *getSocket() const;
 
-		// This is how we tie this shit in
-		// std::vector<openPort>	_openPorts;
+    int respondToClient(int sock); // This shit is temporary bollocks
+    int connectionError(short revents);
+
+    void newConnection();
+
+    void closeConnection(std::vector<struct pollfd>::iterator it);
+
+private:
+    serverBoy();
+
+    serverSock *_socket;
+    clientConnecter poller;
+
+    // This is how we tie this shit in
+    // std::vector<openPort>	_openPorts;
 };
 
