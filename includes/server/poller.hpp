@@ -19,13 +19,16 @@
 class poller {
 
 public:
+
+    typedef std::vector<struct pollfd> socketVector;
+
     poller(std::vector<server> serverBlocks);
 
     ~poller();
 
     void pollConnections();
 
-    int newConnection();
+    int newConnection(int index);
 
     int connectionError(short revents);
 
@@ -36,7 +39,7 @@ public:
 private:
 
     // This is how we tie this shit in
-    std::vector<struct pollfd> _sockets;
+    socketVector _sockets;
     std::vector<serverBlock> _serverConfigs; // Should have a socket in each
 
     std::map<int, clientConnecter> _clients;

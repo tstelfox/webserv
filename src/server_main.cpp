@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "serverBlock.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -20,22 +21,24 @@
 int main() {
 
     // Parse config file and then use that info to count serverBlocks and give specificatons
-    // int serverBlocksNum = 1;
-    // std::vector<openPort>	serverBlocks;
-    // for (int i = 0; i < serverBlocks; i++) {
-    // 	// Retrieve the info to create the openPort class
-    // 	openPort	newPort(8080);
-    // 	serverBlocks.push_back(newPort);
-    // }
+     int openPortsNum = 1;
+     std::vector<serverBlock>	openPorts;
+     for (int i = 0; i < openPortsNum; i++) {
+     	// Retrieve the info to create the openPort class
+         serverBlock	tempServer(8080);
+         openPorts.push_back(tempServer);
+     }
 
-    // serverBoy		littyServer(serverBlocks);
-
-
-    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
-    serverBoy littyServer(hello);
+     poller littyServer(openPorts);
 
 
-    littyServer.runServer();
+
+    /*Functioning main pre restructure*/
+//    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
+//    serverBoy littyServer(hello);
+//
+//
+//    littyServer.runServer();
     std::cout << "Exiting via here?" << std::endl;
     return 0;
 }

@@ -13,11 +13,14 @@
 
 #ifndef SERVERBLOCK_HPP
 #define SERVERBLOCK_HPP
+#include "socket.hpp"
 
 class serverBlock {
 
 public:
-    serverBlock(serverSock &listeningSocket);
+    /*One of the following tbd*/
+//    serverBlock(serverSock &listeningSocket);
+    serverBlock(int port);
 
     ~serverBlock();
 
@@ -26,12 +29,18 @@ private:
     serverBlock();
 
     /*Server Block specifications*/
-    int _port;
-    std::string _serverName;
+    int _port; // And what about host?
+
+//    std::string _serverName;
+//    std::string _rootDirectory;
+//
+//    bool _isDirListOn;
+//
+//    std::vector <std::string> _acceptedMethods;
 
     /*Actual Socket or Socket fd*/
-//    serverSock *_socket;
-//    int _socketFd;
+    serverSock *_socket;
+    int _socketFd;
 
 
 };

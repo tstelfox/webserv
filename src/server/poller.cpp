@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector<serverBlock> serverBlocks) : _serverConfigs(serverBlocks) {}
+poller::poller(std::vector <serverBlock> serverBlocks) : _serverConfigs(serverBlocks) {}
 
 poller::~poller() {}
 
@@ -33,15 +33,59 @@ void poller::setPollFd(int fd, short events) {
     _sockets.push_back(newPollFd);
 }
 
+void poller::newConnection(int index) {
+    socklen_t addrLen;
+    int new_fd = accept(_socket->getSock(), (struct sockaddr *) &_socket->getAddr(), (socklen_t * ) & addrlen);
+    if (new_fd < 0) {
+        if (errno != EWOULDBLOCK) {
+            perror("accept failed");
+        }
+        return;
+    }
+    int on = 1;
+    if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+        std::cout << "sockoptions got fucked" << std::endl;
+        return;
+    }
+    if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
+        std::cout << "fcntl got fucked" << std::endl;
+        return;
+    }
+    _sockets.setPollFd(new_fd, (POLLIN | POLLOUT));
+
+    // Create a new Request class that takes the server configs at the index in the map container
+}
+
 void poller::pollConnections() {
     // Set up the sockets for each port
+    std::map<int, int> indexToConfig;
     for (int i = 0; i < _serverConfigs.size(); i++) {
         // Create the pollfd structs and then push them into the vector
         int newSocket = _serverConfigs[i].getSocket();
+        indexToConfig[newSocket] = i;
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
-
-
+    char buffer[1024] = {0};
+    while (true) {
+        if (poll(&(*_sockets.begin()), _sockets->size(), -1) < 0) {
+            perror("poll");
+            break;
+        }
+        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
+            if (connectionError(it->revents)) {
+                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+                break;
+            }
+            if (it->revents & POLLIN) {
+                // std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+                if (indexToConfig.count(it->fd)) { // This should check that it's one of the listening sockets
+                    newConnection(indexToConfig[it->fd]);
+                    break;
+                }
+                // Otherwise the actual reading
+            }
+        }
+    }
 
     /*
         while true
@@ -60,12 +104,6 @@ void poller::pollConnections() {
      */
 
 
-
-
-
-
-
-    int listening_socket = _socket->getSock(); // Should create an openPort class
     int ret;
     ssize_t valread = -1;
 

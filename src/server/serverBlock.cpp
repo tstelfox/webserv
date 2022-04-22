@@ -11,7 +11,15 @@
 /* ************************************************************************** */
 
 #include "serverBlock.hpp"
+#include <iostream>
 
 serverBlock::serverBlock() {}
+
+serverBlock::serverBlock(int port) : _port(port) {
+    serverSock *newSock = new serverSock(AF_INET, SOCK_STREAM, 0, _port, INADDR_ANY);
+    _socket = newSock;
+    _socketFd = _socket->getSock();
+    std::cout << "New socket created: " << _socketFd << std::endl;
+}
 
 serverBlock::~serverBlock() {}
