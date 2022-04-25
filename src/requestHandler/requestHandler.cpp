@@ -32,7 +32,7 @@ requestHandler::~requestHandler() {}
 
 /* < ---------- Manage Incoming Request Buffer ----------- > */
 
-void requestHandler::fillBuffer(char *buff, int valread) {
+void requestHandler::fillBuffer(char *buff, ssize_t valread) {
     int temp = _buffSize;
     _buffSize += valread;
     for (int i = 0; i < valread; i++) {

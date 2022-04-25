@@ -25,7 +25,7 @@ public:
     ~requestHandler();
 
     /* Management of incoming request */
-    void fillBuffer(char *buff, int valread);
+    void fillBuffer(char *buff, ssize_t valread);
 
     void setBufferAsFull();
 
