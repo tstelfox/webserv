@@ -21,7 +21,7 @@
 
 int main() {
 
-    // Parse config file and then use that info to count serverBlocks and give specificatons
+    // The following also won't work because server blocks can have multiple ports
      int openPortsNum = 1;
      std::vector<serverBlock>	openPorts;
      for (int i = 0; i < openPortsNum; i++) {
