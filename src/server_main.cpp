@@ -13,6 +13,8 @@
 #include "webserv.hpp"
 #include "serverBlock.hpp"
 #include "poller.hpp"
+#include "serverConfig.hpp"
+#include "Parsing.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -22,11 +24,11 @@
 int main(int argc, char *argv[]) {
 
     std::cout << "Starting..." << std::endl;
-    std::vector<WSERV::serverBlock> S;
+    std::vector<WSERV::serverConfig> S;
     // WSERV::Server serv(argc, argv);
     try {
         WSERV::Parser p(argc, argv);
-        S = p.get_Server();
+        S = p.get_serverConfig();
 
     }
     catch (const std::exception &e) {

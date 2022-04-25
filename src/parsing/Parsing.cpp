@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/parsing/Parsing.hpp"
+#include "Parsing.hpp"
 
 // template<typedef T>
-// void setters_server(WSERV::Server  S_temp, T data, void (*func)(WSERV::Server  S_temp, T data))
+// void setters_server(WSERV::serverConfig  S_temp, T data, void (*func)(WSERV::serverConfig  S_temp, T data))
 // {
 //     func(S_temp, data);
 // }
@@ -69,14 +69,14 @@
 //     }
 // }
 
-void set_port_func(WSERV::Server  &S_temp, std::string data);
-void set_host_func(WSERV::Server  &S_temp, std::string data);
-void set_server_name_func(WSERV::Server  &S_temp, std::string data);
-void set_Location_vec_func(WSERV::Server  &S_temp, std::vector<WSERV::Location> data);//!
-void set_maxfilesize_func(WSERV::Server  &S_temp, std::string data);
-void set_time_out_func(WSERV::Server  &S_temp, std::string data);
-void set_error_page_func(WSERV::Server  &S_temp, std::string data);
-void set_cgi_file_types_func(WSERV::Server  &S_temp, std::string data);
+void set_port_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_host_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_server_name_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_Location_vec_func(WSERV::serverConfig  &S_temp, std::vector<WSERV::Location> data);//!
+void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_time_out_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data);
+void set_cgi_file_types_func(WSERV::serverConfig  &S_temp, std::string data);
 void set_root_func(WSERV::Location  &L_temp, std::string data);
 void set_autoindex_func(WSERV::Location  &L_temp, std::string data);
 void set_allow_method_func(WSERV::Location  &L_temp, std::string data);
@@ -84,7 +84,7 @@ void set_index_func(WSERV::Location  &L_temp, std::string data);
 void set_max_file_size_func(WSERV::Location  &L_temp, std::string data);
 void set_auth_basic_func(WSERV::Location  &L_temp, std::string data);
 
-std::vector<WSERV::Server>	WSERV::Parser::get_Server(void) const
+std::vector<WSERV::serverConfig>	WSERV::Parser::get_serverConfig(void) const
 {
     return (this->_vec_servers);
 }
@@ -162,13 +162,13 @@ void    WSERV::Parser::read_file_to_vect()
 
 void    WSERV::Parser::add_vector_vars_to_server_class()
 {
-    Server  *S_temp;
+    serverConfig  *S_temp;
     std::vector<Location> *vec_loc_temp;
     std::string cmp_serv[] = {"port", "host", "server_name", "error_page", \
         "cgi_file_types", "time_out", "max_file_size", "location"};
     std::string cmp_loc[] = {"root", "allowed_method", "index", "autoindex", \
         "max_file_size", "auth_basic"};
-    void (*set_funcs_serv[])(WSERV::Server&, std::string) = {&set_port_func, \
+    void (*set_funcs_serv[])(WSERV::serverConfig&, std::string) = {&set_port_func, \
         &set_host_func, &set_server_name_func, &set_error_page_func,\
         &set_cgi_file_types_func, &set_time_out_func, &set_maxfilesize_func};
     void (*set_funcs_loc[])(WSERV::Location&, std::string) = {&set_root_func, \
@@ -177,7 +177,7 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
 
     for (unsigned long servs = 0; servs < _serv_map_vec.size(); servs++)
     {
-        S_temp = new Server;
+        S_temp = new serverConfig;
         vec_loc_temp = new std::vector<Location>;
         int count = 0;
         for (std::map<std::string,std::string>::iterator it=_serv_map_vec[servs].begin(); it!=_serv_map_vec[servs].end(); ++it)

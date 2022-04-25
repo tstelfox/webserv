@@ -10,45 +10,45 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/parsing/Parsing.hpp"
-#include "includes/exceptions/exceptions.hpp"
+#include "Parsing.hpp"
+#include "exceptions.hpp"
 
-void set_port_func(WSERV::Server  &S_temp, std::string data)
+void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_port(std::atoi( data.c_str() ));
 }
 
-void set_host_func(WSERV::Server  &S_temp, std::string data)
+void set_host_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_host( data );
 }
 
-void set_server_name_func(WSERV::Server  &S_temp, std::string data)
+void set_server_name_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_server_name( data );
 }
 
-void set_Location_vec_func(WSERV::Server  &S_temp, std::vector<WSERV::Location> data) //!
+void set_Location_vec_func(WSERV::serverConfig  &S_temp, std::vector<WSERV::Location> data) //!
 {
     S_temp.set_Location_vec( data );
 }
 
-void set_maxfilesize_func(WSERV::Server  &S_temp, std::string data)
+void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_maxfilesize(std::atoi( data.c_str() ));
 }
 
-void set_time_out_func(WSERV::Server  &S_temp, std::string data)
+void set_time_out_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_time_out(std::atoi( data.c_str() ));;
 }
 
-void set_error_page_func(WSERV::Server  &S_temp, std::string data)
+void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_error_page( data );
 }
 
-void set_cgi_file_types_func(WSERV::Server  &S_temp, std::string data)
+void set_cgi_file_types_func(WSERV::serverConfig  &S_temp, std::string data)
 {
     S_temp.set_cgi_file_types( data );
 }

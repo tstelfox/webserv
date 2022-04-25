@@ -18,9 +18,9 @@
 #	include <iostream> //std::cout
 #	include <algorithm> //std::find
 #	include <ctype.h> //std::isalpha
-#	include "../server/Server.hpp"
-#	include "includes/exceptions/exceptions.hpp"
-#	include "../colors/colors.h"
+#	include "serverConfig.hpp"
+#	include "exceptions.hpp"
+#	include "colours.hpp"
 
 
 // void    open_file(std::string file_name, std::ifstream &file);
@@ -43,7 +43,7 @@ namespace WSERV
 	class Parser
 	{
 		private:
-			std::vector<WSERV::Server>	_vec_servers;
+			std::vector<WSERV::serverConfig>	_vec_servers;
 			std::string		_config_name;
 			std::string		_configfile;
 			std::string 	_separator;
@@ -68,7 +68,7 @@ namespace WSERV
 					std::map<std::string, std::string> &loc_vars, \
 					std::vector<std::map<std::string, std::string> > &temp);
 			bool	closing_server_block_check(std::string &line);
-			std::vector<WSERV::Server>	get_Server(void) const;
+			std::vector<WSERV::serverConfig>	get_serverConfig(void) const;
 	};
 }
 

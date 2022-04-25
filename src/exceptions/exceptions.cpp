@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/exceptions/exceptions.hpp"
+#include "exceptions.hpp"
 #include <sstream>
-#include "../colors/colors.h"
+#include "colours.hpp"
 #include <iostream>
 
 OpenFileExcep::OpenFileExcep() : _ret_msg("\n" COLOR_DARKRED \
