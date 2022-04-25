@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
-    for (unsigned long i = 0; i < S.size(); i++) {
+    for (size_t i = 0; i < S.size(); i++) {
         std::cout << "port= " << S[i].get_port() << std::endl;
         std::cout << "host= " << S[i].get_host() << std::endl;
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         std::cout << "cgi_file_types= " << S[i].get_cgi_file_types() << std::endl;
         std::cout << "time_out= " << S[i].get_time_out() << std::endl;
         std::cout << std::endl;
-        for (unsigned long x = 0; x < S[i].get_Location_vec().size(); x++) {
+        for (size_t x = 0; x < S[i].get_Location_vec().size(); x++) {
             std::cout << "root= " << S[i].get_Location_vec()[x].get_root() << std::endl;
             std::cout << "location_path= " << S[i].get_Location_vec()[x].get_location_path() << std::endl;
             std::cout << "autoindex= " << S[i].get_Location_vec()[x].get_autoindex() << std::endl;
