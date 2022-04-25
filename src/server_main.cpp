@@ -22,24 +22,24 @@
 int main() {
 
     // Parse config file and then use that info to count serverBlocks and give specificatons
-//     int openPortsNum = 1;
-//     std::vector<serverBlock>	openPorts;
-//     for (int i = 0; i < openPortsNum; i++) {
-//     	// Retrieve the info to create the openPort class
-//         serverBlock	tempServer(8080);
-//         openPorts.push_back(tempServer);
-//     }
-//
-//     poller littyServer(openPorts);
-//
-//     littyServer.pollConnections();
+     int openPortsNum = 1;
+     std::vector<serverBlock>	openPorts;
+     for (int i = 0; i < openPortsNum; i++) {
+     	// Retrieve the info to create the openPort class
+         serverBlock	tempServer(8080);
+         openPorts.push_back(tempServer);
+     }
+
+     poller littyServer(openPorts);
+
+     littyServer.pollConnections();
 
     /*Functioning main pre restructure*/
-    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
-    serverBoy littyServer(hello);
-
-
-    littyServer.runServer();
+//    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
+//    serverBoy littyServer(hello);
+//
+//
+//    littyServer.runServer();
     std::cout << "Exiting via here?" << std::endl;
     return 0;
 }
