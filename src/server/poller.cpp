@@ -24,7 +24,7 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector <serverBlock> serverBlocks) : _serverConfigs(serverBlocks) {}
+poller::poller(std::vector <serverBlock>const& serverBlocks) : _serverConfigs(serverBlocks) {}
 
 poller::~poller() {}
 

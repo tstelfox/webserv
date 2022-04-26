@@ -22,21 +22,8 @@
 #include <sstream>
 #include <fstream>
 
-int main(int argc, char *argv[]) {
-
-    std::cout << "Starting..." << std::endl;
-    std::vector<WSERV::serverConfig> S;
-    // WSERV::Server serv(argc, argv);
-    try {
-        WSERV::Parser p(argc, argv);
-        S = p.get_serverConfig();
-
-    }
-    catch (const std::exception &e) {
-        std::cerr << e.what() << '\n';
-        return EXIT_FAILURE;
-    }
-    for (size_t i = 0; i < S.size(); i++) {
+void parsedContents(std::vector<WSERV::serverConfig> const& S) {
+        for (size_t i = 0; i < S.size(); i++) {
         std::cout << RED << "< ---------  Server Block --------- >" << RESET_COLOUR << std::endl;
         std::cout << "port= " << S[i].get_port() << std::endl;
         std::cout << "host= " << S[i].get_host() << std::endl;
@@ -64,9 +51,25 @@ int main(int argc, char *argv[]) {
         }
         std::cout << std::endl;
     }
+}
+
+int main(int argc, char *argv[]) {
+
+    std::cout << "Starting..." << std::endl;
+    std::vector<WSERV::serverConfig> S;
+    // WSERV::Server serv(argc, argv);
+    try {
+        WSERV::Parser p(argc, argv);
+        S = p.get_serverConfig();
+
+    }
+    catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
+//    parsedContents(S);
 
 
-    // The following also won't work because server blocks can have multiple ports
 //    int openPortsNum = 1;
 //    std::vector<serverBlock> openPorts;
 //
@@ -90,6 +93,6 @@ int main(int argc, char *argv[]) {
 //
 //
 //    littyServer.runServer();
-    std::cout << "Exiting via here?" << std::endl;
+//    std::cout << "Exiting via here?" << std::endl;
     return 0;
 }

@@ -22,7 +22,7 @@ public:
 
     typedef std::vector<struct pollfd> socketVector;
 
-    poller(std::vector<serverBlock> serverBlocks);
+    poller(std::vector<serverBlock>const& serverBlocks);
 
     ~poller();
 
