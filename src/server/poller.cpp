@@ -86,6 +86,7 @@ std::set<int> poller::openPorts() {
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
+//    std::map<std::pair<std::string, int>, WSERV::serverConfig> uniqueConnections;
     char buffer[1024] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
@@ -117,7 +118,9 @@ void poller::pollConnections() {
                     perror("What ");
                     break;
                 }
-                // Otherwise the actual reading
+            }
+            else if (it->revents & POLLOUT) {
+                // You _should_ know the drill
             }
         }
     }
