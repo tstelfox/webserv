@@ -22,20 +22,22 @@ class poller {
 
 public:
 
-    typedef std::vector<struct pollfd>          socketVector;
-    typedef std::vector<WSERV::serverConfig>    configVector;
+    typedef std::vector<struct pollfd> socketVector;
+    typedef std::vector<WSERV::serverConfig> configVector;
 
-    poller(configVector const& serverBlocks);
+    poller(configVector const &serverBlocks);
 
     ~poller();
 
-    void pollConnections();
-
     void setPollFd(int fd, short events);
+
+    int connectionError(short revents) const;
 
     int newConnection(int fd);
 
-    int connectionError(short revents) const;
+    std::set<int> openPorts();
+
+    void pollConnections();
 
     // serverSock		*getSocket() const;
 

@@ -67,10 +67,8 @@ int poller::newConnection(int fd) {
     return 1;
 }
 
-void poller::pollConnections() {
-
-   /* Make the following a standalone function that returns the set of ports */
-    std::set<int>   ports;
+std::set<int> poller::openPorts() {
+    std::set<int> ports;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(it->get_port());
     }
@@ -80,6 +78,12 @@ void poller::pollConnections() {
         int newSocket = buildSocket.getSock();
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
+    return ports;
+}
+
+void poller::pollConnections() {
+
+    std::set<int> ports = openPorts();
 
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
