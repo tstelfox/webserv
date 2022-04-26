@@ -69,6 +69,7 @@ int poller::newConnection(int fd) {
 
 std::set<int> poller::openPorts() {
     std::set<int> ports;
+    std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(it->get_port());
     }
@@ -76,15 +77,16 @@ std::set<int> poller::openPorts() {
         std::cout << "Ports: " << *i << std::endl;
         serverSock buildSocket(AF_INET, SOCK_STREAM, 0, *i, INADDR_ANY);
         int newSocket = buildSocket.getSock();
+        listenSockets.insert(newSocket);
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
-    return ports;
+    return listenSockets;
 }
 
 void poller::pollConnections() {
 
-    std::set<int> ports = openPorts();
-
+    std::set<int> portSockets = openPorts();
+    char buffer[1024] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
             perror("poll");
@@ -96,9 +98,23 @@ void poller::pollConnections() {
                 break;
             }
             if (it->revents & POLLIN) {
-                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                if (ports.count(it->fd)) { // This should check that it's one of the listening sockets
+                if (portSockets.count(it->fd)) { // This should check that it's one of the listening sockets
                     newConnection(it->fd);
+                    break;
+                }
+                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+                size_t valread = recv(it->fd, buffer, 1024, 0);
+                if (valread) {
+                    // I should start filling in a client connecter here
+                    // Should probably have already created the map<host:port, *config>
+                    std::cout << "Received message\n" << buffer << std::endl;
+                }
+                if (!valread) {
+                    // Do nothing for now - Maybe close connection if required.
+                }
+                if (valread < 0) {
+                    std::cout << "No bytes to read" << std::endl;
+                    perror("What ");
                     break;
                 }
                 // Otherwise the actual reading

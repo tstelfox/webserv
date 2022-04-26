@@ -45,17 +45,16 @@ public:
     // void			closeConnection(std::vector<struct pollfd>::iterator it);
 private:
 
-
+    /* Vector of the poll structs and events */
     socketVector _sockets;
 
-    /*So I need to loop through every port in this POS and open sockets
-    Then later create a map of every host:port combination which I will find whenever
-    I parse the request header*/
-//    std::set<int>   _ports;
+    /* Create a map of every host:port combination which I will find whenever
+    I parse the request header */
 
-
+   /* Vector of all of the server configurations */
     configVector _serverConfigs;
 
+    /* Map of all the clients sorted by socket */
     std::map<int, clientConnecter> _clients;
 
 };

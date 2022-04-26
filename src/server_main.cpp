@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-#include "src/server/serverBlock.hpp"
+#include "rubbish/serverBlock.hpp"
 #include "src/server/poller.hpp"
 #include "src/server/serverConfig.hpp"
 #include "src/parsing/Parsing.hpp"
