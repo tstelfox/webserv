@@ -22,7 +22,7 @@ OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
-INCLUDES = -Isrc/utils
+INCLUDES = -Isrc/utils -Isrc/sockets
 
 ifdef DEBUG
   FLAGS += -g -fsanitize=address

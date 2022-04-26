@@ -67,8 +67,12 @@ int main(int argc, char *argv[]) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
+    /*Print all configs*/
 //    parsedContents(S);
 
+    /*Extract all the unique ports and put them into a set.*/
+
+    poller littyServer(S);
 
 //    int openPortsNum = 1;
 //    std::vector<serverBlock> openPorts;
@@ -83,7 +87,6 @@ int main(int argc, char *argv[]) {
 //        openPorts.push_back(tempServer);
 //    }
 //
-//    poller littyServer(openPorts);
 //
 //    littyServer.pollConnections();
 

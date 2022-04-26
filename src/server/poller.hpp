@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "src/sockets/socket.hpp"
+#include "socket.hpp"
 #include "clientConnecter.hpp"
+#include "serverConfig.hpp"
 #include <string>
 
 class poller {
@@ -22,7 +23,7 @@ public:
 
     typedef std::vector<struct pollfd> socketVector;
 
-    poller(std::vector<serverBlock>const& serverBlocks);
+    poller(std::vector<WSERV::serverConfig>const& serverBlocks);
 
     ~poller();
 
@@ -40,9 +41,13 @@ public:
     // void			closeConnection(std::vector<struct pollfd>::iterator it);
 private:
 
-    // This is how we tie this shit in
+
     socketVector _sockets;
-    std::vector<serverBlock> _serverConfigs; // Should have a socket in each
+
+    /*So I need to loop through every port in this POS and open sockets
+    Then later create a map of every host:port combination which I will find whenever
+    I parse the request header*/
+    std::vector<WSERV::serverConfig> _serverConfigs;
 
     std::map<int, clientConnecter> _clients;
 

@@ -20,10 +20,11 @@
 # include <set>
 # include <vector>
 
+
 namespace WSERV {
     class serverConfig {
     private:
-        int _port; // std::set<int>        _port;
+        int _port; // std::set<int>        _port; In the future
         std::string _host;
         std::string _server_name;
         int _maxfilesize;

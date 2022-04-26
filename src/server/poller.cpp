@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 //#include "server.hpp"
-#include "serverBlock.hpp"
+//#include "serverConfig.hpp"
 //#include "clientConnecter.hpp"
 #include "poller.hpp"
 #include "colours.hpp"
@@ -24,7 +24,9 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector <serverBlock>const& serverBlocks) : _serverConfigs(serverBlocks) {}
+poller::poller(std::vector <WSERV::serverConfig>const& configVector) : _serverConfigs(configVector) {
+    // Here I have to create that set of ports.
+}
 
 poller::~poller() {}
 
@@ -67,34 +69,34 @@ int poller::newConnection(int fd, int index) {
 
 void poller::pollConnections() {
     // Set up the sockets for each port
-    std::map<int, int> indexToConfig;
-    for (size_t i = 0; i < _serverConfigs.size(); i++) {
-        // Create the pollfd structs and then push them into the vector
-        int newSocket = _serverConfigs[i].getSockFd();
-        indexToConfig[newSocket] = i;
-        setPollFd(newSocket, (POLLIN | POLLOUT));
-    }
-//    char buffer[1024] = {0};
-    while (true) {
-        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
-            perror("poll");
-            break;
-        }
-        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
-            if (connectionError(it->revents)) {
-                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
-                break;
-            }
-            if (it->revents & POLLIN) {
-                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                if (indexToConfig.count(it->fd)) { // This should check that it's one of the listening sockets
-                    newConnection(it->fd, indexToConfig[it->fd]);
-                    break;
-                }
-                // Otherwise the actual reading
-            }
-        }
-    }
+//    std::map<int, int> indexToConfig;
+//    for (size_t i = 0; i < _serverConfigs.size(); i++) {
+//        // Create the pollfd structs and then push them into the vector
+//        int newSocket = _serverConfigs[i].getSockFd();
+//        indexToConfig[newSocket] = i;
+//        setPollFd(newSocket, (POLLIN | POLLOUT));
+//    }
+////    char buffer[1024] = {0};
+//    while (true) {
+//        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
+//            perror("poll");
+//            break;
+//        }
+//        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
+//            if (connectionError(it->revents)) {
+//                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+//                break;
+//            }
+//            if (it->revents & POLLIN) {
+//                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+//                if (indexToConfig.count(it->fd)) { // This should check that it's one of the listening sockets
+//                    newConnection(it->fd, indexToConfig[it->fd]);
+//                    break;
+//                }
+//                // Otherwise the actual reading
+//            }
+//        }
+//    }
 
     /*
         while true
