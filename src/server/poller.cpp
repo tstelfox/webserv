@@ -25,11 +25,7 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(configVector const& configVector) : _serverConfigs(configVector) {
-
-    // Here I have to create that set of ports.
-
-}
+poller::poller(configVector const& configVector) : _serverConfigs(configVector) {}
 
 poller::~poller() {}
 
@@ -72,15 +68,8 @@ int poller::newConnection(int fd) {
 }
 
 void poller::pollConnections() {
-    // Set up the sockets for each port
-//    std::map<int, int> indexToConfig;
-//    for (size_t i = 0; i < _serverConfigs.size(); i++) {
-//        // Create the pollfd structs and then push them into the vector
-//        int newSocket = _serverConfigs[i].getSockFd();
-//        indexToConfig[newSocket] = i;
-//        setPollFd(newSocket, (POLLIN | POLLOUT));
-//    }
-//    char buffer[1024] = {0};
+
+   /* Make the following a standalone function that returns the set of ports */
     std::set<int>   ports;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(it->get_port());
@@ -91,6 +80,7 @@ void poller::pollConnections() {
         int newSocket = buildSocket.getSock();
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
+
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
             perror("poll");
