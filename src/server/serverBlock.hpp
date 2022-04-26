@@ -13,7 +13,7 @@
 
 #ifndef SERVERBLOCK_HPP
 #define SERVERBLOCK_HPP
-#include "socket.hpp"
+#include "src/sockets/socket.hpp"
 
 class serverBlock {
 

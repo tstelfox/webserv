@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/server/Location.hpp"
+#include "Location.hpp"
 
 WSERV::Location::Location(/* args */)
 {

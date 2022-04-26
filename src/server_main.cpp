@@ -11,10 +11,10 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-#include "serverBlock.hpp"
-#include "poller.hpp"
-#include "serverConfig.hpp"
-#include "Parsing.hpp"
+#include "src/server/serverBlock.hpp"
+#include "src/server/poller.hpp"
+#include "src/server/serverConfig.hpp"
+#include "src/parsing/Parsing.hpp"
 #include "colours.hpp"
 
 #include <iostream>

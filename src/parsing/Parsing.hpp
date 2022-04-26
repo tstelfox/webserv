@@ -18,8 +18,8 @@
 #	include <iostream> //std::cout
 #	include <algorithm> //std::find
 #	include <ctype.h> //std::isalpha
-#	include "serverConfig.hpp"
-#	include "exceptions.hpp"
+#	include "src/server/serverConfig.hpp"
+#	include "src/exceptions/exceptions.hpp"
 #	include "colours.hpp"
 
 

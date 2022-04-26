@@ -20,6 +20,6 @@
 #include <vector>
 #include <sys/poll.h>
 
-#include "socket.hpp"
-#include "server.hpp"
-#include "clientConnecter.hpp"
+#include "src/sockets/socket.hpp"
+#include "src/server/server.hpp"
+#include "src/server/clientConnecter.hpp"

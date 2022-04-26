@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "Parsing.hpp"
-#include "exceptions.hpp"
+#include "src/exceptions/exceptions.hpp"
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
