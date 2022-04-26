@@ -73,22 +73,7 @@ int main(int argc, char *argv[]) {
     /*Extract all the unique ports and put them into a set.*/
 
     poller littyServer(S);
-
-//    int openPortsNum = 1;
-//    std::vector<serverBlock> openPorts;
-//
-//    // Take all the input information and then create the sockets
-//    // Create serverBlock class instances that take references to the right socket in the std::set
-//    // Work that into the struct pollfd loop
-//
-//    for (int i = 0; i < openPortsNum; i++) {
-//        // Retrieve the info to create the openPort class
-//        serverBlock tempServer(8080);
-//        openPorts.push_back(tempServer);
-//    }
-//
-//
-//    littyServer.pollConnections();
+    littyServer.pollConnections();
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

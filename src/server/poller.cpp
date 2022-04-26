@@ -15,6 +15,7 @@
 //#include "clientConnecter.hpp"
 #include "poller.hpp"
 #include "colours.hpp"
+#include "socket.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -24,8 +25,10 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 
-poller::poller(std::vector <WSERV::serverConfig>const& configVector) : _serverConfigs(configVector) {
+poller::poller(configVector const& configVector) : _serverConfigs(configVector) {
+
     // Here I have to create that set of ports.
+
 }
 
 poller::~poller() {}
@@ -42,7 +45,7 @@ int poller::connectionError(short revents) const {
            (!(revents & (POLLIN)) && revents & POLLHUP);
 };
 
-int poller::newConnection(int fd, int index) {
+int poller::newConnection(int fd) {
     socklen_t addrLen;
     int new_fd = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
     if (new_fd < 0) {
@@ -61,8 +64,9 @@ int poller::newConnection(int fd, int index) {
         return 0;
     }
     setPollFd(new_fd, (POLLIN | POLLOUT));
-    // Create a new Request class that takes the server configs at the index in the map container
-    (void)index;
+/*
+    Create the request class which will verify that the incoming request is matched to a particular host:port combination
+*/
     std::cout << RED << "New accepted client connection: " << new_fd << RESET_COLOUR << std::endl;
     return 1;
 }
@@ -76,27 +80,37 @@ void poller::pollConnections() {
 //        indexToConfig[newSocket] = i;
 //        setPollFd(newSocket, (POLLIN | POLLOUT));
 //    }
-////    char buffer[1024] = {0};
-//    while (true) {
-//        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
-//            perror("poll");
-//            break;
-//        }
-//        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
-//            if (connectionError(it->revents)) {
-//                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
-//                break;
-//            }
-//            if (it->revents & POLLIN) {
-//                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-//                if (indexToConfig.count(it->fd)) { // This should check that it's one of the listening sockets
-//                    newConnection(it->fd, indexToConfig[it->fd]);
-//                    break;
-//                }
-//                // Otherwise the actual reading
-//            }
-//        }
-//    }
+//    char buffer[1024] = {0};
+    std::set<int>   ports;
+    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
+        ports.insert(it->get_port());
+    }
+    for (std::set<int>::iterator i = ports.begin(); i != ports.end(); i++) {
+        std::cout << "Ports: " << *i << std::endl;
+        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, *i, INADDR_ANY);
+        int newSocket = buildSocket.getSock();
+        setPollFd(newSocket, (POLLIN | POLLOUT));
+    }
+    while (true) {
+        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
+            perror("poll");
+            break;
+        }
+        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
+            if (connectionError(it->revents)) {
+                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+                break;
+            }
+            if (it->revents & POLLIN) {
+                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+                if (ports.count(it->fd)) { // This should check that it's one of the listening sockets
+                    newConnection(it->fd);
+                    break;
+                }
+                // Otherwise the actual reading
+            }
+        }
+    }
 
     /*
         while true

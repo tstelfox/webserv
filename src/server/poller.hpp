@@ -16,14 +16,16 @@
 #include "clientConnecter.hpp"
 #include "serverConfig.hpp"
 #include <string>
+#include <set>
 
 class poller {
 
 public:
 
-    typedef std::vector<struct pollfd> socketVector;
+    typedef std::vector<struct pollfd>          socketVector;
+    typedef std::vector<WSERV::serverConfig>    configVector;
 
-    poller(std::vector<WSERV::serverConfig>const& serverBlocks);
+    poller(configVector const& serverBlocks);
 
     ~poller();
 
@@ -31,7 +33,7 @@ public:
 
     void setPollFd(int fd, short events);
 
-    int newConnection(int fd, int index);
+    int newConnection(int fd);
 
     int connectionError(short revents) const;
 
@@ -47,7 +49,10 @@ private:
     /*So I need to loop through every port in this POS and open sockets
     Then later create a map of every host:port combination which I will find whenever
     I parse the request header*/
-    std::vector<WSERV::serverConfig> _serverConfigs;
+//    std::set<int>   _ports;
+
+
+    configVector _serverConfigs;
 
     std::map<int, clientConnecter> _clients;
 
