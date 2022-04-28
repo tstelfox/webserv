@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "src/sockets/socket.hpp"
+#include "socket.hpp"
 #include "clientConnecter.hpp"
 #include <string>
 
