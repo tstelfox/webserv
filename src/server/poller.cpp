@@ -60,6 +60,7 @@ int poller::newConnection(int fd) {
         return 0;
     }
     setPollFd(new_fd, (POLLIN | POLLOUT));
+    /*Maybe save IP address and port combination*/
 /*
     Create the request class which will verify that the incoming request is matched to a particular host:port combination
 */
@@ -68,7 +69,7 @@ int poller::newConnection(int fd) {
 }
 
 std::set<int> poller::openPorts() {
-    std::set<int> ports;
+    std::set<int> ports; // cmd/shift f6 select all instances in project
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(it->get_port());
@@ -83,10 +84,14 @@ std::set<int> poller::openPorts() {
     return listenSockets;
 }
 
+//std::map<std::pair<std::string, int>, WSERV::serverConfig>  poller::getUniqueConnections() {
+//
+//}
+
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
-//    std::map<std::pair<std::string, int>, WSERV::serverConfig> uniqueConnections;
+//    std::map<std::pair<std::string, int>, WSERV::serverConfig> uniqueConnections = getUniqueConnections();
     char buffer[1024] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
@@ -104,16 +109,16 @@ void poller::pollConnections() {
                     break;
                 }
                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                size_t valread = recv(it->fd, buffer, 1024, 0);
-                if (valread) {
+                size_t valRead = recv(it->fd, buffer, 1024, 0);
+                if (valRead) {
                     // I should start filling in a client connecter here
                     // Should probably have already created the map<host:port, *config>
                     std::cout << "Received message\n" << buffer << std::endl;
                 }
-                if (!valread) {
+                if (!valRead) {
                     // Do nothing for now - Maybe close connection if required.
                 }
-                if (valread < 0) {
+                if (valRead < 0) {
                     std::cout << "No bytes to read" << std::endl;
                     perror("What ");
                     break;
@@ -143,7 +148,7 @@ void poller::pollConnections() {
 
 
 //    int ret;
-//    ssize_t valread = -1;
+//    ssize_t valRead = -1;
 //
 //    poller.setPollFd(listening_socket, (POLLIN | POLLOUT));
 //    char buffer[999] = {0};
@@ -171,24 +176,24 @@ void poller::pollConnections() {
 //                    break;
 //                }
 //
-//                valread = recv(it->fd, buffer, 999, 0);
-//                // std::cout << "valread contains: [" << valread << "]" << std::endl;
-//                if (valread > 0) {
-//                    poller.getRequests()[it->fd].fillBuffer(buffer, valread);
+//                valRead = recv(it->fd, buffer, 999, 0);
+//                // std::cout << "valRead contains: [" << valRead << "]" << std::endl;
+//                if (valRead > 0) {
+//                    poller.getRequests()[it->fd].fillBuffer(buffer, valRead);
 //                    // std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
 //                    // std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
 //                    // if (!poller.getRequests()[it->fd].getFullState())
 //                    poller.getRequests()[it->fd].parseRequest(); // Why is this empty on the second call?
 //                    memset(buffer, 0, sizeof(buffer));
 //                }
-//                if (!valread) {
+//                if (!valRead) {
 //
 //                    /* Leave the connections open for now */
 //                    // std::cout << "Connection ended by client" << std::endl;
 //                    // closeConnection(it);
 //                    continue;
 //                }
-//                if (valread < 0) {
+//                if (valRead < 0) {
 //                    std::cout << "No bytes to read" << std::endl;
 //                    perror("What ");
 //                    break;
