@@ -34,5 +34,5 @@
 # https://www.rfc-editor.org/rfc/rfc7231#section-4.3.1
 
 
-
+# https://distinctplace.com/2017/04/14/nginx-server_name-and-how-it-works/
 
