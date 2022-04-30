@@ -4,6 +4,7 @@
 
 #ifndef WEBSERV_CLIENT_HPP
 #define WEBSERV_CLIENT_HPP
+#include "serverConfig.hpp"
 
 
 class client {
@@ -21,6 +22,11 @@ public:
     };
 
 private:
+
+    /* Initially wanted to put configs in a map but nah
+     * Actually a map would be a bad idea cause I have to use the
+     * first in the case there is no server_name match*/
+
     /* Variables needed for config routing */
     configVector _configs;
     std::string _hostIp;
@@ -29,7 +35,7 @@ private:
     /* Buffer variables */
     char _buffer[1024]; // Maybe max client size can be enforced here?
     int _buffSize;
-    bool _isBuffFull?
+    bool _isBuffFull;
 
     /* Request line info */
     int _method;

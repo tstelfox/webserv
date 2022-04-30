@@ -4,6 +4,18 @@
 
 #include "client.hpp"
 
-client::client() {}
+client::client() {
+    /* Just for now */
+    (void)_port;
+    (void)_buffer;
+    (void)_buffSize;
+    (void)_isBuffFull;
+    (void)_method;
+    (void)_keepAlive;
+    (void)_status;
+//    (void);
+
+
+}
 
 client::~client() {}

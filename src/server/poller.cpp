@@ -12,7 +12,7 @@
 
 //#include "server.hpp"
 //#include "serverConfig.hpp"
-//#include "clientConnecter.hpp"
+#include "clientConnecter.hpp"
 #include "poller.hpp"
 #include "colours.hpp"
 #include "socket.hpp"
@@ -106,8 +106,8 @@ int poller::newConnection(int fd) {
         Here is where I should just create an instance of a client connection that also contains
 
     */
-    client  new_client(host, port, relevant);
-    _clients[new_fd] = new_client;
+//    client  new_client(host, port, relevant);
+//    _clients[new_fd] = new_client;
 
     return 1;
 }
