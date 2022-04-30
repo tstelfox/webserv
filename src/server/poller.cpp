@@ -12,7 +12,7 @@
 
 //#include "server.hpp"
 //#include "serverConfig.hpp"
-#include "clientConnecter.hpp"
+#include "client.hpp"
 #include "poller.hpp"
 #include "colours.hpp"
 #include "socket.hpp"
