@@ -101,6 +101,14 @@ int poller::newConnection(int fd) {
 
 
     std::cout << RED << "New accepted client connection: " << new_fd << RESET_COLOUR << std::endl;
+
+    /*
+        Here is where I should just create an instance of a client connection that also contains
+
+    */
+    client  new_client(host, port, relevant);
+    _clients[new_fd] = new_client;
+
     return 1;
 }
 

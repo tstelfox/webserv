@@ -16,7 +16,7 @@ SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp \
 		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX)
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
-SERV = clientConnecter.cpp server.cpp poller.cpp serverConfig.cpp Location.cpp
+SERV = client.cpp poller.cpp serverConfig.cpp Location.cpp
 PARSE = Pars_add_vars_to_vec.cpp Pars_helper_funcs.cpp Pars_setters.cpp Parsing.cpp
 OBJ_DIR = obj
 SRC_DIR = src
