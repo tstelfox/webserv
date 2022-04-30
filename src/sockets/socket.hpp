@@ -14,6 +14,7 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <string>
 // #include <sys/fcntl.h>
 // #include <iostream>
 // #include "webserv.hpp"
@@ -21,13 +22,13 @@
 class socketMan {
 public:
     socketMan(int domain, int service, int protocol,
-              int port, u_long interface);
+              int port, const char *host);
 
     virtual ~socketMan(); // This means inherited classes don't need to have a destructor
 
     virtual int bindServer(int sock, struct sockaddr_in address) = 0;
 
-    void testConnection(int);
+    void testConnection(int, std::string);
 
     int getSock();
 
@@ -42,7 +43,7 @@ class serverSock : public socketMan {
 
 public:
     serverSock(int domain, int service, int protocol,
-               int port, u_long interface);
+               int port, const char *host);
 
     virtual ~serverSock();
     // serverSock(serverSock const &x);
@@ -65,7 +66,7 @@ private:
 	
 	public:
 		clientSock(int domain, int service, int protocol,
-			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) {
+			int port, const char *host) : socketMan(domain, service, protocol, port,host) {
 				// Bind/connect the socket
 				connection = connect_server(sock, address);
 				test_connection(connection);

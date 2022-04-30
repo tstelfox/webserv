@@ -24,6 +24,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/fcntl.h>
+#include <netinet/in.h> // inet_addr()
+#include <arpa/inet.h> // inet_addr()
+#include <utility>
 
 poller::poller(configVector const& configVector) : _serverConfigs(configVector) {}
 
@@ -69,14 +72,24 @@ int poller::newConnection(int fd) {
 }
 
 std::set<int> poller::openPorts() {
-    std::set<int> ports; // cmd/shift f6 select all instances in project
+    std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
-        ports.insert(it->get_port());
+        ports.insert(std::make_pair(it->get_host(), it->get_port()));
     }
-    for (std::set<int>::iterator i = ports.begin(); i != ports.end(); i++) {
-        std::cout << "Ports: " << *i << std::endl;
-        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, *i, INADDR_ANY);
+    for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++) {
+        std::cout << "Host: " << i->first << " Port: " << i->second << std::endl;
+//        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, i->second, INADDR_ANY);
+//        char host[i->first.size() + 1];
+//        strcpy(host, i->first.c_str())
+//        in_addr_t host = inet_addr(i->first.c_str());
+//        std::cout << "Converted to: " << host << std::endl;
+        std::string host;
+        if (!i->first.compare("localhost"))
+            host = "127.0.0.1";
+        else
+            host = i->first;
+        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, i->second, host.c_str());
         int newSocket = buildSocket.getSock();
         listenSockets.insert(newSocket);
         setPollFd(newSocket, (POLLIN | POLLOUT));
