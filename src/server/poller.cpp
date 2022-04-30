@@ -65,21 +65,41 @@ int poller::newConnection(int fd) {
     }
     setPollFd(new_fd, (POLLIN | POLLOUT));
 
-    /* Retrieving the host:port this connection is coming from */
+    /* Retrieving the host:port this connection is coming from
+     * This could Perhaps even be its own function
+    */
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
+    int port; // This might not work?
+    char *host = NULL;
+
     if (getsockname(new_fd, (struct sockaddr *)&sin, &len))
         perror("getsockname");
     else {
-        int port = ntohs(sin.sin_port);
-        char *host = inet_ntoa(sin.sin_addr);
+        port = ntohs(sin.sin_port);
+        host = inet_ntoa(sin.sin_addr);
         std::cout << "New connection from port: " << port << \
             " on host: " << host << std::endl;
     }
 
-/*
-    Create the request class which will verify that the incoming request is matched to a particular host:port combination
-*/
+    /*
+        Make a vector of only the configs relevant to the host:port combination
+        And pass that into the client class
+    */
+    configVector relevant;
+    std::string hostIp = host;
+    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
+        if (it->get_port() == port && (it->get_host() == hostIp || \
+            ((it->get_host()) == "localhost" && !hostIp.compare("127.0.0.1"))))
+            relevant.push_back(*it);
+    }
+    std::cout << "Relevant vectors are:" << std::endl;
+    for (configVector::iterator iter = relevant.begin(); iter != relevant.end(); iter++) {
+        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
+            " and server_name: " << iter->get_server_name() << std::endl;
+    }
+
+
     std::cout << RED << "New accepted client connection: " << new_fd << RESET_COLOUR << std::endl;
     return 1;
 }
