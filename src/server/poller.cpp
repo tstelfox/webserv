@@ -64,16 +64,17 @@ int poller::newConnection(int fd) {
         return 0;
     }
     setPollFd(new_fd, (POLLIN | POLLOUT));
-    /* In here is where I have to match ? */
 
-    /*Retrieving the host:port this connection is coming from*/
+    /* Retrieving the host:port this connection is coming from */
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
     if (getsockname(new_fd, (struct sockaddr *)&sin, &len))
         perror("getsockname");
     else {
-        std::cout << "New connection from port: " << ntohs(sin.sin_port) << \
-            " on host: " << inet_ntoa(sin.sin_addr) << std::endl;
+        int port = ntohs(sin.sin_port);
+        char *host = inet_ntoa(sin.sin_addr);
+        std::cout << "New connection from port: " << port << \
+            " on host: " << host << std::endl;
     }
 
 /*
