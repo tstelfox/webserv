@@ -5,7 +5,7 @@
 #ifndef WEBSERV_CLIENT_HPP
 #define WEBSERV_CLIENT_HPP
 #include "serverConfig.hpp"
-#include "sys/poll.h"
+
 
 
 class client {
