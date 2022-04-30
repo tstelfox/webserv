@@ -21,7 +21,7 @@
 socketMan::socketMan(int domain, int service, int protocol, int port,
                      const char *host) {
 
-    std::cout << "host: " << host << std::endl;
+//    std::cout << "host: " << host << std::endl;
     // Set up address structure
     address.sin_family = domain;
     address.sin_addr.s_addr = inet_addr(host);

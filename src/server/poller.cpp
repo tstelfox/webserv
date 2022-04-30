@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/fcntl.h>
+#include <sys/types.h>
 #include <netinet/in.h> // inet_addr()
 #include <arpa/inet.h> // inet_addr()
 #include <utility>
@@ -63,7 +64,18 @@ int poller::newConnection(int fd) {
         return 0;
     }
     setPollFd(new_fd, (POLLIN | POLLOUT));
-    /*Maybe save IP address and port combination*/
+    /* In here is where I have to match ? */
+
+    /*Retrieving the host:port this connection is coming from*/
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    if (getsockname(new_fd, (struct sockaddr *)&sin, &len))
+        perror("getsockname");
+    else {
+        std::cout << "New connection from port: " << ntohs(sin.sin_port) << \
+            " on host: " << inet_ntoa(sin.sin_addr) << std::endl;
+    }
+
 /*
     Create the request class which will verify that the incoming request is matched to a particular host:port combination
 */
@@ -76,14 +88,11 @@ std::set<int> poller::openPorts() {
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(std::make_pair(it->get_host(), it->get_port()));
+        /*It's still here that I should be managing to keep track of the configs as well or is it???*/
     }
     for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++) {
         std::cout << "Host: " << i->first << " Port: " << i->second << std::endl;
 //        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, i->second, INADDR_ANY);
-//        char host[i->first.size() + 1];
-//        strcpy(host, i->first.c_str())
-//        in_addr_t host = inet_addr(i->first.c_str());
-//        std::cout << "Converted to: " << host << std::endl;
         std::string host;
         if (!i->first.compare("localhost"))
             host = "127.0.0.1";
