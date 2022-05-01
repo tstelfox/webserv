@@ -136,14 +136,9 @@ std::set<int> poller::openPorts() {
     return listenSockets;
 }
 
-//std::map<std::pair<std::string, int>, WSERV::serverConfig>  poller::getUniqueConnections() {
-//
-//}
-
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
-//    std::map<std::pair<std::string, int>, WSERV::serverConfig> uniqueConnections = getUniqueConnections();
     char buffer[1024] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
@@ -165,11 +160,8 @@ void poller::pollConnections() {
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
                     currentClient.fillBuffer(buffer, valRead);
-//                    _clients[it->fd].fillBuffer(buffer, valRead);
-//                    std::cout << "Client Request:\n" << _clients[it->fd].getBuffer() << std::endl;
                     std::cout << "Client Request:\n" << currentClient.getBuffer() << std::endl;
 
-//                    std::cout << "Received message\n" << buffer << std::endl;
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
@@ -180,93 +172,9 @@ void poller::pollConnections() {
                     perror("What ");
                     break;
                 }
-            }
-            else if (it->revents & POLLOUT) {
+            } else if (it->revents & POLLOUT) {
                 // You _should_ know the drill
             }
         }
     }
-
-    /*
-        while true
-        poll through all these connections
-        while loop through the vector of pollfds structs
-            if the connection matches one of those in the server _serverConfigs
-                accept the connection and save the serverconfig to it. - But how?
-            if POLLIN
-                stuff
-            if POLLOUT
-                you know it
-
-    When accepting a new connection create a Client class and save to it the index of the serverConfigs
-    Contents of the Client class? Pass it the appropriate serverConfig and the fd to read/write to.
-    Maybe keep a map of Client classes in the poller and then can keep the polling loop similar in functioning
-     */
-
-
-//    int ret;
-//    ssize_t valRead = -1;
-//
-//    poller.setPollFd(listening_socket, (POLLIN | POLLOUT));
-//    char buffer[999] = {0};
-//
-//    while (true) {
-//        ret = poll(&(*poller.getConnections().begin()), poller.getConnections().size(),
-//                   -1); // Could use std::vector::data() but that's c++11
-//        if (ret < 0) {
-//            perror("poll");
-//            break;
-//        }
-//        // std::cout << "Well? " << poller.getConnections().size() << std::endl;
-//        for (std::vector<struct pollfd>::iterator it = poller.getConnections().begin();
-//             it != poller.getConnections().end(); it++) {
-//            // std::cout << "Diocane " << std::hex << it->revents << std::endl;
-//            if (connectionError(it->revents)) {
-//                std::cout << "Connection was hung up or invalid requested events: " << std::hex << it->revents
-//                          << std::endl;
-//                break;
-//            }
-//            if (it->revents & POLLIN) {
-//                // std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-//                if (it->fd == listening_socket) {
-//                    newConnection();
-//                    break;
-//                }
-//
-//                valRead = recv(it->fd, buffer, 999, 0);
-//                // std::cout << "valRead contains: [" << valRead << "]" << std::endl;
-//                if (valRead > 0) {
-//                    poller.getRequests()[it->fd].fillBuffer(buffer, valRead);
-//                    // std::cout << poller.getRequests()[it->fd].getFd() << std::endl;
-//                    // std::cout << "From fd: " << it->fd << "\n" << buffer << std::endl;
-//                    // if (!poller.getRequests()[it->fd].getFullState())
-//                    poller.getRequests()[it->fd].parseRequest(); // Why is this empty on the second call?
-//                    memset(buffer, 0, sizeof(buffer));
-//                }
-//                if (!valRead) {
-//
-//                    /* Leave the connections open for now */
-//                    // std::cout << "Connection ended by client" << std::endl;
-//                    // closeConnection(it);
-//                    continue;
-//                }
-//                if (valRead < 0) {
-//                    std::cout << "No bytes to read" << std::endl;
-//                    perror("What ");
-//                    break;
-//                }
-//            }
-//            if (it->revents & POLLOUT) {
-//
-//                if (poller.getRequests()[it->fd].getFullState()) { // Change this to something more readable
-//                    ret = respondToClient(it->fd);
-//                    if (ret < 0) {
-//                        perror("   send() failed");
-//                        break;
-//                    }
-//                    poller.getRequests()[it->fd].resetHandler();
-//                }
-//            }
-//        } // End of loop through pollable connections
-//    }
 }
