@@ -48,23 +48,23 @@ int poller::connectionError(short revents) const {
 
 int poller::newConnection(int fd) {
     socklen_t addrLen;
-    int new_fd = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
-    if (new_fd < 0) {
+    int newConnection = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
+    if (newConnection < 0) {
         if (errno != EWOULDBLOCK) {
             perror("accept failed");
         }
         return 0;
     }
     int on = 1;
-    if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+    if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
         std::cout << "sockoptions got fucked" << std::endl;
         return 0;
     }
-    if ((fcntl(new_fd, F_SETFL, O_NONBLOCK)) < 0) {
+    if ((fcntl(newConnection, F_SETFL, O_NONBLOCK)) < 0) {
         std::cout << "fcntl got fucked" << std::endl;
         return 0;
     }
-    setPollFd(new_fd, (POLLIN | POLLOUT));
+    setPollFd(newConnection, (POLLIN | POLLOUT));
 
     /* Retrieving the host:port this connection is coming from
      * This could Perhaps even be its own function
@@ -74,7 +74,7 @@ int poller::newConnection(int fd) {
     int port; // This might not work?
     char *host = NULL;
 
-    if (getsockname(new_fd, (struct sockaddr *)&sin, &len))
+    if (getsockname(newConnection, (struct sockaddr *)&sin, &len))
         perror("getsockname");
     else {
         port = ntohs(sin.sin_port);
@@ -101,14 +101,14 @@ int poller::newConnection(int fd) {
     }
 
 
-    std::cout << RED << "New accepted client connection: " << new_fd << RESET_COLOUR << std::endl;
+    std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
 
     /*
         Here is where I should just create an instance of a client connection that also contains
-
+        the accepted socket?
     */
-//    client  new_client(host, port, relevant);
-//    _clients[new_fd] = new_client;
+    client  newClient(hostIp, port, relevant, newConnection);
+    _clients.insert(std::make_pair(newConnection, newClient));
 
     return 1;
 }
@@ -151,6 +151,7 @@ void poller::pollConnections() {
             break;
         }
         for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
+            client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
                 break;
@@ -163,9 +164,12 @@ void poller::pollConnections() {
                 std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
-                    // I should start filling in a client connecter here
-                    // Should probably have already created the map<host:port, *config>
+                    currentClient.fillBuffer(buffer, valRead);
+//                    _clients[it->fd].fillBuffer(buffer, valRead);
+                    std::cout << "Client Request:\n" << currentClient.getBuffer() << std::endl;
+
                     std::cout << "Received message\n" << buffer << std::endl;
+                    memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
                     // Do nothing for now - Maybe close connection if required.
