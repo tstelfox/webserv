@@ -173,8 +173,8 @@ void poller::pollConnections() {
                     break;
                 }
             } else if (it->revents & POLLOUT) {
-                /* If buffer is full, parse and respond. Separate class again? */
-                if (currentClient.isBufferFull()) {
+                if (currentClient.isBufferFull()) { // This should perhaps be only internal to the client
+
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.
                      */
