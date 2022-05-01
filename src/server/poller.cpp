@@ -166,9 +166,10 @@ void poller::pollConnections() {
                 if (valRead) {
                     currentClient.fillBuffer(buffer, valRead);
 //                    _clients[it->fd].fillBuffer(buffer, valRead);
+//                    std::cout << "Client Request:\n" << _clients[it->fd].getBuffer() << std::endl;
                     std::cout << "Client Request:\n" << currentClient.getBuffer() << std::endl;
 
-                    std::cout << "Received message\n" << buffer << std::endl;
+//                    std::cout << "Received message\n" << buffer << std::endl;
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {

@@ -15,9 +15,14 @@
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
-    std::cout << "Client Class created with config:\n" << std::endl;
-    for (configVector::iterator it = _configs.begin(); it != _configs.end(); it++)
-        std::cout << "Servername: " << it->get_server_name() << std::endl;
+//    std::cout << "Client Class created with config:" << std::endl;
+//    for (configVector::iterator it = _configs.begin(); it != _configs.end(); it++)
+//        std::cout << "Servername: " << it->get_server_name() << std::endl;
+
+    _buffSize = 0;
+    _isBuffFull = false;
+    _status = 200;
+    _method = 0;
 }
 
 client::client() {
@@ -42,7 +47,6 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
         temp++;
     }
     _buffer[temp] = '\0';
-    std::cout << _buffer << std::endl;
 }
 
 char *client::getBuffer() {
