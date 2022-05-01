@@ -20,19 +20,19 @@ client::client(std::string hostIp, int port, configVector const& configs, int so
     memset(_buffer, 0, 1024);
     _buffSize = 0;
     _isBuffFull = false;
-    _status = 200;
-    _method = 0;
+//    _status = 200;
+//    _method = 0;
 }
 
 client::client() {
     /* Just for now */
     (void)_port;
-    (void)_buffer;
-    (void)_buffSize;
-    (void)_isBuffFull;
-    (void)_method;
-    (void)_keepAlive;
-    (void)_status;
+//    (void)_buffer;
+//    (void)_buffSize;
+//    (void)_isBuffFull;
+//    (void)_method;
+//    (void)_keepAlive;
+//    (void)_status;
     (void)_socket;
 }
 
@@ -48,17 +48,17 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
         temp++;
     }
     _buffer[temp] = '\0';
-    if (fullRequestReceived())
+    if (fullHeaderReceived())
         _isBuffFull = true; // Check if there's a body or nah
 }
 
-int client::fullRequestReceived() {
+int client::fullHeaderReceived() {
     std::string request(_buffer);
     std::istringstream ss(request);
     std::string line;
     while (std::getline(ss, line)) {
         if (!line.compare("\r")) {
-            // setBufferAsFull(); Request might have a body so not ready for this
+            // _isBuffFull = true   ; Request might have a body so not ready for this
             return 1;
         }
     }

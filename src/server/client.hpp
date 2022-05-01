@@ -28,7 +28,7 @@ public:
 
     /* Storing incoming client request */
     void fillBuffer(const char *buff, ssize_t valRead);
-    int fullRequestReceived();
+    int fullHeaderReceived();
 //    void resetClient();
     char *getBuffer();
 
@@ -48,34 +48,39 @@ private:
 
     /* Variables needed for config routing */
     configVector _configs;
+    /* Buffer variables */
+    char _buffer[1024]; // Maybe max client size can be enforced here?
+
+    int _buffSize;
+    bool _isBuffFull;
+    /* Perhaps client should contain a requestHandler */
+
+
+    /* Following things may be needed but am not 100% sure */
     std::string _hostIp;
     int _port;
     int _socket;
 
-    /* Buffer variables */
-    char _buffer[1024]; // Maybe max client size can be enforced here?
-    int _buffSize;
-    bool _isBuffFull;
 
-    /* Request line info */
-    int _method;
-    std::string _uri;
-    std::string _http;
-
-    /* Request Header Fields */
-    std::string _requestedServer;
-    bool _keepAlive;
-
-    /* Status Code and response info */
-    int _status;
-    std::string _name;
-
-    /* Truly should consider making a request class TODO*/
-//    bool _autoIndex;
-//    set<int> _acceptedMethods;
-
-    /* Final response string */
-    std::string _response;
+//    /* Request line info */
+//    int _method;
+//    std::string _uri;
+//    std::string _http;
+//
+//    /* Request Header Fields */
+//    std::string _requestedServer;
+//    bool _keepAlive;
+//
+//    /* Status Code and response info */
+//    int _status;
+//    std::string _name;
+//
+//    /* Truly should consider making a request class TODO*/
+////    bool _autoIndex;
+////    set<int> _acceptedMethods;
+//
+//    /* Final response string */
+//    std::string _response;
 };
 
 

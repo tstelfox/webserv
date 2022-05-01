@@ -163,10 +163,6 @@ void poller::pollConnections() {
                     std::cout << "Client Request:\n" << currentClient.getBuffer() << std::endl;
 
                     memset(buffer, 0, sizeof(buffer));
-                    if (currentClient.isBufferFull()) {
-                        std::cout << "Appesi come Caravaggio" << std::endl;
-                        // Parse here or in POLLOUT?
-                    }
                 }
                 if (!valRead) {
                     // Do nothing for now - Maybe close connection if required.
@@ -177,8 +173,13 @@ void poller::pollConnections() {
                     break;
                 }
             } else if (it->revents & POLLOUT) {
-                // You _should_ know the drill
                 /* If buffer is full, parse and respond. Separate class again? */
+                if (currentClient.isBufferFull()) {
+                    /* Do the parsing here (Check if there is a body)
+                     * When parsing is done, respond.
+                     */
+                    std::cout << "Appesi come Caravaggio" << std::endl;
+                }
             }
         }
     }
