@@ -28,7 +28,11 @@ public:
 
     /* Storing incoming client request */
     void fillBuffer(const char *buff, ssize_t valRead);
+    int fullRequestReceived();
+//    void resetClient();
     char *getBuffer();
+
+    bool isBufferFull() const;
 
 public:
     enum methodTypes {

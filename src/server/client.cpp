@@ -12,13 +12,12 @@
 
 #include "client.hpp"
 #include <iostream>
+#include <sstream>
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
-//    std::cout << "Client Class created with config:" << std::endl;
-//    for (configVector::iterator it = _configs.begin(); it != _configs.end(); it++)
-//        std::cout << "Servername: " << it->get_server_name() << std::endl;
 
+    memset(_buffer, 0, 1024);
     _buffSize = 0;
     _isBuffFull = false;
     _status = 200;
@@ -39,6 +38,8 @@ client::client() {
 
 client::~client() {}
 
+/* < ---------- Manage Incoming Request Buffer ----------- > */
+
 void client::fillBuffer(const char *buff, ssize_t valRead) {
     int temp = _buffSize;
     _buffSize += valRead;
@@ -47,8 +48,39 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
         temp++;
     }
     _buffer[temp] = '\0';
+    if (fullRequestReceived())
+        _isBuffFull = true; // Check if there's a body or nah
 }
+
+int client::fullRequestReceived() {
+    std::string request(_buffer);
+    std::istringstream ss(request);
+    std::string line;
+    while (std::getline(ss, line)) {
+        if (!line.compare("\r")) {
+            // setBufferAsFull(); Request might have a body so not ready for this
+            return 1;
+        }
+    }
+    return 0;
+}
+
+//void client::resetClient() { // TODO
+//    /* Is it necessary to wipe it this way
+//     * or can I just delete the client entirely?
+//     * Perhaps this is in order to receive the favicon too
+//     */
+//}
+
+/* < --------- Parse Received Request ------ > */
+
+
+
 
 char *client::getBuffer() {
     return _buffer;
+}
+
+bool client::isBufferFull() const {
+    return _isBuffFull;
 }
