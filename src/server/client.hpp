@@ -48,6 +48,7 @@ private:
 
     /* Variables needed for config routing */
     configVector _configs;
+
     /* Buffer variables */
     char _buffer[1024]; // Maybe max client size can be enforced here?
 

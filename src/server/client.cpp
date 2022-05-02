@@ -40,6 +40,8 @@ client::~client() {}
 
 /* < ---------- Manage Incoming Request Buffer ----------- > */
 
+
+/* Questions still hang over this implementation when there is a body */
 void client::fillBuffer(const char *buff, ssize_t valRead) {
     int temp = _buffSize;
     _buffSize += valRead;

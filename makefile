@@ -13,7 +13,8 @@
 NAME = server
 CXX = c++
 SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp \
-		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX)
+		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX) \
+		requestParser/requestParser.cpp
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
 SERV = client.cpp poller.cpp serverConfig.cpp Location.cpp

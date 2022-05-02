@@ -12,9 +12,28 @@
 
 #ifndef WEBSERV_REQUESTPARSER_HPP
 #define WEBSERV_REQUESTPARSER_HPP
+#include <string>
+#include "serverConfig.hpp"
 
 
 class requestParser {
+public:
+    typedef std::vector <WSERV::serverConfig> configVector;
+
+    requestParser(configVector const& configs, std::string request);
+    ~requestParser();
+
+private:
+    requestParser();
+    std::string _request;
+
+    /* Configs to sort through OR could do this in client and just
+     * send the right config straight to the parser
+     */
+    configVector _configs;
+
+    /* Ultimate response to return */
+    std::string _response;
 
 };
 
