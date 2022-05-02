@@ -32,6 +32,10 @@ public:
 //    void resetClient();
     char *getBuffer();
 
+    /* Parsing Request Header and Config Routing */
+    void parseRequestLine(std::string request);
+    void routeConfig();
+
     bool isBufferFull() const;
 
 public:
@@ -64,16 +68,16 @@ private:
 
 
 //    /* Request line info */
-//    int _method;
-//    std::string _uri;
-//    std::string _http;
+    int _method;
+    std::string _uri;
+    std::string _http;
 //
 //    /* Request Header Fields */
 //    std::string _requestedServer;
 //    bool _keepAlive;
 //
 //    /* Status Code and response info */
-//    int _status;
+    int _status;
 //    std::string _name;
 //
 //    /* Truly should consider making a request class TODO*/

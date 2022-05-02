@@ -174,11 +174,12 @@ void poller::pollConnections() {
                 }
             } else if (it->revents & POLLOUT) {
                 if (currentClient.isBufferFull()) { // This should perhaps be only internal to the client
-
+                    currentClient.routeConfig();
+                    return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.
                      */
-                    std::cout << "Appesi come Caravaggio" << std::endl;
+//                    std::cout << "Appesi come Caravaggio" << std::endl;
                 }
             }
         }

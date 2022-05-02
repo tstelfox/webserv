@@ -13,6 +13,7 @@
 #include "client.hpp"
 #include <iostream>
 #include <sstream>
+#include "colours.hpp"
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
@@ -20,19 +21,12 @@ client::client(std::string hostIp, int port, configVector const& configs, int so
     memset(_buffer, 0, 1024);
     _buffSize = 0;
     _isBuffFull = false;
-//    _status = 200;
-//    _method = 0;
+    _status = 200;
+    _method = 0;
 }
 
 client::client() {
-    /* Just for now */
     (void)_port;
-//    (void)_buffer;
-//    (void)_buffSize;
-//    (void)_isBuffFull;
-//    (void)_method;
-//    (void)_keepAlive;
-//    (void)_status;
     (void)_socket;
 }
 
@@ -74,8 +68,76 @@ int client::fullHeaderReceived() {
 //     */
 //}
 
-/* < --------- Parse Received Request ------ > */
+/* < --------- Request Parsing and Config Routing ------ > */
 
+void client::parseRequestLine(std::string request) {
+    std::stringstream ss(request);
+    std::string field;
+
+    ss >> field;
+    /* 405 Method not allowed will be about the config allowed methods
+    Otherwise all others are 400 Bad Request */
+    if (!field.compare("POST"))
+        _method = POST;
+    else if (!field.compare("DELETE"))
+        _method = DELETE;
+    else if (!field.compare("GET"))
+        _method = GET;
+    else
+        _status = 400; // BAD REQUEST
+    // else if (std::isupper(field[0])) {
+    // 	_status = 405; // Method Not Allowed
+    // }
+    ss >> _uri;
+    if (!_uri.empty() && _uri[0] != '/') {
+        // Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
+        _status = 400;
+    }
+    ss >> _http;
+    if (!_http.empty() && _http.compare("HTTP/1.1")) {
+        _status = 505; // HTTP VERSION NOT SUPPORTED
+    }
+    if (_status != 200) {
+
+    }
+        //Ya know the drill
+}
+
+void client::routeConfig() {
+    // nginx demands the host be filled out or it's a 400 bad request
+    std::string request(_buffer);
+    std::istringstream ss(request);
+    std::string line;
+
+    std::getline(ss, line);
+    parseRequestLine(line); // If something is invalid in the request line just respond immediately.
+
+    std::map<std::string, std::string> fields;
+    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
+            _method << " " << _uri << " " << _http << std::endl << std::endl;
+
+    while (std::getline(ss, line)) {
+        std::replace(line.begin(), line.end(), ':', ' ');
+        std::stringstream stream(line);
+        std::string key;
+        stream >> key;
+        std::string value;
+        while (stream) {
+            std::string rcodio;
+            stream >> rcodio;
+            value += rcodio + " ";
+        }
+        if (value.size() > 2)
+            value.resize(
+                    value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
+        transform(key.begin(), key.end(), key.begin(), ::tolower);
+        fields[key] = value;
+    }
+    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+    std::cout << std::endl;
+}
 
 
 
