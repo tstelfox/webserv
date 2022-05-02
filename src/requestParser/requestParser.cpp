@@ -11,3 +11,13 @@
 /* ************************************************************************** */
 
 #include "requestParser.hpp"
+
+requestParser::requestParser(const configVector &configs, std::string request)
+: _configs(configs), _request(request) {
+
+}
+
+requestParser::requestParser() {}
+
+requestParser::~requestParser() {}
+
