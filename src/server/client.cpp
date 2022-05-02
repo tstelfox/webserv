@@ -164,18 +164,21 @@ void client::parseRequestHeader() {
 void client::routeConfig() {
     std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
-        std::cout << "server_name: " << iter->get_server_name() << std::end;
+        std::cout << "server_name: " << iter->get_server_name() << std::endl;
     }
 
     // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
 
+    WSERV::serverConfig  rightConfig;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
-        if (!_requestedHost.compare(->get_server_name())) {
-            iter = _configs.end();
-
+        if (!_requestedHost.compare(iter->get_server_name())) {
+            rightConfig = *iter;
+            break;
         }
-
+        if ((iter + 1) == _configs.end())
+            rightConfig = *_configs.begin();
     }
+    std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
 
 }
