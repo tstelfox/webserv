@@ -183,8 +183,8 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     }
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
-    requestParser(rightConfig, fields);
-
+    requestParser parser(rightConfig, fields);
+//    parser.parseShit();
 }
 
 char *client::getBuffer() {
