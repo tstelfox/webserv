@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include "colours.hpp"
+#include "requestParser.hpp"
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
@@ -158,16 +159,18 @@ void client::parseRequestHeader() {
         std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
     std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
-    routeConfig();
+    routeConfig(fields);
 }
 
-void client::routeConfig() {
+void client::routeConfig(std::map<std::string, std::string> &fields) {
     std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
         std::cout << "server_name: " << iter->get_server_name() << std::endl;
     }
 
     // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
+
+
 
     WSERV::serverConfig  rightConfig;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
@@ -180,6 +183,7 @@ void client::routeConfig() {
     }
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
+    requestParser(rightConfig, fields);
 
 }
 

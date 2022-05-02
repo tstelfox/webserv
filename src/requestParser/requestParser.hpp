@@ -21,7 +21,7 @@ class requestParser {
 public:
     typedef std::vector<WSERV::serverConfig> configVector;
 
-    requestParser(configVector const &configs, std::string request);
+    requestParser(WSERV::serverConfig const &configs, std::map<std::string, std::string> &request);
 
     ~requestParser();
 
@@ -31,9 +31,9 @@ private:
     /* Configs to sort through OR could do this in client and just
      * send the right config straight to the parser
      */
-    configVector _configs;
+    WSERV::serverConfig _config;
 
-    std::string _request;
+    std::map<std::string, std::string> _requestFields;
 
 
     /* Ultimate response to return */

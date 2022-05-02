@@ -36,7 +36,7 @@ public:
     void parseRequestLine(std::string request);
     void requestedHost(std::map<std::string, std::string> &fields);
     void parseRequestHeader();
-    void routeConfig();
+    void routeConfig(std::map<std::string, std::string> &fields);
 
     bool isBufferFull() const;
 
