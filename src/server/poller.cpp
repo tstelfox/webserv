@@ -174,7 +174,7 @@ void poller::pollConnections() {
                 }
             } else if (it->revents & POLLOUT) {
                 if (currentClient.isBufferFull()) { // This should perhaps be only internal to the client
-                    currentClient.routeConfig();
+                    currentClient.parseRequestHeader();
                     return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.

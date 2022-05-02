@@ -102,7 +102,26 @@ void client::parseRequestLine(std::string request) {
     }
 }
 
-void client::routeConfig() {
+void client::requestedHost(std::map<std::string, std::string> &fields) {
+
+    /* Check that there is a valid Host */
+    std::map<std::string, std::string>::iterator it;
+    it = fields.find("host");
+    if (it == fields.end()) {
+        _status = 400;
+        return;
+    }
+    /* Test the following with no host
+        It may be that if the Uri is an absolute path then
+        host can actually be omitted (?) */
+    if (fields["host"].empty() || !fields["host"].compare(" ")) {
+        std::cout << "No host" << std::endl;
+        _status = 400;
+    } else
+        _requestedHost = fields["host"];
+}
+
+void client::parseRequestHeader() {
     // nginx demands the host be filled out or it's a 400 bad request
     std::string request(_buffer);
     std::istringstream ss(request);
@@ -138,9 +157,28 @@ void client::routeConfig() {
     for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
         std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
     std::cout << std::endl;
+    requestedHost(fields); // If something is invalid in the request line just respond immediately.
+    routeConfig();
 }
 
+void client::routeConfig() {
+    std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
+    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
+        std::cout << "server_name: " << iter->get_server_name() << std::end;
+    }
 
+    // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
+
+    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
+        if (!_requestedHost.compare(->get_server_name())) {
+            iter = _configs.end();
+
+        }
+
+    }
+
+
+}
 
 char *client::getBuffer() {
     return _buffer;

@@ -34,6 +34,8 @@ public:
 
     /* Parsing Request Header and Config Routing */
     void parseRequestLine(std::string request);
+    void requestedHost(std::map<std::string, std::string> &fields);
+    void parseRequestHeader();
     void routeConfig();
 
     bool isBufferFull() const;
@@ -73,7 +75,7 @@ private:
     std::string _http;
 //
 //    /* Request Header Fields */
-//    std::string _requestedServer;
+    std::string _requestedHost;
 //    bool _keepAlive;
 //
 //    /* Status Code and response info */
