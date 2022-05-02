@@ -98,9 +98,8 @@ void client::parseRequestLine(std::string request) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
     }
     if (_status != 200) {
-
-    }
         //Ya know the drill
+    }
 }
 
 void client::routeConfig() {
@@ -117,6 +116,8 @@ void client::routeConfig() {
             _method << " " << _uri << " " << _http << std::endl << std::endl;
 
     while (std::getline(ss, line)) {
+        if (!line.compare("\r"))
+            break;
         std::replace(line.begin(), line.end(), ':', ' ');
         std::stringstream stream(line);
         std::string key;
