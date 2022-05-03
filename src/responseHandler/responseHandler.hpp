@@ -39,6 +39,11 @@ private:
     std::string getResponse(std::string uri);
 
 
+    /* Response header building utils */
+    std::string buildHttpLine(int status);
+    std::string buildDateLine();
+
+
     /* Should probably send in the request line tbh */
     std::string _requestLine;
     WSERV::serverConfig _config;
