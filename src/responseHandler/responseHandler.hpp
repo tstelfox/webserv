@@ -20,25 +20,28 @@
 class responseHandler {
 public:
 
-    responseHandler(WSERV::serverConfig const &configs, std::map<std::string, std::string> &request);
+    responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
+                    std::map<std::string, std::string> &request);
 
     ~responseHandler();
 
-    std::string parseAndRespond(int status);
+    std::string parseAndRespond(int status, int method, std::string uri);
 
 
 private:
     responseHandler();
 
+    /* Error Responses */
     std::string respondError(int status);
-
     std::string extractErrorFile(int status);
 
-    /* Configs to sort through OR could do this in client and just
-     * send the right config straight to the parser
-     */
-    WSERV::serverConfig _config;
+    /* GET request*/
+    std::string getResponse(std::string uri);
 
+
+    /* Should probably send in the request line tbh */
+    std::string _requestLine;
+    WSERV::serverConfig _config;
     std::map<std::string, std::string> _requestFields;
 
 

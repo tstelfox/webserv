@@ -129,7 +129,8 @@ void client::parseRequestHeader() {
     std::string line;
 
     std::getline(ss, line);
-    parseRequestLine(line); // If something is invalid in the request line just respond immediately.
+    parseRequestLine(line);
+    _requestLine = line;
 
     std::map<std::string, std::string> fields;
     std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
@@ -167,11 +168,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
         std::cout << "server_name: " << iter->get_server_name() << std::endl;
     }
-
     // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
-
-
-
     WSERV::serverConfig  rightConfig;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
         if (!_requestedHost.compare(iter->get_server_name())) {
@@ -184,8 +181,8 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
 
-    responseHandler response(rightConfig, fields);
-    _response = response.parseAndRespond(_status);
+    responseHandler response(_requestLine, rightConfig, fields);
+    _response = response.parseAndRespond(_status, _method, _uri);
 
 }
 

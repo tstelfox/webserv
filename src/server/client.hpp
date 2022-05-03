@@ -85,7 +85,8 @@ private:
     std::string _requestedHost;
 //    bool _keepAlive;
 //
-//    /* Status Code and response info */
+//    /* Request Line and Status Info */
+    std::string _requestLine;
     int _status;
 //    std::string _name;
 //

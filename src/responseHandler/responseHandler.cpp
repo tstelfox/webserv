@@ -18,8 +18,9 @@
 #include <sstream>
 
 
-responseHandler::responseHandler(WSERV::serverConfig const &configs, std::map<std::string, std::string> &fields)
-: _config(configs), _requestFields(fields) {
+responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
+                                 std::map <std::string, std::string> &fields)
+        : _requestLine(requestLine), _config(configs), _requestFields(fields) {
 //    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
 }
 
@@ -27,12 +28,38 @@ responseHandler::responseHandler() {}
 
 responseHandler::~responseHandler() {}
 
-std::string responseHandler::parseAndRespond(int status) {
+std::string responseHandler::parseAndRespond(int status, int method, std::string uri) {
     if (status != 200)
         return respondError(status);
 
-    // Or the normal sheet
+    /* Actual normal parsing of a normal request */
+    std::cout << "Request Line is: " << _requestLine << std::endl;
+    switch(method) {
+        case 1:
+            std::cout << "GET request" << std::endl;
+            return getResponse(uri);
+            break;
+        case 2:
+            std::cout << "POST request" << std::endl;
+//            return postResponse(uri);
+            break;
+        case 3:
+            std::cout << "DELETE request" << std::endl;
+//            return deleteResponse(uri);
+    }
     return "Placeholder"; // TODO
+}
+
+std::string responseHandler::getResponse(std::string uri) {
+    std::cout << "GET whatever is at " << uri << std::endl;
+    /*Compare the uri against the locations
+    in order to find the correct details*/
+
+    /*Check that the method in question is an allowed method*/
+
+//    if (!uri.compare("/")) {
+//    }
+    return uri;
 }
 
 std::string responseHandler::respondError(int status) {
