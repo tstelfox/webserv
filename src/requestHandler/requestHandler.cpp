@@ -182,13 +182,13 @@ void requestHandler::parseRequest() {
 void requestHandler::extractErrorFile() {
     std::ifstream errFile;
     if (_status == 505) {
-        errFile.open("pages/errorPages/httpVersionError.html");
+        errFile.open("pages/errorPages/505.html");
     }
     if (_status == 400) {
-        errFile.open("pages/errorPages/badRequest.html");
+        errFile.open("pages/errorPages/400.html");
     }
     if (_status == 404) {
-        errFile.open("pages/errorPages/fileNotFound.html");
+        errFile.open("pages/errorPages/404.html");
     }
     if (_status == 405) { // This'll be dependent on location accepted methods
         errFile.open("pages/errorPages/methodNotAllowed.html");

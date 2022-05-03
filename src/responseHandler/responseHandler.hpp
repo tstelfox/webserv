@@ -32,6 +32,8 @@ private:
 
     std::string respondError(int status);
 
+    std::string extractErrorFile(int status);
+
     /* Configs to sort through OR could do this in client and just
      * send the right config straight to the parser
      */

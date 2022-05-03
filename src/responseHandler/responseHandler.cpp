@@ -14,6 +14,8 @@
 #include "colours.hpp"
 #include <iostream>
 #include <map>
+#include <fstream>
+#include <sstream>
 
 
 responseHandler::responseHandler(WSERV::serverConfig const &configs, std::map<std::string, std::string> &fields)
@@ -42,31 +44,48 @@ std::string responseHandler::respondError(int status) {
     statusCodes[505] = "HTTP Version Not Supported";
 //    std::cout << STATUSCODES[400] << std::endl;
 
-    std::string header = "HTTP/1.1 ";
-    header += std::to_string(status) + " "; // C++ 11 oops fix this later
-    header += statusCodes[status] + "\n";
+    std::string response = "HTTP/1.1 ";
+    response += std::to_string(status) + " "; // C++ 11 oops fix this later
+    response += statusCodes[status] + "\n";
 
     // Server name
-    header += "Server: Flamenco \033[31m Flame \033[37m Server\n";
+    response += "Server: Flamenco \033[31m Flame \033[37m Server\n";
     // Date
     time_t now = time(0);
     char *date = ctime(&now);
     std::string stringDate = date;
     stringDate.insert(3, ",");
     stringDate.resize(stringDate.size() - 1);
-    header += "Date: " + stringDate + " GMT\n";
+    response += "Date: " + stringDate + " GMT\n";
 
     //Content
-    header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
+    response += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     // Extract file
-//    std::cout << "Error pages directory: " << _config.get_error_page() << std::endl;
-//    std::cout << "So far we have: " << header << std::endl;
+    std::string body = extractErrorFile(status);
+    response.append(std::to_string(body.size()));
+    //Error files
+    response += "\nConnection: close";
 
-//    std::string response;
+    //End of Header
+    response.append("\n\n");
+    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
+
+    response.append(body + "\n");
 
 
-
-
-    return header; // Placeholder
+    return response;
 }
 
+std::string responseHandler::extractErrorFile(int status) {
+    std::ifstream errFile;
+    std::string path = _config.get_error_page();
+    path += std::to_string(status) + ".html";
+    std::cout << "File path: " << path << std::endl;
+    errFile.open(path);
+    if (errFile.fail()) {
+        // panic
+    }
+    std::ostringstream fileContent;
+    fileContent << errFile.rdbuf();
+    return fileContent.str();
+}
