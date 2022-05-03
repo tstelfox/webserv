@@ -14,7 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include "colours.hpp"
-#include "requestParser.hpp"
+#include "responseHandler.hpp"
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
@@ -183,8 +183,13 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     }
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
-    requestParser parser(rightConfig, fields);
-//    parser.parseShit();
+
+    responseHandler response(rightConfig, fields);
+
+    std::cout << "status is: " << _status << std::endl;
+    _response = response.parseAndRespond(_status);
+
+    std::cout << "The response is, then:" << _response << std::endl;
 }
 
 char *client::getBuffer() {

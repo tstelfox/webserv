@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   requestParser.hpp                                  :+:    :+:            */
+/*   responseHandler.hpp                                  :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
@@ -10,23 +10,27 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERV_REQUESTPARSER_HPP
-#define WEBSERV_REQUESTPARSER_HPP
+#ifndef WEBSERV_RESPONSEHANDLER_HPP
+#define WEBSERV_RESPONSEHANDLER_HPP
 
 #include <string>
 #include "serverConfig.hpp"
 
 
-class requestParser {
+class responseHandler {
 public:
-    typedef std::vector<WSERV::serverConfig> configVector;
 
-    requestParser(WSERV::serverConfig const &configs, std::map<std::string, std::string> &request);
+    responseHandler(WSERV::serverConfig const &configs, std::map<std::string, std::string> &request);
 
-    ~requestParser();
+    ~responseHandler();
+
+    std::string parseAndRespond(int status);
+
 
 private:
-    requestParser();
+    responseHandler();
+
+    std::string respondError(int status);
 
     /* Configs to sort through OR could do this in client and just
      * send the right config straight to the parser
@@ -36,10 +40,13 @@ private:
     std::map<std::string, std::string> _requestFields;
 
 
+    /* Status code */
+//    int _status;
+
     /* Ultimate response to return */
-    std::string _response;
+    std::string _finalResponse;
 
 };
 
 
-#endif //WEBSERV_REQUESTPARSER_HPP
+#endif //WEBSERV_RESPONSEHANDLER_HPP

@@ -87,7 +87,7 @@ private:
 ////    set<int> _acceptedMethods;
 //
 //    /* Final response string */
-//    std::string _response;
+    std::string _response;
 };
 
 

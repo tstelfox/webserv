@@ -14,7 +14,7 @@ NAME = server
 CXX = c++
 SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp \
 		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX) \
-		requestParser/requestParser.cpp
+		responseHandler/responseHandler.cpp
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
 SERV = client.cpp poller.cpp serverConfig.cpp Location.cpp
@@ -24,7 +24,7 @@ SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
 FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/requestHandler -Isrc/parsing \
-		-Isrc/exceptions -Isrc/requestParser
+		-Isrc/exceptions -Isrc/responseHandler
 ifdef DEBUG
   FLAGS += -g -fsanitize=address
 endif
