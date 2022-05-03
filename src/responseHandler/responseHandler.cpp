@@ -89,6 +89,8 @@ std::string responseHandler::getResponse(std::string uri) {
 
     /* Max file Size will only be important for POST I believe */
 
+    /* Default file when a directory is requested is just the index - Include in parsing */
+
     /* Autoindex off means that accessing a directory gives a 403
      * OTHERWISE I'll have to make a html file which lists directory contents
      * _WITH_ links? hmmmmmm
