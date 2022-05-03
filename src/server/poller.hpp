@@ -38,6 +38,8 @@ public:
 
     std::set<int> openPorts();
 
+    int respondToClient(int socket, std::string response);
+
     void pollConnections();
 
     // serverSock		*getSocket() const;

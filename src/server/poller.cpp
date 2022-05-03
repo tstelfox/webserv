@@ -136,6 +136,15 @@ std::set<int> poller::openPorts() {
     return listenSockets;
 }
 
+int poller::respondToClient(int socket, std::string response) {
+
+    char toSend[response.length() + 1];
+    std::strcpy(toSend, response.c_str());
+
+    int ret = send(socket, toSend, strlen(toSend), 0);
+    return ret;
+}
+
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
@@ -160,8 +169,6 @@ void poller::pollConnections() {
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
                     currentClient.fillBuffer(buffer, valRead);
-                    std::cout << "Client Request:\n" << currentClient.getBuffer() << std::endl;
-
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
@@ -173,8 +180,12 @@ void poller::pollConnections() {
                     break;
                 }
             } else if (it->revents & POLLOUT) {
-                if (currentClient.isBufferFull()) { // This should perhaps be only internal to the client
+                if (currentClient.isBufferFull()) { // Still unsure about the body
                     currentClient.parseRequestHeader();
+                    if (respondToClient(it->fd, currentClient.getResponse()) < 0) {
+                        perror("send() failed");
+                        break;
+                    }
                     return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.

@@ -185,15 +185,16 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 
 
     responseHandler response(rightConfig, fields);
-
-//    std::cout << "status is: " << _status << std::endl;
     _response = response.parseAndRespond(_status);
 
-//    std::cout << "The response is, then:" << _response << std::endl;
 }
 
 char *client::getBuffer() {
     return _buffer;
+}
+
+std::string client::getResponse() const {
+    return _response;
 }
 
 bool client::isBufferFull() const {

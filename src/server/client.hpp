@@ -29,16 +29,23 @@ public:
     /* Storing incoming client request */
     void fillBuffer(const char *buff, ssize_t valRead);
     int fullHeaderReceived();
-//    void resetClient();
-    char *getBuffer();
+    bool isBufferFull() const;
 
     /* Parsing Request Header and Config Routing */
     void parseRequestLine(std::string request);
     void requestedHost(std::map<std::string, std::string> &fields);
     void parseRequestHeader();
+
     void routeConfig(std::map<std::string, std::string> &fields);
 
-    bool isBufferFull() const;
+    /* Getters */
+    char *getBuffer();
+    std::string getResponse() const;
+
+//    void resetClient();
+
+
+
 
 public:
     enum methodTypes {

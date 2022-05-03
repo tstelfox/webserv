@@ -42,10 +42,9 @@ std::string responseHandler::respondError(int status) {
     statusCodes[404] = "Not Found";
     statusCodes[405] = "Method Not Allowed";
     statusCodes[505] = "HTTP Version Not Supported";
-//    std::cout << STATUSCODES[400] << std::endl;
 
     std::string response = "HTTP/1.1 ";
-    response += std::to_string(status) + " "; // C++ 11 oops fix this later
+    response += std::to_string(status) + " "; // C++11 oops fix this later
     response += statusCodes[status] + "\n";
 
     // Server name
@@ -69,10 +68,7 @@ std::string responseHandler::respondError(int status) {
     //End of Header
     response.append("\n\n");
     std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
-
     response.append(body + "\n");
-
-
     return response;
 }
 
