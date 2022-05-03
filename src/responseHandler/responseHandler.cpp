@@ -20,7 +20,7 @@
 
 responseHandler::responseHandler(WSERV::serverConfig const &configs, std::map<std::string, std::string> &fields)
 : _config(configs), _requestFields(fields) {
-    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
+//    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
 }
 
 responseHandler::responseHandler() {}
@@ -76,7 +76,7 @@ std::string responseHandler::extractErrorFile(int status) {
     std::ifstream errFile;
     std::string path = _config.get_error_page();
     path += std::to_string(status) + ".html";
-    std::cout << "File path: " << path << std::endl;
+//    std::cout << "File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
         // panic
