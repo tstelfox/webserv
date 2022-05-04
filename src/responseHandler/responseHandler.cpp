@@ -140,7 +140,7 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     std::cout << "File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
-        // panic
+        // panic hard
     }
     std::ostringstream fileContent;
     fileContent << errFile.rdbuf();
