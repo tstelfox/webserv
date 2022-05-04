@@ -67,7 +67,7 @@ std::string responseHandler::getResponse(std::string uri) {
     requestedFile += uri;
     std::ifstream myFile;
     myFile.open(requestedFile);
-    if (myFile.fail()) {
+    if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
         return respondError(404);
     }
     std::ostringstream fileContent;
@@ -106,15 +106,6 @@ std::string responseHandler::respondError(int status) {
     std::string response;
     response = buildHttpLine(status);
     response += buildDateLine();
-    // Server name
-//    response += "Server: Flamenco \033[31m Flame \033[37m Server\n";
-    // Date
-//    time_t now = time(0);
-//    char *date = ctime(&now);
-//    std::string stringDate = date;
-//    stringDate.insert(3, ",");
-//    stringDate.resize(stringDate.size() - 1);
-//    response += "Date: " + stringDate + " GMT\n";
 
     //Content
     response += "Content-type: text/html; charset=UTF-8\nContent-Length:";
