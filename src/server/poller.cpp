@@ -165,7 +165,7 @@ void poller::pollConnections() {
                     newConnection(it->fd);
                     break;
                 }
-                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+//                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
                     currentClient.fillBuffer(buffer, valRead);
@@ -186,7 +186,7 @@ void poller::pollConnections() {
                         perror("send() failed");
                         break;
                     }
-                    return ; // Just for now
+//                    return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.
                      */
