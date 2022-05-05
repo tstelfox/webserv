@@ -39,7 +39,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch(method) {
         case 1:
-            std::cout << "GET request" << std::endl;
+//            std::cout << "GET request" << std::endl;
             return getResponse(uri);
             break;
         case 2:
@@ -54,7 +54,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 }
 
 std::string responseHandler::getResponse(std::string uri) {
-    std::cout << "GET whatever is at " << uri << std::endl;
+//    std::cout << "GET whatever is at " << uri << std::endl;
 
 
 
@@ -75,11 +75,9 @@ std::string responseHandler::getResponse(std::string uri) {
     struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode)) {
-            std::cout << "Rcoddio it's a directory" << std::endl;
             if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
                 return respondError(403);
             else {
-                std::cout << "In here?" << std::endl;
                 return buildDirectoryListing(requestedFile);
             }
         }
@@ -169,21 +167,45 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     DIR *dh;
     struct dirent *contents;
 
-    std::ve
+    std::set<std::string> fileSet;
+    std::set<std::string> directorySet;
     dh = opendir(directory.c_str());
     if (!dh)
         std::cout << "No such directory as " << directory << std::endl;
     else {
         while ((contents = readdir(dh)) != NULL) {
             std::string name = contents->d_name;
-            std::cout << name << std::endl;
+            if (!name.compare("."))
+                continue;
+            struct stat s;
+            std::string path = directory + "/" + name;
+            if (lstat(path.c_str(), &s) == 0) {
+                if (name.compare("..")) {
+                    struct tm *timeInfo = localtime(&s.st_ctime);
+                    std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
+                        + std::to_string(timeInfo->tm_year + 1900);
+                    int justification = 68 - name.length() + date.length(); // 67 seems to be nginx's thing
+                    name.append(justification, ' ');
+                    name += date;
+                }
+                else
+                    name += "/";
+                if (S_ISDIR(s.st_mode))
+                    directorySet.insert(name);
+                else if (S_ISREG(s.st_mode))
+                    fileSet.insert(name);
+            }
         }
         closedir(dh);
     }
+    for (std::set<std::string>::iterator it = directorySet.begin(); it != directorySet.end(); it++)
+        std::cout << *it << std::endl;
+    for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
+        std::cout << *it << std::endl;
 
     return "placeholder";
 }
-
+// anotherlevel/                                      05-May-2022 13:21
 /* < ---------- Response header building utils ---------- > */
 
 std::string responseHandler::buildHttpLine(int status) {
