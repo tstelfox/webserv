@@ -144,9 +144,9 @@ std::string responseHandler::respondError(int status) {
 std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
     std::ifstream errFile;
     std::string path = _config.get_error_page();
-    std::cout << "de boia " << path << std::endl;
+//    std::cout << "de boia " << path << std::endl;
     path += std::to_string(status) + ".html";
-    std::cout << "File path: " << path << std::endl;
+//    std::cout << "File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
         // panic hard
