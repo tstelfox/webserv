@@ -71,8 +71,15 @@ std::string responseHandler::getResponse(std::string uri) {
 
     struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
-        if (S_ISDIR(s.st_mode))
+        if (S_ISDIR(s.st_mode)) {
             std::cout << "Rcoddio it's a directory" << std::endl;
+            if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
+                return respondError(403);
+            else {
+                std::cout << "In here?" << std::endl;
+                // requestedFile = makeDirectoryListing();
+            }
+        }
     }
 
     myFile.open(requestedFile);
@@ -154,6 +161,7 @@ std::string responseHandler::buildHttpLine(int status) {
     std::map<int, std::string> statusCodes;
     statusCodes[200] = "OK";
     statusCodes[400] = "Bad Request";
+    statusCodes[403] = "Forbidden";
     statusCodes[404] = "Not Found";
     statusCodes[405] = "Method Not Allowed";
     statusCodes[505] = "HTTP Version Not Supported";
