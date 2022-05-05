@@ -43,6 +43,8 @@ private:
     std::string buildHttpLine(int status);
     std::string buildDateLine();
 
+    /* Create html for Directory listing */
+    std::string buildDirectoryListing(std::string &directory);
 
     /* Should probably send in the request line tbh */
     std::string _requestLine;

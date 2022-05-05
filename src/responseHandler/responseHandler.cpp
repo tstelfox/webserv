@@ -16,7 +16,9 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-#include <sys/stat.h>
+#include <sys/stat.h> // For checking if directory
+#include <dirent.h> // For getting directory contents
+#include <time.h> // time for time
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
@@ -69,6 +71,7 @@ std::string responseHandler::getResponse(std::string uri) {
     std::ifstream myFile;
     std::cout << "Path to be opened: " << requestedFile << std::endl;
 
+    // If a Directory is requested
     struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode)) {
@@ -77,7 +80,7 @@ std::string responseHandler::getResponse(std::string uri) {
                 return respondError(403);
             else {
                 std::cout << "In here?" << std::endl;
-                // requestedFile = makeDirectoryListing();
+                return buildDirectoryListing(requestedFile);
             }
         }
     }
@@ -155,6 +158,32 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     return fileContent.str();
 }
 
+std::string responseHandler::buildDirectoryListing(std::string &directory) {
+    std::cout << "Gotta make the directory page for: " << directory << std::endl;
+
+    /* nginx lists directories first in alphabetical order then files in alphabetical order
+     * Date and time of creation or modification for each file
+     * And then size of file "-" for directories
+     * */
+
+    DIR *dh;
+    struct dirent *contents;
+
+    std::ve
+    dh = opendir(directory.c_str());
+    if (!dh)
+        std::cout << "No such directory as " << directory << std::endl;
+    else {
+        while ((contents = readdir(dh)) != NULL) {
+            std::string name = contents->d_name;
+            std::cout << name << std::endl;
+        }
+        closedir(dh);
+    }
+
+    return "placeholder";
+}
+
 /* < ---------- Response header building utils ---------- > */
 
 std::string responseHandler::buildHttpLine(int status) {
@@ -184,3 +213,4 @@ std::string responseHandler::buildDateLine() {
     stringDate = "Date: " + stringDate + " GMT\n";
     return stringDate;
 }
+
