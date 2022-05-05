@@ -16,6 +16,7 @@
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
@@ -66,6 +67,14 @@ std::string responseHandler::getResponse(std::string uri) {
         uri += "index.html";
     requestedFile += uri;
     std::ifstream myFile;
+    std::cout << "Path to be opened: " << requestedFile << std::endl;
+
+    struct stat s;
+    if (lstat(requestedFile.c_str(), &s) == 0) {
+        if (S_ISDIR(s.st_mode))
+            std::cout << "Rcoddio it's a directory" << std::endl;
+    }
+
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
         return respondError(404);
@@ -74,7 +83,8 @@ std::string responseHandler::getResponse(std::string uri) {
     fileContent << myFile.rdbuf();
     std::string responseBody = fileContent.str();
     myFile.close();
-    std::cout << "Diocane: " << requestedFile << std::endl;
+
+//    std::cout << "Opened content: " << fileContent << std::endl;
 
     std::string responseHeader;
     responseHeader = buildHttpLine(200);
