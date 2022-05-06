@@ -187,13 +187,19 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
                     int justification = 68 - name.length() + date.length(); // 67 seems to be nginx's thing
                     name.append(justification, ' ');
                     name += date;
+                    name.append(19, ' '); // 19 spaces'
                 }
                 else
                     name += "/";
-                if (S_ISDIR(s.st_mode))
+                if (S_ISDIR(s.st_mode)) {
+                    if (name.compare("../"))
+                        name.append("-");
                     directorySet.insert(name);
-                else if (S_ISREG(s.st_mode))
+                }
+                else if (S_ISREG(s.st_mode)) {
+                    name += std::to_string(s.st_size);
                     fileSet.insert(name);
+                }
             }
         }
         closedir(dh);
@@ -205,6 +211,9 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
 
     return "placeholder";
 }
+
+
+
 // anotherlevel/                                      05-May-2022 13:21
 /* < ---------- Response header building utils ---------- > */
 
