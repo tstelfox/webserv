@@ -46,10 +46,10 @@ private:
     std::string buildDateLine();
 
     /* Create html for Directory listing */
-    std::string buildDirectoryListing(std::string &directory);
+    std::string buildDirectoryListing(std::string &directory, std::string uri);
 
     std::string directoryListResponse(std::set <std::string> &directories,
-                                      std::set <std::string> &files);
+                                      std::set <std::string> &files, std::string uri);
 
     /* Should probably send in the request line tbh */
     std::string _requestLine;

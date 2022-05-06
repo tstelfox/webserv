@@ -65,6 +65,7 @@ std::string responseHandler::getResponse(std::string uri) {
      */
 
     std::string requestedFile = _config.get_Location_vec()[0].get_root(); // PLACEHOLDER TODO
+    std::string uriOG = uri;
     if (!uri.compare("/"))
         uri += "index.html";
     requestedFile += uri;
@@ -78,7 +79,7 @@ std::string responseHandler::getResponse(std::string uri) {
             if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
                 return respondError(403);
             else {
-                return buildDirectoryListing(requestedFile);
+                return buildDirectoryListing(requestedFile, uriOG);
             }
         }
     }
@@ -156,7 +157,7 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     return fileContent.str();
 }
 
-std::string responseHandler::buildDirectoryListing(std::string &directory) {
+std::string responseHandler::buildDirectoryListing(std::string &directory, std::string uri) {
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
 
     /* nginx lists directories first in alphabetical order then files in alphabetical order
@@ -209,9 +210,9 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
         std::cout << *it << std::endl;
 
-    std::string directoryResponse = directoryListResponse(directorySet, fileSet);
+    std::string directoryResponse = directoryListResponse(directorySet, fileSet, uri);
     std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
-    return "placeholder";
+    return directoryResponse;
 }
 
 
@@ -248,11 +249,28 @@ std::string responseHandler::buildDateLine() {
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::string> &directories,
-                                                   std::set <std::string> &files) {
+                                                   std::set <std::string> &files, std::string uri) {
+    // Creating the Html as I would like it
+    std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
+    htmlFile += "\t<title>Index of " + uri + "/</title>\n"; // Might need to backspace tab but we need to see if it complains anyway
+    htmlFile += "</head>\n<body>\n<h2>" + uri + "/</h2>\n<hr/>\n<pre>\n";
+    for (std::set<std::string>::iterator it = directories.begin(); it != directories.end(); it++) {
+        htmlFile += "<a>" + *it + "</a>\n"; // Link maybe?
+    }
+    for (std::set<std::string>::iterator it = files.begin(); it != files.end(); it++) {
+        htmlFile += "<a>" + *it + "</a>\n"; // Link maybe?
+    }
+    htmlFile += "</pre>\n<hr/>\n";
+//    std::cout << "Html itself: " << htmlFile << std::endl;
+
+
+    //Building the actual header part
     std::string header = "HTTP/1.1 200 OK\nServer: Flamenco \033[31m Flame \033[37m Server\n";
     header += buildDateLine();
-    (void)directories;
-    (void)files;
+    header += "Content-type: text/html; charset=UTF-8\nContent-Length:";
+    header += std::to_string(htmlFile.size());
+    header += "\n\n";
+    header += htmlFile;
 
 
 
