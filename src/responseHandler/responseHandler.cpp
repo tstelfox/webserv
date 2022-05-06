@@ -37,7 +37,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 
     /* Actual normal parsing of a normal request */
     std::cout << "Request Line is: " << _requestLine << std::endl;
-    switch(method) {
+    switch (method) {
         case 1:
 //            std::cout << "GET request" << std::endl;
             return getResponse(uri);
@@ -167,8 +167,8 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     DIR *dh;
     struct dirent *contents;
 
-    std::set<std::string> fileSet;
-    std::set<std::string> directorySet;
+    std::set <std::string> fileSet;
+    std::set <std::string> directorySet;
     dh = opendir(directory.c_str());
     if (!dh)
         std::cout << "No such directory as " << directory << std::endl;
@@ -183,20 +183,18 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
                 if (name.compare("..")) {
                     struct tm *timeInfo = localtime(&s.st_ctime);
                     std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
-                        + std::to_string(timeInfo->tm_year + 1900);
+ + std::to_string(timeInfo->tm_year + 1900);
                     int justification = 68 - name.length() + date.length(); // 67 seems to be nginx's thing
                     name.append(justification, ' ');
                     name += date;
                     name.append(19, ' '); // 19 spaces'
-                }
-                else
+                } else
                     name += "/";
                 if (S_ISDIR(s.st_mode)) {
                     if (name.compare("../"))
                         name.append("-");
                     directorySet.insert(name);
-                }
-                else if (S_ISREG(s.st_mode)) {
+                } else if (S_ISREG(s.st_mode)) {
                     name += std::to_string(s.st_size);
                     fileSet.insert(name);
                 }
@@ -204,11 +202,15 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
         }
         closedir(dh);
     }
+
+    /* Right here the things should be put into the html format */
     for (std::set<std::string>::iterator it = directorySet.begin(); it != directorySet.end(); it++)
         std::cout << *it << std::endl;
     for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
         std::cout << *it << std::endl;
 
+    std::string directoryResponse = directoryListResponse(directorySet, fileSet);
+    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
     return "placeholder";
 }
 
@@ -245,3 +247,15 @@ std::string responseHandler::buildDateLine() {
     return stringDate;
 }
 
+std::string responseHandler::directoryListResponse(std::set <std::string> &directories,
+                                                   std::set <std::string> &files) {
+    std::string header = "HTTP/1.1 200 OK\nServer: Flamenco \033[31m Flame \033[37m Server\n";
+    header += buildDateLine();
+    (void)directories;
+    (void)files;
+
+
+
+
+    return header;
+}

@@ -21,7 +21,7 @@ class responseHandler {
 public:
 
     responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                    std::map<std::string, std::string> &request);
+                    std::map <std::string, std::string> &request);
 
     ~responseHandler();
 
@@ -33,6 +33,7 @@ private:
 
     /* Error Responses */
     std::string respondError(int status);
+
     std::string extractErrorFile(int status);
 
     /* GET request*/
@@ -41,15 +42,19 @@ private:
 
     /* Response header building utils */
     std::string buildHttpLine(int status);
+
     std::string buildDateLine();
 
     /* Create html for Directory listing */
     std::string buildDirectoryListing(std::string &directory);
 
+    std::string directoryListResponse(std::set <std::string> &directories,
+                                      std::set <std::string> &files);
+
     /* Should probably send in the request line tbh */
     std::string _requestLine;
     WSERV::serverConfig _config;
-    std::map<std::string, std::string> _requestFields;
+    std::map <std::string, std::string> _requestFields;
 
 
     /* Status code */
