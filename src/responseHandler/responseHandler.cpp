@@ -185,7 +185,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
                     struct tm *timeInfo = localtime(&s.st_ctime);
                     std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
  + std::to_string(timeInfo->tm_year + 1900);
-                    int justification = 68 - name.length() + date.length(); // 67 seems to be nginx's thing
+                    int justification = 48 - name.length() + date.length(); // 67 seems to be nginx's thing
                     name.append(justification, ' ');
                     name += date;
                     name.append(19, ' '); // 19 spaces'
