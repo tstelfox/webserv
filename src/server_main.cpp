@@ -6,15 +6,15 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 20:48:09 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/05/09 14:39:56 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-#include "rubbish/serverBlock.hpp"
-#include "src/server/poller.hpp"
-#include "src/server/serverConfig.hpp"
-#include "src/parsing/Parsing.hpp"
+#include "../rubbish/serverBlock.hpp"
+#include "server/poller.hpp"
+#include "server/serverConfig.hpp"
+#include "parsing/Parsing.hpp"
 #include "colours.hpp"
 
 #include <iostream>
@@ -25,7 +25,10 @@
 void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         for (size_t i = 0; i < S.size(); i++) {
         std::cout << RED << "< ---------  Server Block --------- >" << RESET_COLOUR << std::endl;
-        std::cout << "port= " << S[i].get_port() << std::endl;
+        for(size_t vi = 0; vi < S[i].get_port().size(); vi++)
+        {
+            std::cout << "port= " << S[i].get_port()[vi] << std::endl;
+        }
         std::cout << "host= " << S[i].get_host() << std::endl;
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
         std::cout << "maxfilesize= " << S[i].get_maxfilesize() << std::endl;
@@ -68,12 +71,12 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     /*Print all configs*/
-//    parsedContents(S);
+   parsedContents(S);
 
     /*Extract all the unique ports and put them into a set.*/
 
-    poller littyServer(S);
-    littyServer.pollConnections();
+    // poller littyServer(S);
+    // littyServer.pollConnections();
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

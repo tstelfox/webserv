@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 19:01:03 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/07 15:22:30 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:36:32 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,6 @@
 #include <vector>
 #include <sys/poll.h>
 
-#include "src/sockets/socket.hpp"
-#include "src/server/server.hpp"
-#include "src/server/clientConnecter.hpp"
+#include "sockets/socket.hpp"
+#include "server/server.hpp"
+#include "server/clientConnecter.hpp"

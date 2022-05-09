@@ -6,13 +6,13 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 17:50:28 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:37:20 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "src/sockets/socket.hpp"
+#include "../sockets/socket.hpp"
 #include "clientConnecter.hpp"
 #include <string>
 

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 19:06:20 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 15:56:39 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:52:02 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,7 +222,9 @@ void requestHandler::buildHeader() {
     */
 
     std::string header = "HTTP/1.1 ";
-    header += std::to_string(_status) + " ";
+    std::ostringstream s;
+    s << _status;
+    header += s.str() + " ";
     header += statusCodes[_status] + "\n";
 
     // Server name
@@ -246,7 +248,9 @@ void requestHandler::buildHeader() {
     }
     /* The following is still simplified */
     int len = _response.size();
-    header.append(std::to_string(len));
+    s.str("");
+    s << len;
+    header.append(s.str());
 
     if (_status != 200) { // Need to check if this is always the case
         header += "\nConnection: close";
@@ -268,11 +272,11 @@ void requestHandler::buildHeader() {
 void requestHandler::respondGet() {
     std::string requestedFile("pages");
     if (!_uri.compare("/")) { // This part is gonna be dependent on the location
-        _uri += "index.html";
+        _uri += "cgi.html";
     }
     requestedFile += _uri;
     std::ifstream myfile;
-    myfile.open(requestedFile);
+    myfile.open(requestedFile.c_str());
     if (myfile.fail()) {
         _status = 404; // File not Found
         buildHeader();

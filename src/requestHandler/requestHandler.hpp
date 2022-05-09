@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/03/25 18:47:39 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/20 15:57:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:44:27 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 #include <string>
 #include <map>
+#include <cstdlib>
+#include <string.h>
 
 class requestHandler {
 

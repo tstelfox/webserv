@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/21 17:06:22 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:54:42 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ void serverBoy::newConnection() {
         return;
     }
     int on = 1;
-    if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+    if ((setsockopt(new_fd, SOL_SOCKET, MSG_NOSIGNAL, &on, sizeof(on)) < 0)) { //SO_NOSIGPIPE
         std::cout << "sockoptions got fucked" << std::endl;
         return;
     }
@@ -139,7 +139,7 @@ int serverBoy::respondToClient(int sock_fd) {
     std::string response = poller.getRequests()[sock_fd].getResponse();
 
     char *hey = new char[response.length() + 1];
-    std::strcpy(hey, response.c_str());
+    strcpy(hey, response.c_str());
 
     int ret = send(sock_fd, hey, strlen(hey), 0);
     delete[] hey;

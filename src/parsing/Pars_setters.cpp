@@ -6,21 +6,37 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/04/25 14:05:55 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/09 15:03:00 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parsing.hpp"
-#include "src/exceptions/exceptions.hpp"
+#include "../exceptions/exceptions.hpp"
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
-    S_temp.set_port(std::atoi( data.c_str() ));
+    int start = 0;
+    std::string delimiter = " ";
+    int end = data.find(delimiter);
+    std::vector<int> ports;
+    while (end != -1)
+    {
+        ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
+        start = end + delimiter.size();
+        end = data.find(delimiter, start);
+    }
+    ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
+    S_temp.set_port(ports);
 }
 
 void set_host_func(WSERV::serverConfig  &S_temp, std::string data)
 {
-    S_temp.set_host( data );
+    if (S_temp.get_host().empty() == false)
+        throw IncorrectConfigExcep();
+    if (data == "localhost")
+        S_temp.set_host( "127.0.0.1" );
+    else
+        S_temp.set_host( data );
 }
 
 void set_server_name_func(WSERV::serverConfig  &S_temp, std::string data)
@@ -56,6 +72,11 @@ void set_cgi_file_types_func(WSERV::serverConfig  &S_temp, std::string data)
 void set_root_func(WSERV::Location  &L_temp, std::string data)
 {
     L_temp.set_root( data );
+}
+
+void set_loc_path(WSERV::Location  &L_temp, std::string data)
+{
+    L_temp.set_location_path( data );
 }
 
 void set_autoindex_func(WSERV::Location  &L_temp, std::string data)

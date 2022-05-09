@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   parsing.hpp                                        :+:    :+:            */
+/*   Parsing.hpp                                        :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:36:00 by akramp        #+#    #+#                 */
-/*   Updated: 2022/04/25 12:54:45 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/09 14:56:16 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 #	include <iostream> //std::cout
 #	include <algorithm> //std::find
 #	include <ctype.h> //std::isalpha
-#	include "src/server/serverConfig.hpp"
-#	include "src/exceptions/exceptions.hpp"
+#	include "../server/serverConfig.hpp"
+#	include "../exceptions/exceptions.hpp"
 #	include "colours.hpp"
 
 
@@ -39,13 +39,14 @@ namespace WSERV
 	void 		close_file(std::ifstream &file);
 	void 		open_file(std::string file_name, std::string &str);
 	void 		check_argc(int argc);
-	
+
 	class Parser
 	{
 		private:
 			std::vector<WSERV::serverConfig>	_vec_servers;
 			std::string		_config_name;
 			std::string		_configfile;
+			std::vector<std::string>		_loc_path;
 			std::string 	_separator;
 			size_t			 _prev_loc_count;
 			size_t 			_server_count;
@@ -68,6 +69,7 @@ namespace WSERV
 					std::map<std::string, std::string> &loc_vars, \
 					std::vector<std::map<std::string, std::string> > &temp);
 			bool	closing_server_block_check(std::string &line);
+			void	check_if_var_in_class_is_empty();
 			std::vector<WSERV::serverConfig>	get_serverConfig(void) const;
 	};
 }

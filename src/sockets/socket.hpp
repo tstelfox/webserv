@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:43:03 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:41:46 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <cstdlib>
 // #include <sys/fcntl.h>
 // #include <iostream>
 // #include "webserv.hpp"
@@ -62,7 +63,7 @@ private:
 
 // For the client side o'sheet
 /* class	clientSock : public socketMan {
-	
+
 	public:
 		clientSock(int domain, int service, int protocol,
 			int port, u_long interface) : socketMan(domain, service, protocol, port, interface) {
@@ -75,5 +76,5 @@ private:
 	private:
 		socklen_t	addrlen;
 		clientSock();
-		
+
 }; */

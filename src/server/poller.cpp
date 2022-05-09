@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/22 12:37:00 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/05/04 17:57:29 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "poller.hpp"
 #include "colours.hpp"
 #include "socket.hpp"
+#include <signal.h>
 
 #include <iostream>
 #include <sstream>
@@ -24,6 +25,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/fcntl.h>
+#include <stdint.h>
 
 poller::poller(configVector const& configVector) : _serverConfigs(configVector) {}
 
@@ -41,9 +43,12 @@ int poller::connectionError(short revents) const {
            (!(revents & (POLLIN)) && revents & POLLHUP);
 };
 
+
 int poller::newConnection(int fd) {
     socklen_t addrLen;
-    int new_fd = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
+    struct sockaddr addr;
+
+    int new_fd = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);
     if (new_fd < 0) {
         if (errno != EWOULDBLOCK) {
             perror("accept failed");
@@ -51,7 +56,7 @@ int poller::newConnection(int fd) {
         return 0;
     }
     int on = 1;
-    if ((setsockopt(new_fd, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+    if ((setsockopt(new_fd, SOL_SOCKET, (intptr_t)signal(SIGPIPE, SIG_IGN), &on, sizeof(on)) < 0)) { //SO_NOSIGPIPE
         std::cout << "sockoptions got fucked" << std::endl;
         return 0;
     }
@@ -71,7 +76,7 @@ std::set<int> poller::openPorts() {
     std::set<int> ports;
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
-        ports.insert(it->get_port());
+        ports.insert(it->get_port()[0]);
     }
     for (std::set<int>::iterator i = ports.begin(); i != ports.end(); i++) {
         std::cout << "Ports: " << *i << std::endl;
@@ -113,11 +118,11 @@ void poller::pollConnections() {
                 if (!valread) {
                     // Do nothing for now - Maybe close connection if required.
                 }
-                if (valread < 0) {
-                    std::cout << "No bytes to read" << std::endl;
-                    perror("What ");
-                    break;
-                }
+                // if (valread < 0) { //is si<e_t
+                //     std::cout << "No bytes to read" << std::endl;
+                //     perror("What ");
+                //     break;
+                // }
             }
             else if (it->revents & POLLOUT) {
                 // You _should_ know the drill

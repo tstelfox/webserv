@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/04/12 17:59:47 by tmullan       ########   odam.nl          #
+#    Updated: 2022/05/01 21:21:44 by ubuntu        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ SRC = server_main.cpp sockets/socket.cpp requestHandler/requestHandler.cpp \
 		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX)
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
-SERV = clientConnecter.cpp server.cpp serverBlock.cpp poller.cpp serverConfig.cpp Location.cpp
+SERV = clientConnecter.cpp server.cpp poller.cpp serverConfig.cpp Location.cpp
 PARSE = Pars_add_vars_to_vec.cpp Pars_helper_funcs.cpp Pars_setters.cpp Parsing.cpp
 OBJ_DIR = obj
 SRC_DIR = src
@@ -40,7 +40,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@echo " ───── ❝ 𝗰𝗼𝗺𝗽𝗶𝗹𝗶𝗻𝗴 𝗪𝗲𝗯𝗦𝗲𝗿𝘃 ❞ ───── "
 	@echo "$(GREY)"
-	$(CXX) $^ $(FLAGS) $(INCLUDES) -o $(NAME)
+	$(CXX) $^ $(FLAGS) -fsanitize=address $(INCLUDES) -o $(NAME)
 	@echo "$(COLOR_RESET)"
 	@echo " ─────────── ❝ 𝗱𝗼𝗻𝗲 ❞ ──────────── \n"
 

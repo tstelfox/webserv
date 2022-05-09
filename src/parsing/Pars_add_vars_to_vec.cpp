@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 12:00:13 by akramp        #+#    #+#                 */
-/*   Updated: 2022/04/25 12:02:26 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/09 16:52:07 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,14 @@ bool WSERV::Parser::location_block_errorcheck_pushback(std::string &line, \
             _loc_map_vec.push_back(temp);
             temp.clear();
         }
+        int i = line.find("🔥", 0);
+        line.erase(i,_separator.length()); //delete fire emoji
+        std::string temp_str = line.substr(i, line.find("{") - 1);
+        if (temp_str.find(" ") != std::string::npos)
+            temp_str.erase(temp_str.find(" "), temp_str.size());
+        if (temp_str.find("{") != std::string::npos)
+            temp_str.erase(temp_str.find("{"), temp_str.size());
+        _loc_path.push_back(temp_str);
         return (true) ;
     }
     return (false);
