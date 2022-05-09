@@ -110,10 +110,6 @@ std::string responseHandler::getResponse(std::string uri) {
 
     /* Default file when a directory is requested is just the index - Include in parsing */
 
-    /* Autoindex off means that accessing a directory gives a 403
-     * OTHERWISE I'll have to make a html file which lists directory contents
-     * _WITH_ links? hmmmmmm
-     */
 
 
 
@@ -234,7 +230,6 @@ std::string responseHandler::buildHttpLine(int status) {
 }
 
 std::string responseHandler::buildDateLine() {
-//   std::string s;
 
     time_t now = time(0);
     char *date = ctime(&now);
@@ -255,7 +250,6 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
    /* Don't look at this absolute horror, for god's sake */
     for (std::set<std::vector<std::string> >::iterator it = directories.begin(); it != directories.end(); it++) {
         std::vector<std::string> iter = *it;
-
         if (!iter[0].compare("../"))
             htmlFile += "<a href =\"" + iter[0] + "\">" + iter[0] + "</a>\n";
         else {
