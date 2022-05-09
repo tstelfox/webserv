@@ -78,8 +78,10 @@ void client::parseRequestLine(std::string request) {
     ss >> field;
     /* 405 Method not allowed will be about the config allowed methods
     Otherwise all others are 400 Bad Request */
-    if (!field.compare("POST"))
+    if (!field.compare("POST")) {
         _method = POST;
+        std::cout << "Poche seghe, la richiesta POST: " << _buffer << std::endl;
+    }
     else if (!field.compare("DELETE"))
         _method = DELETE;
     else if (!field.compare("GET"))

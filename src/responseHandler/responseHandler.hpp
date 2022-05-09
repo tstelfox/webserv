@@ -40,7 +40,7 @@ private:
     std::string getResponse(std::string uri);
 
     /* POST request */
-    std::string getPost(std::string uri);
+    std::string postResponse(std::string uri);
 
     /* Response header building utils */
     std::string buildHttpLine(int status);

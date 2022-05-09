@@ -109,8 +109,10 @@ std::string responseHandler::getResponse(std::string uri) {
     return responseHeader;
 }
 
-std::string responseHandler::getPost(std::string uri) {
-
+std::string responseHandler::postResponse(std::string uri) {
+//    std::cout << "Poche seghe: " <<
+    (void)uri;
+    return "placeholder";
 }
 
 std::string responseHandler::respondError(int status) {
