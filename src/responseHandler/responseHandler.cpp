@@ -170,7 +170,6 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
 
     std::set <std::vector<std::string> > fileSet;
     std::set <std::vector<std::string> > directorySet;
-//    std::vector<std::string> details;
     dh = opendir(directory.c_str());
     if (!dh)
         std::cout << "No such directory as " << directory << std::endl;
@@ -189,44 +188,24 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
                     std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
  + std::to_string(timeInfo->tm_year + 1900);
                     details.push_back(date);
-//                    int justification = 48 - name.length() + date.length(); // 67 seems to be nginx's thing
-//                    name.append(justification, ' ');
-//                    name += date;
-//                    name.append(19, ' '); // 19 spaces'
                 } else {
                     name += "/";
                     details.push_back(name);
                 }
                 if (S_ISDIR(s.st_mode)) {
                     if (name.compare("../")) {
-//                        name.append("-");
                         details.push_back("-");
                     }
 
                     directorySet.insert(details);
                 } else if (S_ISREG(s.st_mode)) {
                     details.push_back(std::to_string(s.st_size));
-//                    name += std::to_string(s.st_size);
                     fileSet.insert(details);
                 }
             }
         }
         closedir(dh);
     }
-
-    /* Right here the things should be put into the html format */
-//    for (std::set<std::vector<std::string> >::iterator it = directorySet.begin(); it != directorySet.end(); it++) {
-//        std::vector<std::string> test = *it;
-//        for (std::vector<std::string>::iterator yonk = test.begin(); yonk != test.end(); yonk++)
-//            std::cout << *yonk << std::endl;
-//    }
-//    for (std::set<std::vector<std::string> >::iterator it = fileSet.begin(); it != fileSet.end(); it++) {
-//        std::vector<std::string> test = *it;
-//        for (std::vector<std::string>::iterator yonk = test.begin(); yonk != test.end(); yonk++)
-//            std::cout << *yonk << std::endl;
-//    }
-//    for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
-//        std::cout << *it << std::endl;
 
     std::string directoryResponse = directoryListResponse(directorySet, fileSet, uri);
     std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
@@ -285,7 +264,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n"; // Link maybe?
+            htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n";
         }
     }
     for (std::set<std::vector<std::string> >::iterator it = files.begin(); it != files.end(); it++) {
@@ -295,7 +274,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n"; // Link maybe?
+        htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";
 
