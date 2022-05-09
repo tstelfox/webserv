@@ -36,3 +36,7 @@
 
 # https://distinctplace.com/2017/04/14/nginx-server_name-and-how-it-works/
 
+# POST REQUESTS
+
+#https://reqbin.com/Article/HttpPost
+
