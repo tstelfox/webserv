@@ -39,13 +39,11 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
         case 1:
-//            std::cout << "GET request" << std::endl;
             return getResponse(uri);
-            break;
         case 2:
             std::cout << "POST request" << std::endl;
-//            return postResponse(uri);
-            break;
+            return postResponse(uri);
+//            break;
         case 3:
             std::cout << "DELETE request" << std::endl;
 //            return deleteResponse(uri);
@@ -55,8 +53,6 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 
 std::string responseHandler::getResponse(std::string uri) {
 //    std::cout << "GET whatever is at " << uri << std::endl;
-
-
 
     /*Compare the uri against the locations
     in order to find the correct locations configs
@@ -109,11 +105,12 @@ std::string responseHandler::getResponse(std::string uri) {
     /* Max file Size will only be important for POST I believe */
 
     /* Default file when a directory is requested is just the index - Include in parsing */
-
-
-
-
+    
     return responseHeader;
+}
+
+std::string responseHandler::getPost(std::string uri) {
+
 }
 
 std::string responseHandler::respondError(int status) {
