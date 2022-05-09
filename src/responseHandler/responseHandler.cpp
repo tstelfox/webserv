@@ -170,6 +170,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
 
     std::set <std::string> fileSet;
     std::set <std::string> directorySet;
+//    std::vector<std::string> details;
     dh = opendir(directory.c_str());
     if (!dh)
         std::cout << "No such directory as " << directory << std::endl;
@@ -255,10 +256,10 @@ std::string responseHandler::directoryListResponse(std::set <std::string> &direc
     htmlFile += "\t<title>Index of " + uri + "/</title>\n"; // Might need to backspace tab but we need to see if it complains anyway
     htmlFile += "</head>\n<body>\n<h2>" + uri + "/</h2>\n<hr/>\n<pre>\n";
     for (std::set<std::string>::iterator it = directories.begin(); it != directories.end(); it++) {
-        htmlFile += "<a>" + *it + "</a>\n"; // Link maybe?
+        htmlFile += "<a href =\"" + *it + "\">" + *it + "</a>\n"; // Link maybe?
     }
     for (std::set<std::string>::iterator it = files.begin(); it != files.end(); it++) {
-        htmlFile += "<a>" + *it + "</a>\n"; // Link maybe?
+        htmlFile += "<a href =\"" + *it + "\">" + *it + "</a>\n"; // Link maybe?
     }
     htmlFile += "</pre>\n<hr/>\n";
 //    std::cout << "Html itself: " << htmlFile << std::endl;

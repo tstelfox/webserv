@@ -186,7 +186,7 @@ void poller::pollConnections() {
                         perror("send() failed");
                         break;
                     }
-                    return ; // Just for now
+//                    return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.
                      */
