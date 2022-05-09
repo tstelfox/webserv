@@ -168,8 +168,8 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
     DIR *dh;
     struct dirent *contents;
 
-    std::set <std::string> fileSet;
-    std::set <std::string> directorySet;
+    std::set <std::vector<std::string> > fileSet;
+    std::set <std::vector<std::string> > directorySet;
 //    std::vector<std::string> details;
     dh = opendir(directory.c_str());
     if (!dh)
@@ -182,23 +182,32 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
             struct stat s;
             std::string path = directory + "/" + name;
             if (lstat(path.c_str(), &s) == 0) {
+                std::vector<std::string> details;
                 if (name.compare("..")) {
+                    details.push_back(name);
                     struct tm *timeInfo = localtime(&s.st_ctime);
                     std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
  + std::to_string(timeInfo->tm_year + 1900);
-                    int justification = 48 - name.length() + date.length(); // 67 seems to be nginx's thing
-                    name.append(justification, ' ');
-                    name += date;
-                    name.append(19, ' '); // 19 spaces'
-                } else
+                    details.push_back(date);
+//                    int justification = 48 - name.length() + date.length(); // 67 seems to be nginx's thing
+//                    name.append(justification, ' ');
+//                    name += date;
+//                    name.append(19, ' '); // 19 spaces'
+                } else {
                     name += "/";
+                    details.push_back(name);
+                }
                 if (S_ISDIR(s.st_mode)) {
-                    if (name.compare("../"))
-                        name.append("-");
-                    directorySet.insert(name);
+                    if (name.compare("../")) {
+//                        name.append("-");
+                        details.push_back("-");
+                    }
+
+                    directorySet.insert(details);
                 } else if (S_ISREG(s.st_mode)) {
-                    name += std::to_string(s.st_size);
-                    fileSet.insert(name);
+                    details.push_back(std::to_string(s.st_size));
+//                    name += std::to_string(s.st_size);
+                    fileSet.insert(details);
                 }
             }
         }
@@ -206,10 +215,18 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
     }
 
     /* Right here the things should be put into the html format */
-    for (std::set<std::string>::iterator it = directorySet.begin(); it != directorySet.end(); it++)
-        std::cout << *it << std::endl;
-    for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
-        std::cout << *it << std::endl;
+//    for (std::set<std::vector<std::string> >::iterator it = directorySet.begin(); it != directorySet.end(); it++) {
+//        std::vector<std::string> test = *it;
+//        for (std::vector<std::string>::iterator yonk = test.begin(); yonk != test.end(); yonk++)
+//            std::cout << *yonk << std::endl;
+//    }
+//    for (std::set<std::vector<std::string> >::iterator it = fileSet.begin(); it != fileSet.end(); it++) {
+//        std::vector<std::string> test = *it;
+//        for (std::vector<std::string>::iterator yonk = test.begin(); yonk != test.end(); yonk++)
+//            std::cout << *yonk << std::endl;
+//    }
+//    for (std::set<std::string>::iterator it = fileSet.begin(); it != fileSet.end(); it++)
+//        std::cout << *it << std::endl;
 
     std::string directoryResponse = directoryListResponse(directorySet, fileSet, uri);
     std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
@@ -249,20 +266,38 @@ std::string responseHandler::buildDateLine() {
     return stringDate;
 }
 
-std::string responseHandler::directoryListResponse(std::set <std::string> &directories,
-                                                   std::set <std::string> &files, std::string uri) {
+std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
+                                                   std::set <std::vector<std::string> > &files, std::string uri) {
     // Creating the Html as I would like it
     std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
-    htmlFile += "\t<title>Index of " + uri + "/</title>\n"; // Might need to backspace tab but we need to see if it complains anyway
+    htmlFile += "\t<title>Index of " + uri + "/</title>\n";
     htmlFile += "</head>\n<body>\n<h2>" + uri + "/</h2>\n<hr/>\n<pre>\n";
-    for (std::set<std::string>::iterator it = directories.begin(); it != directories.end(); it++) {
-        htmlFile += "<a href =\"" + *it + "\">" + *it + "</a>\n"; // Link maybe?
+
+   /* Don't look at this absolute horror, for god's sake */
+    for (std::set<std::vector<std::string> >::iterator it = directories.begin(); it != directories.end(); it++) {
+        std::vector<std::string> iter = *it;
+
+        if (!iter[0].compare("../"))
+            htmlFile += "<a href =\"" + iter[0] + "\">" + iter[0] + "</a>\n";
+        else {
+            int justification = 47 - iter[0].length() + iter[1].length();
+            std::string firstPad = " ";
+            firstPad.append(justification, ' ');
+            std::string padding = " ";
+            padding.append(20, ' ');
+            htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n"; // Link maybe?
+        }
     }
-    for (std::set<std::string>::iterator it = files.begin(); it != files.end(); it++) {
-        htmlFile += "<a href =\"" + *it + "\">" + *it + "</a>\n"; // Link maybe?
+    for (std::set<std::vector<std::string> >::iterator it = files.begin(); it != files.end(); it++) {
+        std::vector<std::string> iter = *it;
+        int justification = 47 - iter[0].length() + iter[1].length();
+        std::string firstPad = " ";
+        firstPad.append(justification, ' ');
+        std::string padding = " ";
+        padding.append(20, ' ');
+        htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n"; // Link maybe?
     }
     htmlFile += "</pre>\n<hr/>\n";
-//    std::cout << "Html itself: " << htmlFile << std::endl;
 
 
     //Building the actual header part
