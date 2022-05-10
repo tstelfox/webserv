@@ -38,6 +38,8 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     /* Actual normal parsing of a normal request */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
+        case 0:
+            return respondError(405);
         case 1:
             return getResponse(uri);
         case 2:
@@ -61,24 +63,27 @@ std::string responseHandler::getResponse(std::string uri) {
      */
 
     std::string requestedFile = _config.get_Location_vec()[0].get_root(); // PLACEHOLDER TODO
-    std::string uriOG = uri;
-    if (!uri.compare("/"))
-        uri += "index.html";
-    requestedFile += uri;
-    std::ifstream myFile;
-    std::cout << "Path to be opened: " << requestedFile << std::endl;
-
     // If a Directory is requested
     struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode)) {
-            if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
+            if (!_config.get_Location_vec()[0].get_index().empty()) { // Need to talk about this
+                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
+            }
+            else if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
                 return respondError(403);
             else {
-                return buildDirectoryListing(requestedFile, uriOG);
+                return buildDirectoryListing(requestedFile, uri);
             }
         }
     }
+    if (!uri.compare("/")) { // What about when they request something "/location_name/something.html"
+        uri += "index.html";
+    }
+    requestedFile += uri;
+    std::ifstream myFile;
+    std::cout << "Path to be opened: " << requestedFile << std::endl;
+
 
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
@@ -97,8 +102,8 @@ std::string responseHandler::getResponse(std::string uri) {
     responseHeader += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     responseHeader.append(std::to_string(responseBody.size()));
     responseHeader.append("\n\n");
+    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << "RESPONSE: " << RESET_COLOUR << responseHeader << std::endl;
     responseHeader.append(responseBody + "\n");
-    std::cout << "RESPONSE: " << responseHeader << std::endl;
 
     /*Check that the method in question is an allowed method*/
 
@@ -132,7 +137,7 @@ std::string responseHandler::respondError(int status) {
 
     //End of Header
     response.append("\n\n");
-    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
+//    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
     response.append(body + "\n");
     return response;
 }

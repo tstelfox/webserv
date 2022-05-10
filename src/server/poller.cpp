@@ -168,6 +168,7 @@ void poller::pollConnections() {
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
+//                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
                     memset(buffer, 0, sizeof(buffer));
                 }
@@ -182,7 +183,7 @@ void poller::pollConnections() {
             } else if (it->revents & POLLOUT) {
                 if (currentClient.isBufferFull()) { // Still unsure about the body
                     currentClient.parseRequestHeader();
-                    if (respondToClient(it->fd, currentClient.getResponse()) < 0) {
+                    if (respondToClient(it->fd, currentClient.getResponse()) < 0) { // TODO check also for 0
                         perror("send() failed");
                         break;
                     }

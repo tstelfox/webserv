@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-//#include "rubbish/serverBlock.hpp"
 #include "poller.hpp"
 #include "serverConfig.hpp"
 #include "Parsing.hpp"
@@ -68,7 +67,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     /*Print all configs*/
-//    parsedContents(S);
+    parsedContents(S);
 
     /*Extract all the unique ports and put them into a set.*/
 

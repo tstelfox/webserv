@@ -76,8 +76,7 @@ void client::parseRequestLine(std::string request) {
     std::string field;
 
     ss >> field;
-    /* 405 Method not allowed will be about the config allowed methods
-    Otherwise all others are 400 Bad Request */
+    /* 405 Method not allowed */
     if (!field.compare("POST")) {
         _method = POST;
         std::cout << "Poche seghe, la richiesta POST: " << _buffer << std::endl;
@@ -86,18 +85,13 @@ void client::parseRequestLine(std::string request) {
         _method = DELETE;
     else if (!field.compare("GET"))
         _method = GET;
-    else
-        _status = 400; // BAD REQUEST
-    // else if (std::isupper(field[0])) {
-    // 	_status = 405; // Method Not Allowed
-    // }
     ss >> _uri;
     if (!_uri.empty() && _uri[0] != '/') {
         // Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
         _status = 400;
     }
     ss >> _http;
-    if (!_http.empty() && _http.compare("HTTP/1.1")) {
+    if (_http.empty() || (!_http.empty() && _http.compare("HTTP/1.1"))) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
     }
     if (_status != 200) {
@@ -125,6 +119,7 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
 }
 
 void client::parseRequestHeader() {
+//    std::cout << BLUE << "This is the culprit isn't it " << RESET_COLOUR << std::endl;
     // nginx demands the host be filled out or it's a 400 bad request
     std::string request(_buffer);
     std::istringstream ss(request);
@@ -185,6 +180,9 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 
     responseHandler response(_requestLine, rightConfig, fields);
     _response = response.parseAndRespond(_status, _method, _uri);
+
+    // Here I should reset
+    _isBuffFull = false; // TODO should this reset be expanded?
 
 }
 
