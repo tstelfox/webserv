@@ -54,32 +54,53 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 }
 
 std::string responseHandler::getResponse(std::string uri) {
-//    std::cout << "GET whatever is at " << uri << std::endl;
-
-    /*Compare the uri against the locations
-    in order to find the correct locations configs
-    including the root.
-    BUT for now just improvise something simple
-     */
-
 
     /* The following is stupid because I'm not doing the actual location checks */
 //    std::string requestedFile = _config.get_Location_vec()[0].get_root();
-    /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings */
-    // If a Directory is requested
+    /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings
+     *
+     * nginx behaviour:
+     *      - Directory listing only if there is no set index for that directory
+     *      - root is where to go retrieve the files by adding location at the end
+     *
+     *      SO WE WILL DO
+     *      - compare uri with location
+     *      - Check for root (obligatory)
+     *      - Check if there is an index
+     *          - If uri leads to root which is a folder without index then directory listing
+     *          - If uri leads to root which is a folder with index then display index
+     *
+     * */
+
+
     std::string requestedFile = uri;
     std::string ogUri = uri;
-    struct stat s;
     std::cout << "Path to be opened: " << requestedFile << std::endl;
-    if (!uri.compare("/")) { // What about when they request something "/location_name/something.html"
-        uri += "index.html";
-    }
-//    requestedFile += uri; // Might need to be reinserted
 
-//    requestedFile = "pages";
+    /* if uri matches a location */
+    std::string root = _config.get_Location_vec()[0].get_root();
+    /* Check for index -
+        if there is no index
+            if root is directory:
+                directory listing
+            else
+                return 404 (It's what nginx does)
+        else
+            look for root plus index
+            */
+    
+    std::string index;
+    if (!_config.get_Location_vec()[0].get_index().empty())
+        index = _config.get_Location_vec()[0].get_index();
+    else
+        //
+    /* else If uri matches no location then 404 */
+        // Porcoddio 404 qui
+
+    struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode)) {
-            std::cout << "Not in here?" << std::endl;
+//            std::cout << "Not in here?" << std::endl;
             /*The following uncommented is only when the uri matches a location
              and the location actually has a root and index
             */
