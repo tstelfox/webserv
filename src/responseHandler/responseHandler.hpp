@@ -48,7 +48,7 @@ private:
     std::string buildDateLine();
 
     /* Create html for Directory listing */
-    std::string buildDirectoryListing(std::string &directory, std::string uri);
+    std::string buildDirectoryListing(std::string &directory, std::string &uri);
 
     std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
                                       std::set <std::vector<std::string> > &files, std::string uri);

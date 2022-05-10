@@ -62,38 +62,49 @@ std::string responseHandler::getResponse(std::string uri) {
     BUT for now just improvise something simple
      */
 
-    std::string requestedFile = _config.get_Location_vec()[0].get_root(); // PLACEHOLDER TODO
+
+    /* The following is stupid because I'm not doing the actual location checks */
+//    std::string requestedFile = _config.get_Location_vec()[0].get_root();
+    /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings */
     // If a Directory is requested
+    std::string requestedFile = uri;
+    std::string ogUri = uri;
     struct stat s;
-    if (lstat(requestedFile.c_str(), &s) == 0) {
-        if (S_ISDIR(s.st_mode)) {
-            if (!_config.get_Location_vec()[0].get_index().empty()) { // Need to talk about this
-                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
-            }
-            else if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
-                return respondError(403);
-            else {
-                return buildDirectoryListing(requestedFile, uri);
-            }
-        }
-    }
+    std::cout << "Path to be opened: " << requestedFile << std::endl;
     if (!uri.compare("/")) { // What about when they request something "/location_name/something.html"
         uri += "index.html";
     }
-    requestedFile += uri;
+//    requestedFile += uri; // Might need to be reinserted
+
+//    requestedFile = "pages";
+    if (lstat(requestedFile.c_str(), &s) == 0) {
+        if (S_ISDIR(s.st_mode)) {
+            std::cout << "Not in here?" << std::endl;
+            /*The following uncommented is only when the uri matches a location
+             and the location actually has a root and index
+            */
+//            if (!_config.get_Location_vec()[0].get_index().empty()) {
+//                uri = _config.get_Location_vec()[0].get_index();
+//                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
+//            }
+            if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
+                return respondError(403);
+            else {
+                return buildDirectoryListing(requestedFile, ogUri);
+            }
+        }
+    }
     std::ifstream myFile;
-    std::cout << "Path to be opened: " << requestedFile << std::endl;
-
-
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
         return respondError(404);
     }
+
+
     std::ostringstream fileContent;
     fileContent << myFile.rdbuf();
     std::string responseBody = fileContent.str();
     myFile.close();
-
 //    std::cout << "Opened content: " << fileContent << std::endl;
 
     std::string responseHeader;
@@ -110,7 +121,7 @@ std::string responseHandler::getResponse(std::string uri) {
     /* Max file Size will only be important for POST I believe */
 
     /* Default file when a directory is requested is just the index - Include in parsing */
-    
+
     return responseHeader;
 }
 
@@ -157,7 +168,7 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     return fileContent.str();
 }
 
-std::string responseHandler::buildDirectoryListing(std::string &directory, std::string uri) {
+std::string responseHandler::buildDirectoryListing(std::string &directory, std::string &uri) {
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
 
     /* nginx lists directories first in alphabetical order then files in alphabetical order
