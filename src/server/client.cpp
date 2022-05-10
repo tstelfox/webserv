@@ -147,8 +147,7 @@ void client::parseRequestHeader() {
             value += rcodio + " ";
         }
         if (value.size() > 2)
-            value.resize(
-                    value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
+            value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
