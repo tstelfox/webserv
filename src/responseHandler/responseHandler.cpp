@@ -88,7 +88,7 @@ std::string responseHandler::getResponse(std::string uri) {
         else
             look for root plus index
             */
-    
+
     std::string index;
     if (!_config.get_Location_vec()[0].get_index().empty())
         index = _config.get_Location_vec()[0].get_index();
