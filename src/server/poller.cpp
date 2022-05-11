@@ -50,7 +50,11 @@ int poller::connectionError(short revents) const {
 
 int poller::newConnection(int fd) {
     socklen_t addrLen;
-    int newConnection = accept(fd, (struct sockaddr *) &addrLen, (socklen_t * ) & addrLen);
+    struct sockaddr_in addr;
+    bzero(&addrthing, sizeof(struct sockaddr_in));
+    std::cout << RED << "fd: " << fd << RESET_COLOUR << std::endl;
+    int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);  // TODO Something here is causing an abort with fsanitize
+
     if (newConnection < 0) {
         if (errno != EWOULDBLOCK) {
             perror("accept failed");
@@ -58,7 +62,7 @@ int poller::newConnection(int fd) {
         return 0;
     }
     int on = 1;
-    if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) < 0)) {
+    if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int)) < 0)) {
         std::cout << "sockoptions got fucked" << std::endl;
         return 0;
     }

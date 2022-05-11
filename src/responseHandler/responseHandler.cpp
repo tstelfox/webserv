@@ -39,6 +39,10 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (locationStatus)
         return respondError(locationStatus);
 
+    /* TODO Check that method is allowed in this location - get input in a map or something */
+    /* if (_method is not in location list of methods)
+        set method to 0 and triggers a 405 */
+
 
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
@@ -59,11 +63,12 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 }
 
 int responseHandler::matchLocation(std::string uri) {
-    std::vector<WSERV::Location> locationsVec = _config.get_Location_vec();
+    std::vector <WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
 
     bool aMatch = false;
-    for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin(); locIter != locationsVec.end(); locIter++) {
+    for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
+         locIter != locationsVec.end(); locIter++) {
         /* Exact match */
         if (!uri.compare(locIter->get_location_path())) {
             std::cout << "Exact Location match" << std::endl;
@@ -111,18 +116,14 @@ std::string responseHandler::getResponse(std::string uri) {
      * Requested path is root + location + uri
      * */
 
-    std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index() << std::endl;
-    /* Have to fuse root with unique uri */
-    if (_location.get_index().empty()) {
+    std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
+              << std::endl;
 
-    }
-    std::string requestedPath = _location.get_root() +
+    /* Have to fuse root with unique uri and think of the "/" combos man holy frick */
+    std::string finalUri = uri.substr(_location.get_location_path().length());
+    std::string requestedPath = _location.get_root() + finalUri;
+    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
 
-    std::string requestedFile = uri;
-    std::string ogUri = uri;
-
-    /* if uri matches a location */
-    std::string root = _config.get_Location_vec()[0].get_root();
     /* Check for index -
         if there is no index
             if root is directory:
@@ -132,34 +133,24 @@ std::string responseHandler::getResponse(std::string uri) {
         else
             look for root plus index
             */
+    if (_location.get_index().empty()) {
+        if (isDirectory(requestedPath)) {
+            if (!_location.get_autoindex()) {
+                return respondError(403);
+            } else {
+                return buildDirectoryListing(requestedPath, finalUri);
+            }
+        }
+    }
+
+    std::string ogUri = uri;
+    std::string requestedFile = uri;
+
 
     std::string index;
     if (!_config.get_Location_vec()[0].get_index().empty())
         index = _config.get_Location_vec()[0].get_index();
-    // else
-        //
-    /* else If uri matches no location then 404 */
-        // Porcoddio 404 qui
 
-    struct stat s;
-    if (lstat(requestedFile.c_str(), &s) == 0) {
-        if (S_ISDIR(s.st_mode)) {
-            std::cout << "Not in here?" << std::endl;
-            /*The following uncommented is only when the uri matches a location
-             and the location actually has a root and index
-            */
-//            if (!_config.get_Location_vec()[0].get_index().empty()) {
-//                uri = _config.get_Location_vec()[0].get_index();
-//                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
-//            }
-            if (!_config.get_Location_vec()[0].get_autoindex()) { // TODO when locations work
-                return respondError(403);
-            }
-            else {
-                return buildDirectoryListing(requestedFile, ogUri);
-            }
-        }
-    }
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
@@ -179,7 +170,8 @@ std::string responseHandler::getResponse(std::string uri) {
     responseHeader += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     responseHeader.append(std::to_string(responseBody.size()));
     responseHeader.append("\n\n");
-    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << "RESPONSE: " << RESET_COLOUR << responseHeader << std::endl;
+    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << "RESPONSE: " << RESET_COLOUR
+              << responseHeader << std::endl;
     responseHeader.append(responseBody + "\n");
 
     /*Check that the method in question is an allowed method*/
@@ -193,7 +185,7 @@ std::string responseHandler::getResponse(std::string uri) {
 
 std::string responseHandler::postResponse(std::string uri) {
 //    std::cout << "Poche seghe: " <<
-    (void)uri;
+    (void) uri;
     return "placeholder";
 }
 
@@ -242,6 +234,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
      * Date and time of creation or modification for each file
      * And then size of file "-" for directories
      * */
+    std::cout << "Building the directory listing for " << directory << " and " << uri << std::endl;
 
     DIR *dh;
     struct dirent *contents;
@@ -259,7 +252,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
             struct stat s;
             std::string path = directory + "/" + name;
             if (lstat(path.c_str(), &s) == 0) {
-                std::vector<std::string> details;
+                std::vector <std::string> details;
                 if (name.compare("..")) {
                     details.push_back(name);
                     struct tm *timeInfo = localtime(&s.st_ctime);
@@ -285,14 +278,12 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
         closedir(dh);
     }
 
-    std::string directoryResponse = directoryListResponse(directorySet, fileSet, uri);
+    std::string directoryResponse = directoryListResponse(directorySet, fileSet, directory, uri);
 //    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
     return directoryResponse;
 }
 
 
-
-// anotherlevel/                                      05-May-2022 13:21
 /* < ---------- Response header building utils ---------- > */
 
 std::string responseHandler::buildHttpLine(int status) {
@@ -323,15 +314,18 @@ std::string responseHandler::buildDateLine() {
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                                   std::set <std::vector<std::string> > &files, std::string uri) {
+                                                   std::set <std::vector<std::string> > &files, std::string directory, std::string uri) {
     // Creating the Html as I would like it
+//    (void)uri;
     std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
-    htmlFile += "\t<title>Index of " + uri + "/</title>\n";
-    htmlFile += "</head>\n<body>\n<h2>" + uri + "/</h2>\n<hr/>\n<pre>\n";
+    htmlFile += "\t<title>Index of " + directory + "/</title>\n";
+    htmlFile += "</head>\n<body>\n<h2>" + directory + "/</h2>\n<hr/>\n<pre>\n";
 
-   /* Don't look at this absolute horror, for god's sake */
-    for (std::set<std::vector<std::string> >::iterator it = directories.begin(); it != directories.end(); it++) {
-        std::vector<std::string> iter = *it;
+    /* Don't look at this absolute horror, for god's sake */
+    std::string root = _location.get_root();
+    for (std::set < std::vector < std::string > > ::iterator it = directories.begin(); it != directories.end();
+    it++) {
+        std::vector <std::string> iter = *it;
         if (!iter[0].compare("../"))
             htmlFile += "<a href =\"" + iter[0] + "\">" + iter[0] + "</a>\n";
         else {
@@ -340,20 +334,22 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n";
+            htmlFile += "<a href =\"" + root + "/" + uri + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+                        iter[2] + "\n";
         }
     }
-    for (std::set<std::vector<std::string> >::iterator it = files.begin(); it != files.end(); it++) {
-        std::vector<std::string> iter = *it;
+    for (std::set < std::vector < std::string > > ::iterator it = files.begin(); it != files.end();
+    it++) {
+        std::vector <std::string> iter = *it;
         int justification = 47 - iter[0].length() + iter[1].length();
         std::string firstPad = " ";
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + uri + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding + iter[2] + "\n";
+        htmlFile += "<a href =\"" + root + "/" + uri + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+                    iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";
-
 
     //Building the actual header part
     std::string header = "HTTP/1.1 200 OK\nServer: Flamenco \033[31m Flame \033[37m Server\n";
@@ -363,8 +359,16 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
     header += "\n\n";
     header += htmlFile;
 
-
-
-
     return header;
+}
+
+bool responseHandler::isDirectory(std::string path) {
+    struct stat s;
+    if (lstat(path.c_str(), &s) == 0) {
+        if (S_ISDIR(s.st_mode))
+            return true;
+        else
+            return false;
+    }
+    return false;
 }

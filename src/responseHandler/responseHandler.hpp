@@ -54,7 +54,10 @@ private:
     std::string buildDirectoryListing(std::string &directory, std::string &uri);
 
     std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                      std::set <std::vector<std::string> > &files, std::string uri);
+                                      std::set <std::vector<std::string> > &files, std::string directory, std::string uri);
+
+    /* General utils */
+    bool    isDirectory(std::string path);
 
     /* Should probably send in the request line tbh */
     std::string _requestLine;
