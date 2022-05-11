@@ -92,7 +92,7 @@ std::string responseHandler::getResponse(std::string uri) {
     std::string index;
     if (!_config.get_Location_vec()[0].get_index().empty())
         index = _config.get_Location_vec()[0].get_index();
-    else
+    // else
         //
     /* else If uri matches no location then 404 */
         // Porcoddio 404 qui
@@ -100,7 +100,7 @@ std::string responseHandler::getResponse(std::string uri) {
     struct stat s;
     if (lstat(requestedFile.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode)) {
-//            std::cout << "Not in here?" << std::endl;
+            std::cout << "Not in here?" << std::endl;
             /*The following uncommented is only when the uri matches a location
              and the location actually has a root and index
             */
@@ -108,8 +108,10 @@ std::string responseHandler::getResponse(std::string uri) {
 //                uri = _config.get_Location_vec()[0].get_index();
 //                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
 //            }
-            if (!_config.get_Location_vec()[0].get_autoindex()) // TODO when locations work
+            if (!_config.get_Location_vec()[0].get_autoindex()) { // TODO when locations work
+                std::cout << "In here?" << std::endl;
                 return respondError(403);
+            }
             else {
                 return buildDirectoryListing(requestedFile, ogUri);
             }
@@ -162,7 +164,7 @@ std::string responseHandler::respondError(int status) {
     response += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     // Extract file
     std::string body = extractErrorFile(status);
-    std::cout << "Bro" << body << std::endl;
+    std::cout << "Error html: " << body << std::endl;
     response.append(std::to_string(body.size()));
     //Error files
     response += "\nConnection: close";
@@ -177,9 +179,9 @@ std::string responseHandler::respondError(int status) {
 std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
     std::ifstream errFile;
     std::string path = _config.get_error_page();
-//    std::cout << "de boia " << path << std::endl;
+//    std::cout << "Error file path: " << path << std::endl;
     path += std::to_string(status) + ".html";
-//    std::cout << "File path: " << path << std::endl;
+    std::cout << "File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
         // panic hard

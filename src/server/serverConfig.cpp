@@ -3,10 +3,10 @@
 /*                                                        ::::::::            */
 /*   serverConfig.cpp                                   :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: turloughmullan <turloughmullan@student.c...  +#+                     */
+/*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/04/25 19:37:04 by turloughmullan#+#    #+#                 */
-/*   Updated: 2022/04/25 19:37:04 by turloughmullan########   odam.nl         */
+/*   Created: 2022/04/25 19:37:04 by turloughmul   #+#    #+#                 */
+/*   Updated: 2022/05/09 14:39:01 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ WSERV::serverConfig &WSERV::serverConfig::operator=(serverConfig const &copy) {
 
 /* Getters & Setters*/
 
-int WSERV::serverConfig::get_port() const {
+std::vector<int> WSERV::serverConfig::get_port() const {
     return (this->_port);
 }
 
-void WSERV::serverConfig::set_port(int const data) {
+void WSERV::serverConfig::set_port(std::vector<int> const data) {
     this->_port = data;
 }
 
@@ -62,7 +62,7 @@ void WSERV::serverConfig::set_server_name(std::string const data) {
     this->_server_name = data;
 }
 
-int WSERV::serverConfig::get_maxfilesize() const {
+unsigned int WSERV::serverConfig::get_maxfilesize() const {
     return (this->_maxfilesize);
 }
 

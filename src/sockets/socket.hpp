@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/02 15:17:36 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/03/23 13:43:03 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/04/28 18:41:46 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ private:
 
 // For the client side o'sheet
 /* class	clientSock : public socketMan {
-	
+
 	public:
 		clientSock(int domain, int service, int protocol,
 			int port, const char *host) : socketMan(domain, service, protocol, port,host) {
@@ -76,5 +76,5 @@ private:
 	private:
 		socklen_t	addrlen;
 		clientSock();
-		
+
 }; */
