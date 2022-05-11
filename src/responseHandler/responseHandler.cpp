@@ -55,8 +55,17 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 
 std::string responseHandler::getResponse(std::string uri) {
 
-    /* The following is stupid because I'm not doing the actual location checks */
-//    std::string requestedFile = _config.get_Location_vec()[0].get_root();
+    std::vector<WSERV::Location> locationsVec = _config.get_Location_vec();
+    WSERV::Location location;
+    for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin(); locIter != locationsVec.end(); locIter++) {
+        if (!uri.compare(locIter->get_location_path())) {
+            std::cout << "Uri matches a location " << std::endl;
+            location = *locIter;
+            break;
+        }
+        if ((locIter + 1) == locationsVec.end())
+            return respondError(404);
+    }
     /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings
      *
      * nginx behaviour:
@@ -109,7 +118,6 @@ std::string responseHandler::getResponse(std::string uri) {
 //                std::cout << "JUST TESTING THIS FOR THE LOVE OF GOD " << _config.get_Location_vec()[0].get_index() << std::endl;
 //            }
             if (!_config.get_Location_vec()[0].get_autoindex()) { // TODO when locations work
-                std::cout << "In here?" << std::endl;
                 return respondError(403);
             }
             else {
