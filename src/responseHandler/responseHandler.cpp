@@ -62,7 +62,6 @@ int responseHandler::matchLocation(std::string uri) {
     std::vector<WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
 
-    /* This is actually annoyingly complicated */
     bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin(); locIter != locationsVec.end(); locIter++) {
         /* Exact match */
@@ -73,20 +72,17 @@ int responseHandler::matchLocation(std::string uri) {
             break;
         }
         /* location is incorporated into uri */
-        /* TODO EG: localhost:8080/put_test/someFile.html ---- location /put_test <-> location /put_test/someDirectory */
 //        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
         if (uri.find(locIter->get_location_path()) != std::string::npos) {
 //            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
             location = *locIter;
             aMatch = true;
-            if ((locIter + 1) == locationsVec.end())
-                break;
+//            if ((locIter + 1) == locationsVec.end())
+//                break;
         }
     }
-    if (!aMatch) {
-//        std::cout << "In here a match not?" << std::endl;
+    if (!aMatch)
         return 404;
-    }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
@@ -115,10 +111,15 @@ std::string responseHandler::getResponse(std::string uri) {
      * Requested path is root + location + uri
      * */
 
+    std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index() << std::endl;
+    /* Have to fuse root with unique uri */
+    if (_location.get_index().empty()) {
+
+    }
+    std::string requestedPath = _location.get_root() +
 
     std::string requestedFile = uri;
     std::string ogUri = uri;
-    std::cout << "Path to be opened for GET: " << requestedFile << std::endl;
 
     /* if uri matches a location */
     std::string root = _config.get_Location_vec()[0].get_root();
@@ -198,6 +199,7 @@ std::string responseHandler::postResponse(std::string uri) {
 
 std::string responseHandler::respondError(int status) {
 
+    std::cout << MAGENTA << "We be responding to an error" << RESET_COLOUR << std::endl;
     std::string response;
     response = buildHttpLine(status);
     response += buildDateLine();
@@ -206,7 +208,7 @@ std::string responseHandler::respondError(int status) {
     response += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     // Extract file
     std::string body = extractErrorFile(status);
-    std::cout << "Error html: " << body << std::endl;
+//    std::cout << "Error html: " << body << std::endl;
     response.append(std::to_string(body.size()));
     //Error files
     response += "\nConnection: close";
@@ -223,7 +225,7 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     std::string path = _config.get_error_page();
 //    std::cout << "Error file path: " << path << std::endl;
     path += std::to_string(status) + ".html";
-    std::cout << "Error File path: " << path << std::endl;
+//    std::cout << "Error File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
         // panic hard
@@ -284,7 +286,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
     }
 
     std::string directoryResponse = directoryListResponse(directorySet, fileSet, uri);
-    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
+//    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
     return directoryResponse;
 }
 
