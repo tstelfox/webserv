@@ -35,7 +35,12 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (status != 200)
         return respondError(status);
 
-    /* Actual normal parsing of a normal request */
+    int locationStatus = matchLocation(uri);
+    if (locationStatus)
+        return respondError(locationStatus);
+
+
+    /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
         case 0:
@@ -53,24 +58,51 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     return "Placeholder"; // TODO
 }
 
-std::string responseHandler::getResponse(std::string uri) {
-
+int responseHandler::matchLocation(std::string uri) {
     std::vector<WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
+
+    /* This is actually annoyingly complicated */
+    bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin(); locIter != locationsVec.end(); locIter++) {
+        /* Exact match */
         if (!uri.compare(locIter->get_location_path())) {
-            std::cout << "Uri matches a location " << std::endl;
+            std::cout << "Exact Location match" << std::endl;
             location = *locIter;
+            aMatch = true;
             break;
         }
-        if ((locIter + 1) == locationsVec.end())
-            return respondError(404);
+        /* location is incorporated into uri */
+        /* TODO EG: localhost:8080/put_test/someFile.html ---- location /put_test <-> location /put_test/someDirectory */
+//        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
+        if (uri.find(locIter->get_location_path()) != std::string::npos) {
+//            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
+            location = *locIter;
+            aMatch = true;
+            if ((locIter + 1) == locationsVec.end())
+                break;
+        }
     }
+    if (!aMatch) {
+//        std::cout << "In here a match not?" << std::endl;
+        return 404;
+    }
+    _location = location;
+    std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
+
+    return 0;
+}
+
+std::string responseHandler::getResponse(std::string uri) {
+
+
     /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings
      *
      * nginx behaviour:
      *      - Directory listing only if there is no set index for that directory
      *      - root is where to go retrieve the files by adding location at the end
+     *      - root cannot be a file
+     *      - root is obligatory for us
      *
      *      SO WE WILL DO
      *      - compare uri with location
@@ -79,12 +111,14 @@ std::string responseHandler::getResponse(std::string uri) {
      *          - If uri leads to root which is a folder without index then directory listing
      *          - If uri leads to root which is a folder with index then display index
      *
+     *
+     * Requested path is root + location + uri
      * */
 
 
     std::string requestedFile = uri;
     std::string ogUri = uri;
-    std::cout << "Path to be opened: " << requestedFile << std::endl;
+    std::cout << "Path to be opened for GET: " << requestedFile << std::endl;
 
     /* if uri matches a location */
     std::string root = _config.get_Location_vec()[0].get_root();
@@ -189,7 +223,7 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     std::string path = _config.get_error_page();
 //    std::cout << "Error file path: " << path << std::endl;
     path += std::to_string(status) + ".html";
-    std::cout << "File path: " << path << std::endl;
+    std::cout << "Error File path: " << path << std::endl;
     errFile.open(path);
     if (errFile.fail()) {
         // panic hard

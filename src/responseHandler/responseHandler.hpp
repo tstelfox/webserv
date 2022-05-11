@@ -31,6 +31,9 @@ public:
 private:
     responseHandler();
 
+    /* Match location */
+    int matchLocation(std::string uri);
+
     /* Error Responses */
     std::string respondError(int status);
 
@@ -58,7 +61,8 @@ private:
     WSERV::serverConfig _config;
     std::map <std::string, std::string> _requestFields;
 
-
+    /* Correct Location */
+    WSERV::Location _location;
     /* Status code */
 //    int _status;
 
