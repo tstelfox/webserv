@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   parsing.cpp                                        :+:    :+:            */
+/*   Parsing.cpp                                        :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:51:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/04/25 14:06:36 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/09 15:08:21 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void set_allow_method_func(WSERV::Location  &L_temp, std::string data);
 void set_index_func(WSERV::Location  &L_temp, std::string data);
 void set_max_file_size_func(WSERV::Location  &L_temp, std::string data);
 void set_auth_basic_func(WSERV::Location  &L_temp, std::string data);
+void set_loc_path(WSERV::Location  &L_temp, std::string data);
 
 std::vector<WSERV::serverConfig>	WSERV::Parser::get_serverConfig(void) const
 {
@@ -144,9 +145,13 @@ void    WSERV::Parser::read_file_to_vect()
         /*  Adds the temp vars into pairs of the map
             that will later be added to a vector of maps            */
         if (str_r.length() != 0 && str_l.length() != 0 && _in_loc_bloc == 0)
-            serv_vars.insert(std::pair<std::string, std::string>(str_r, str_l));
+        {
+            if(serv_vars.insert(std::pair<std::string, std::string>(str_r, str_l)).second == false)
+                throw IncorrectConfigExcep();
+        }
         else if (str_r.length() != 0 && str_l.length() != 0 && _in_loc_bloc > 0)
-            loc_vars.insert(std::pair<std::string, std::string>(str_r, str_l));
+            if (loc_vars.insert(std::pair<std::string, std::string>(str_r, str_l)).second == false)
+                throw IncorrectConfigExcep();
     }
     /*  checks if the brackets are not closed properly              */
     if (_in_sev_bloc == true || _in_loc_bloc == true)
@@ -163,11 +168,12 @@ void    WSERV::Parser::read_file_to_vect()
 void    WSERV::Parser::add_vector_vars_to_server_class()
 {
     serverConfig  *S_temp;
+    int loc_count = 0;
     std::vector<Location> *vec_loc_temp;
     std::string cmp_serv[] = {"port", "host", "server_name", "error_page", \
         "cgi_file_types", "time_out", "max_file_size", "location"};
     std::string cmp_loc[] = {"root", "allowed_method", "index", "autoindex", \
-        "max_file_size", "auth_basic"};
+        "max_file_size", "auth_basic"}; //location path
     void (*set_funcs_serv[])(WSERV::serverConfig&, std::string) = {&set_port_func, \
         &set_host_func, &set_server_name_func, &set_error_page_func,\
         &set_cgi_file_types_func, &set_time_out_func, &set_maxfilesize_func};
@@ -179,21 +185,21 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
     {
         S_temp = new serverConfig;
         vec_loc_temp = new std::vector<Location>;
-        int count = 0;
+        // int count = 0;
         for (std::map<std::string,std::string>::iterator it=_serv_map_vec[servs].begin(); it!=_serv_map_vec[servs].end(); ++it)
         {
-            for (int var_name = 0; var_name < 8; var_name++)
+            for (int var_name = 0; (unsigned int) var_name < (sizeof(cmp_serv)/sizeof(cmp_serv[0])); var_name++)
             {
                 if (cmp_serv[var_name].compare(0, cmp_serv[var_name].length(), it->first) == 0)
                 {
                     set_funcs_serv[var_name](*S_temp, it->second);
+                    // count++;
                 }
             }
-            count++;
         }
-        if (count == 8)
-            throw IncorrectConfigExcep();
-        count = 0;
+        // if (count == 9) //make enum to clarify that these are the amount of  server func
+        //     throw IncorrectConfigExcep();
+        // count = 0;
         for (unsigned long locs = 0; locs < _loc_map_vec[servs].size(); locs++)
         {
             Location *L_temp;
@@ -201,18 +207,20 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
             L_temp = new Location;
             for (std::map<std::string,std::string>::iterator it=_loc_map_vec[servs][locs].begin(); it!=_loc_map_vec[servs][locs].end(); ++it)
             {
-                for (int var_name = 0; var_name < 8; var_name++)
+                for (int var_name = 0; (unsigned int) var_name < (sizeof(cmp_loc)/sizeof(cmp_loc[0])); var_name++)
                 {
                     if (cmp_loc[var_name].compare(0, cmp_loc[var_name].length(), it->first) == 0)
                     {
                         set_funcs_loc[var_name](*L_temp, it->second);
                     }
                 }
-                count++;
+                // count++;
             }
-            if (count == 5)
-                throw IncorrectConfigExcep();
-            count = 0;
+            set_loc_path(*L_temp, _loc_path[loc_count]);
+            loc_count++;
+            // if (count == 5)
+            //     throw IncorrectConfigExcep();
+            // count = 0;
             (*vec_loc_temp).push_back(*L_temp);
             delete L_temp;
         }
@@ -221,7 +229,48 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
         delete vec_loc_temp;
         delete S_temp;
     }
+
     /* */
+}
+
+void WSERV::Parser::check_if_var_in_class_is_empty()
+{
+    for (unsigned int i = 0; i < _vec_servers.size(); i++)
+    {
+        if (_vec_servers[i].get_port().empty() == true)
+            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_host().empty() == true)
+            throw IncorrectConfigExcep();
+        // if (_vec_servers[i].get_server_name().empty() == true)
+        //     throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_maxfilesize() == 0)
+            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_error_page().empty() == true)
+            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_cgi_file_types().empty() == true)
+            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_time_out() == 0)
+            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_Location_vec().empty() == true)
+            throw IncorrectConfigExcep();
+    }
+
+    // std::string get_root( void ) const;
+	// 		std::string get_location_path( void ) const;
+	// 		bool 		get_autoindex( void ) const;
+	// 		std::string get_allow_method( void ) const;
+	// 		std::string get_index( void ) const;
+	// 		std::string get_error_page( void ) const;
+	// 		int 		get_max_file_size( void ) const;
+	// 		bool 		get_cgi_allowed_extensions( void ) const;
+	// 		std::string get_default_cgi_path( void ) const;
+	// 		std::string get_php_cgi( void ) const;
+	// 		bool get_auth_basic( void ) const;
+
+    //check voor alle loc gettersen ignore servername en maybe andere maar maak de loop
+    //ook maak van file size int naar unsigned it
+    // en sla de location path ergens op
+
 }
 
 WSERV::Parser::Parser(int argc, char **argv)
@@ -231,6 +280,7 @@ WSERV::Parser::Parser(int argc, char **argv)
     open_file(_config_name, _configfile);
     read_file_to_vect();
     add_vector_vars_to_server_class();
+    check_if_var_in_class_is_empty();
 }
 
 WSERV::Parser::~Parser()
@@ -247,6 +297,7 @@ WSERV::Parser & WSERV::Parser::operator = (Parser const & copy)
 	this->_vec_servers = copy._vec_servers;
 	this->_config_name = copy._config_name;
 	this->_configfile = copy._configfile;
+    this->_loc_path = copy._loc_path;
 	this->_separator = copy._separator;
 	this-> _prev_loc_count = copy. _prev_loc_count;
 	this->_server_count = copy._server_count;

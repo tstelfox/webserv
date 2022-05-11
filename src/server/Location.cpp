@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:40 by akramp        #+#    #+#                 */
-/*   Updated: 2022/04/21 22:00:27 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/09 12:56:30 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ std::string WSERV::Location::get_error_page( void ) const
 	return (this->_error_page);
 }
 
-int 		WSERV::Location::get_max_file_size( void ) const
+unsigned int 		WSERV::Location::get_max_file_size( void ) const
 {
 	return (this->_max_file_size);
 }
@@ -127,7 +127,7 @@ void WSERV::Location::set_error_page( std::string const data)
 	this->_error_page = data;
 }
 
-void WSERV::Location::set_max_file_size( int const data)
+void WSERV::Location::set_max_file_size( unsigned int const data)
 {
 	this->_max_file_size = data;
 }

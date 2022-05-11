@@ -3,10 +3,10 @@
 /*                                                        ::::::::            */
 /*   serverConfig.hpp                                   :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: turloughmullan <turloughmullan@student.c...  +#+                     */
+/*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/04/25 19:42:04 by turloughmullan#+#    #+#                 */
-/*   Updated: 2022/04/25 19:42:04 by turloughmullan########   odam.nl         */
+/*   Created: 2022/04/25 19:42:04 by turloughmul   #+#    #+#                 */
+/*   Updated: 2022/05/09 14:39:09 by ubuntu        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@
 namespace WSERV {
     class serverConfig {
     private:
-        int _port; // std::set<int>        _port; In the future
+        std::vector<int> _port; // std::set<int>        _port; In the future
         std::string _host;
         std::string _server_name;
-        int _maxfilesize;
+        unsigned int _maxfilesize;
         std::string _error_page;
         std::string _cgi_file_types;
         int _time_out;
@@ -44,13 +44,13 @@ namespace WSERV {
 
         friend class Parser;
 
-        int get_port() const;
+        std::vector<int> get_port() const;
 
         std::string get_host() const;
 
         std::string get_server_name() const;
 
-        int get_maxfilesize() const;
+        unsigned int get_maxfilesize() const;
 
         std::string get_error_page() const;
 
@@ -60,7 +60,7 @@ namespace WSERV {
 
         std::vector<WSERV::Location> get_Location_vec() const;
 
-        void set_port(int const data);
+        void set_port(std::vector<int> const data);
 
         void set_host(std::string const &data);
 
