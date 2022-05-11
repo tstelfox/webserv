@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "Parsing.hpp"
-#include "../exceptions/exceptions.hpp"
+#include "exceptions.hpp"
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
@@ -83,9 +83,9 @@ void set_autoindex_func(WSERV::Location  &L_temp, std::string data)
 {
     bool convert;
 
-    if (data.compare(0, 2, "on"))
+    if (!data.compare(0, 2, "on"))
         convert = true;
-    else if (data.compare(0, 3, "off"))
+    else if (!data.compare(0, 3, "off"))
         convert = false;
     else
         throw IncorrectConfigExcep();

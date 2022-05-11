@@ -13,7 +13,8 @@
 #pragma once
 
 #include "socket.hpp"
-#include "clientConnecter.hpp"
+#include "client.hpp"
+//#include "clientConnecter.hpp"
 #include "serverConfig.hpp"
 #include <string>
 #include <set>
@@ -37,6 +38,8 @@ public:
 
     std::set<int> openPorts();
 
+    int respondToClient(int socket, std::string response);
+
     void pollConnections();
 
     // serverSock		*getSocket() const;
@@ -55,7 +58,7 @@ private:
     configVector _serverConfigs;
 
     /* Map of all the clients sorted by socket */
-    std::map<int, clientConnecter> _clients;
+    std::map<int, client> _clients;
 
 };
 

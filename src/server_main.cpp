@@ -11,10 +11,9 @@
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-#include "../rubbish/serverBlock.hpp"
-#include "server/poller.hpp"
-#include "server/serverConfig.hpp"
-#include "parsing/Parsing.hpp"
+#include "poller.hpp"
+#include "serverConfig.hpp"
+#include "Parsing.hpp"
 #include "colours.hpp"
 
 #include <iostream>
@@ -75,8 +74,8 @@ int main(int argc, char *argv[]) {
 
     /*Extract all the unique ports and put them into a set.*/
 
-    // poller littyServer(S);
-    // littyServer.pollConnections();
+    poller littyServer(S);
+    littyServer.pollConnections();
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

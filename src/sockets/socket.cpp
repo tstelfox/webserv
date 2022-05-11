@@ -11,29 +11,32 @@
 /* ************************************************************************** */
 
 #include <sys/fcntl.h>
+#include <arpa/inet.h> // inet_addr()
+#include <netinet/in.h> // inet_addr()
 #include <iostream>
 #include "socket.hpp"
 
 // #include "webserv.hpp"
 
 socketMan::socketMan(int domain, int service, int protocol, int port,
-                     u_long interface) {
+                     const char *host) {
 
+//    std::cout << "host: " << host << std::endl;
     // Set up address structure
     address.sin_family = domain;
-    address.sin_addr.s_addr = htonl(interface);
+    address.sin_addr.s_addr = inet_addr(host);
     address.sin_port = htons(port);
     // Create the socket
     sock = socket(domain, service, protocol);
-    testConnection(sock);
+    testConnection(sock, "Creation of Socket");
 
 }
 
 socketMan::~socketMan() {}
 
-void socketMan::testConnection(int to_test) {
+void socketMan::testConnection(int to_test, std::string str) {
     if (to_test < 0) {
-        std::cerr << "Failed to connect";
+        std::cerr << "Failed to connect: " << str << "\n";
         exit(EXIT_FAILURE);
     }
 
@@ -44,7 +47,7 @@ int socketMan::getSock() { return sock; }
 struct sockaddr_in &socketMan::getAddr() { return address; }
 
 serverSock::serverSock(int domain, int service, int protocol,
-                       int port, u_long interface) : socketMan(domain, service, protocol, port, interface), backlog(0) {
+                       int port, const char *host) : socketMan(domain, service, protocol, port, host), backlog(0) {
     // Bind/connect the socket
     int ret;
     int on = 1;
@@ -57,9 +60,9 @@ serverSock::serverSock(int domain, int service, int protocol,
     }
 
 
-    // ret = fcntl(getSock(), F_GETFL, 0);
     ret = bindServer(sock, address);
-    testConnection(ret);
+    testConnection(ret, "Binding failure");
+    // ret = fcntl(getSock(), F_GETFL, 0);
     listenServer(5);
     /* The following is the fcntl version which must be used, as per subject */
     //Set socket to be nonblocking
@@ -80,7 +83,7 @@ int serverSock::bindServer(int sock, struct sockaddr_in address) {
 void serverSock::listenServer(int bcklg) {
     backlog = bcklg;
     int connection = listen(sock, backlog);
-    testConnection(connection);
+    testConnection(connection, "Listen failure");
 }
 
 // int	clientSock::connect_server(int sock, struct sockaddr_in address) {

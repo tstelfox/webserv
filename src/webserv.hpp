@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include <unistd.h>
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <sys/fcntl.h>
-#include <vector>
-#include <sys/poll.h>
-
-#include "sockets/socket.hpp"
-#include "server/server.hpp"
-#include "server/clientConnecter.hpp"
+//#include <unistd.h>
+//#include <sstream>
+//#include <fstream>
+//#include <iostream>
+//#include <sys/fcntl.h>
+//#include <vector>
+//#include <sys/poll.h>
+//
+//#include "socket.hpp"
+//#include "server.hpp"
+//#include "clientConnecter.hpp"
