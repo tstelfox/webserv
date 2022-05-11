@@ -181,7 +181,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     _response = response.parseAndRespond(_status, _method, _uri);
 
     // Here I should reset
-    _isBuffFull = false; // TODO should this reset be expanded?
+    _isBuffFull = false; // TODO time to expand this reset
 
 }
 

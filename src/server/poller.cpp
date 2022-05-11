@@ -51,7 +51,7 @@ int poller::connectionError(short revents) const {
 int poller::newConnection(int fd) {
     socklen_t addrLen;
     struct sockaddr_in addr;
-    bzero(&addrthing, sizeof(struct sockaddr_in));
+    bzero(&addr, sizeof(struct sockaddr_in));
     std::cout << RED << "fd: " << fd << RESET_COLOUR << std::endl;
     int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);  // TODO Something here is causing an abort with fsanitize
 

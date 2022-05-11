@@ -121,7 +121,7 @@ std::string responseHandler::getResponse(std::string uri) {
 
     /* Have to fuse root with unique uri and think of the "/" combos man holy frick */
     std::string finalUri = uri.substr(_location.get_location_path().length());
-    std::string requestedPath = _location.get_root() + finalUri;
+    std::string requestedPath = _location.get_root() + finalUri; // If the root is included in uri it fuck up and does pagespages/uri
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
 
     /* Check for index -
