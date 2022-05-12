@@ -137,28 +137,27 @@ std::string responseHandler::getResponse(std::string uri) {
         else
             look for root plus index
             */
+    // CHeck if index absent
     if (_location.get_index().empty()) {
+        // if directory
         if (isDirectory(requestedPath)) {
+            // Directory Listing
             if (!_location.get_autoindex()) {
                 return respondError(403);
             } else {
-                return buildDirectoryListing(requestedPath, finalUri);
+                return buildDirectoryListing(requestedPath);
             }
+        } else { // return 404
+            return respondError(404);
         }
     }
-
-    std::string ogUri = uri;
-    std::string requestedFile = uri;
-
-
-    std::string index;
-    if (!_config.get_Location_vec()[0].get_index().empty())
-        index = _config.get_Location_vec()[0].get_index();
-
+    // If index present
+    // Look for root+/index
+    std::string requestedFile = requestedPath + _location.get_index();
+    std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
-
         return respondError(404);
     }
 
@@ -232,14 +231,14 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     return fileContent.str();
 }
 
-std::string responseHandler::buildDirectoryListing(std::string &directory, std::string &uri) {
+std::string responseHandler::buildDirectoryListing(std::string &directory) {
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
 
     /* nginx lists directories first in alphabetical order then files in alphabetical order
      * Date and time of creation or modification for each file
      * And then size of file "-" for directories
      * */
-    std::cout << "Building the directory listing for " << directory << " and " << uri << std::endl;
+    std::cout << "Building the directory listing for " << directory << std::endl;
 
     DIR *dh;
     struct dirent *contents;
@@ -283,7 +282,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory, std::
         closedir(dh);
     }
 
-    std::string directoryResponse = directoryListResponse(directorySet, fileSet, directory, uri);
+    std::string directoryResponse = directoryListResponse(directorySet, fileSet, directory);
 //    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
     return directoryResponse;
 }
@@ -319,13 +318,13 @@ std::string responseHandler::buildDateLine() {
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                                   std::set <std::vector<std::string> > &files, std::string directory, std::string uri) {
+                                                   std::set <std::vector<std::string> > &files, std::string directory) {
     // Creating the Html as I would like it
     std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile += "\t<title>Index of " + directory + "/</title>\n";
     htmlFile += "</head>\n<body>\n<h2>" + directory + "/</h2>\n<hr/>\n<pre>\n";
 
-    std::cout << RED <<"Building the directory listing from: " << directory << " and " << uri << RESET_COLOUR << std::endl;
+    std::cout << RED <<"Building the directory listing from: " << directory << RESET_COLOUR << std::endl;
 
     /* Don't look at this absolute horror, for god's sake */
 //    std::string root = _location.get_root();
