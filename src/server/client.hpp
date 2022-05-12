@@ -42,6 +42,9 @@ public:
     char *getBuffer();
     std::string getResponse() const;
 
+    /* Reset client */
+    void resetClient();
+
 //    void resetClient();
 
 

@@ -62,12 +62,13 @@ int client::fullHeaderReceived() {
     return 0;
 }
 
-//void client::resetClient() { // TODO
-//    /* Is it necessary to wipe it this way
-//     * or can I just delete the client entirely?
-//     * Perhaps this is in order to receive the favicon too
-//     */
-//}
+void client::resetClient() {
+
+
+//    _response.clear();
+    bzero(&_buffer, sizeof(_buffer));
+    _isBuffFull = false;
+}
 
 /* < --------- Request Parsing and Config Routing ------ > */
 
@@ -180,9 +181,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     responseHandler response(_requestLine, rightConfig, fields);
     _response = response.parseAndRespond(_status, _method, _uri);
 
-    // Here I should reset
-    _isBuffFull = false; // TODO time to expand this reset
-
+//    resetClient();
 }
 
 char *client::getBuffer() {
