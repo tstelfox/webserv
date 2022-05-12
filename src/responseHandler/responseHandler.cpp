@@ -301,10 +301,10 @@ std::string responseHandler::redirectionResponse() {
     std::string placeHolder = "/put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
-    redirectResponse += _config.get_host() + ":";
-    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
+//    redirectResponse += _config.get_host() + ":";
+//    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
 
-//    redirectResponse += placeHolder + "\n\n";
+    redirectResponse += placeHolder + "\n\n";
 
     std::cout << redirectResponse << std::endl;
     return redirectResponse;
