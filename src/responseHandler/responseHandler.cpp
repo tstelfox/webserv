@@ -133,7 +133,7 @@ std::string responseHandler::getResponse(std::string uri) {
             if root is directory:
                 directory listing
             else
-                return 404 (It's what nginx does)
+                return 404 (It's what nginx does) [Update: not really]
         else
             look for root plus index
             */
@@ -147,13 +147,17 @@ std::string responseHandler::getResponse(std::string uri) {
             } else {
                 return buildDirectoryListing(requestedPath);
             }
-        } else { // return 404
+        }
+        else { // return 404
+            std::cout << "Not in here right?" << std::endl;
             return respondError(404);
         }
     }
-    // If index present
-    // Look for root+/index
-    std::string requestedFile = requestedPath + _location.get_index();
+    std::string requestedFile;
+    if (isDirectory(requestedPath))
+        requestedFile = requestedPath + _location.get_index();
+    else
+        requestedFile = requestedPath;
     std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
     std::ifstream myFile;
     myFile.open(requestedFile);
