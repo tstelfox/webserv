@@ -45,6 +45,9 @@ private:
     /* POST request */
     std::string postResponse(std::string uri);
 
+    /* Redirection Response */
+    std::string redirectionResponse();
+
     /* Response header building utils */
     std::string buildHttpLine(int status);
 
@@ -55,6 +58,7 @@ private:
 
     std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
                                       std::set <std::vector<std::string> > &files, std::string directory);
+
 
     /* General utils */
     bool    isDirectory(std::string path);

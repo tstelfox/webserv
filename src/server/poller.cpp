@@ -53,7 +53,7 @@ int poller::newConnection(int fd) {
     struct sockaddr_in addr;
     bzero(&addr, sizeof(struct sockaddr_in));
     std::cout << RED << "fd: " << fd << RESET_COLOUR << std::endl;
-    int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);  // TODO Something here is causing an abort with fsanitize
+    int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);
 
     if (newConnection < 0) {
         if (errno != EWOULDBLOCK) {
@@ -171,7 +171,7 @@ void poller::pollConnections() {
                     newConnection(it->fd);
                     break;
                 }
-                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
+//                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 size_t valRead = recv(it->fd, buffer, 1024, 0);
                 if (valRead) {
 //                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;

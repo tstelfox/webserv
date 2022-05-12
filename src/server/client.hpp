@@ -93,7 +93,6 @@ private:
     int _status;
 //    std::string _name;
 //
-//    /* Truly should consider making a request class TODO*/
 ////    bool _autoIndex;
 ////    set<int> _acceptedMethods;
 //

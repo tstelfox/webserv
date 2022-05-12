@@ -59,7 +59,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
             std::cout << "DELETE request" << std::endl;
 //            return deleteResponse(uri);
     }
-    return "Placeholder"; // TODO
+    return "Placeholder"; // TODO ths thing
 }
 
 int responseHandler::matchLocation(std::string uri) {
@@ -96,9 +96,7 @@ int responseHandler::matchLocation(std::string uri) {
 
 std::string responseHandler::getResponse(std::string uri) {
 
-
-    /* TODO THIS WHOLE FUCKING THING - Figure out how nginx handles the locations and directory listings
-     *
+     /*
      * nginx behaviour:
      *      - Directory listing only if there is no set index for that directory
      *      - root is where to go retrieve the files by adding location at the end
@@ -115,21 +113,27 @@ std::string responseHandler::getResponse(std::string uri) {
      *
      * Requested path is root + location + uri
      * */
+    /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
+
+    std::string tempRed = "/takemehome";
+    if (!uri.compare(tempRed)) {
+        std::cout << "Redirection stuff for " << uri << std::endl;
+        return redirectionResponse();
+    }
 
     std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
               << std::endl;
 
-    /* Have to fuse root with unique uri and think of the "/" combos man holy frick */
     std::string finalUri = uri.substr(_location.get_location_path().length());
     std::string requestedPath;
     if (uri.find(_location.get_root()) != std::string::npos)
         requestedPath = finalUri;
     else {
         // TODO The adding of the slash may be hacky and not always work
-        requestedPath = _location.get_root() + "/" +
-                        finalUri; // If the root is included in uri it fuck up and does pagespages/uri
+        requestedPath = _location.get_root() + "/" + finalUri;
     }
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
+
 
     /* Check for index -
         if there is no index
@@ -290,10 +294,12 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     }
 
     std::string directoryResponse = directoryListResponse(directorySet, fileSet, directory);
-//    std::cout << "Building the header for the directory listing:\n" << directoryResponse << std::endl;
     return directoryResponse;
 }
 
+std::string responseHandler::redirectionResponse() {
+    return "Redirected bitch";
+}
 
 /* < ---------- Response header building utils ---------- > */
 
