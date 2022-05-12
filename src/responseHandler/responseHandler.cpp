@@ -298,7 +298,7 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
 }
 
 std::string responseHandler::redirectionResponse() {
-    std::string placeHolder = "/put_test/index.html";
+    std::string placeHolder = "put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
