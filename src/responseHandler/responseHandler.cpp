@@ -298,7 +298,16 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
 }
 
 std::string responseHandler::redirectionResponse() {
-    return "Redirected bitch";
+    std::string placeHolder = "/put_test/index.html";
+    std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
+
+    redirectResponse += _config.get_host() + ":";
+    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
+
+//    redirectResponse += placeHolder + "\n\n";
+
+    std::cout << redirectResponse << std::endl;
+    return redirectResponse;
 }
 
 /* < ---------- Response header building utils ---------- > */
@@ -322,7 +331,7 @@ std::string responseHandler::buildHttpLine(int status) {
 std::string responseHandler::buildDateLine() {
 
     time_t now = time(0);
-    char *date = ctime(&now);
+    char *date = ctime(&now); // TODO check if it leaks
     std::string stringDate = date;
     stringDate.insert(3, ",");
     stringDate.resize(stringDate.size() - 1);
