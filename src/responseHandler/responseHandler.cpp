@@ -124,8 +124,11 @@ std::string responseHandler::getResponse(std::string uri) {
     std::string requestedPath;
     if (uri.find(_location.get_root()) != std::string::npos)
         requestedPath = finalUri;
-    else
-        requestedPath = _location.get_root() + finalUri; // If the root is included in uri it fuck up and does pagespages/uri
+    else {
+        // TODO The adding of the slash may be hacky and not always work
+        requestedPath = _location.get_root() + "/" +
+                        finalUri; // If the root is included in uri it fuck up and does pagespages/uri
+    }
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
 
     /* Check for index -
@@ -148,10 +151,10 @@ std::string responseHandler::getResponse(std::string uri) {
                 return buildDirectoryListing(requestedPath);
             }
         }
-        else { // return 404
-            std::cout << "Not in here right?" << std::endl;
-            return respondError(404);
-        }
+//        else { // return 404
+//            std::cout << "Not in here right?" << std::endl;
+//            return respondError(404);
+//        }
     }
     std::string requestedFile;
     if (isDirectory(requestedPath))
@@ -161,7 +164,7 @@ std::string responseHandler::getResponse(std::string uri) {
     std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
     std::ifstream myFile;
     myFile.open(requestedFile);
-    if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
+    if (myFile.fail()) {
         return respondError(404);
     }
 
@@ -342,7 +345,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+            htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                         iter[2] + "\n";
         }
     }
@@ -354,7 +357,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+        htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                     iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";
