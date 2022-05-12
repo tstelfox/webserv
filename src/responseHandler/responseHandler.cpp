@@ -121,7 +121,11 @@ std::string responseHandler::getResponse(std::string uri) {
 
     /* Have to fuse root with unique uri and think of the "/" combos man holy frick */
     std::string finalUri = uri.substr(_location.get_location_path().length());
-    std::string requestedPath = _location.get_root() + finalUri; // If the root is included in uri it fuck up and does pagespages/uri
+    std::string requestedPath;
+    if (uri.find(_location.get_root()) != std::string::npos)
+        requestedPath = finalUri;
+    else
+        requestedPath = _location.get_root() + finalUri; // If the root is included in uri it fuck up and does pagespages/uri
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
 
     /* Check for index -
@@ -154,6 +158,7 @@ std::string responseHandler::getResponse(std::string uri) {
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) { // Check if it is a directory and then if autoindex is set on or off
+
         return respondError(404);
     }
 
@@ -316,15 +321,15 @@ std::string responseHandler::buildDateLine() {
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
                                                    std::set <std::vector<std::string> > &files, std::string directory, std::string uri) {
     // Creating the Html as I would like it
-//    (void)uri;
     std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile += "\t<title>Index of " + directory + "/</title>\n";
     htmlFile += "</head>\n<body>\n<h2>" + directory + "/</h2>\n<hr/>\n<pre>\n";
 
+    std::cout << RED <<"Building the directory listing from: " << directory << " and " << uri << RESET_COLOUR << std::endl;
+
     /* Don't look at this absolute horror, for god's sake */
-    std::string root = _location.get_root();
-    for (std::set < std::vector < std::string > > ::iterator it = directories.begin(); it != directories.end();
-    it++) {
+//    std::string root = _location.get_root();
+    for (std::set < std::vector < std::string > > ::iterator it = directories.begin(); it != directories.end(); it++) {
         std::vector <std::string> iter = *it;
         if (!iter[0].compare("../"))
             htmlFile += "<a href =\"" + iter[0] + "\">" + iter[0] + "</a>\n";
@@ -334,7 +339,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + root + "/" + uri + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+            htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                         iter[2] + "\n";
         }
     }
@@ -346,7 +351,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + root + "/" + uri + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+        htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                     iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";
