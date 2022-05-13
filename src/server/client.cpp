@@ -82,7 +82,7 @@ void client::parseRequestLine(std::string request) {
     /* 405 Method not allowed */
     if (!field.compare("POST")) {
         _method = POST;
-        std::cout << "Poche seghe, la richiesta POST: " << _buffer << std::endl;
+        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
     }
     else if (!field.compare("DELETE"))
         _method = DELETE;
