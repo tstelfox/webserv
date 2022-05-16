@@ -6,11 +6,12 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:40 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/09 12:56:30 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/13 17:58:17 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
+#include <iostream>
 
 WSERV::Location::Location(/* args */)
 {
@@ -56,7 +57,7 @@ bool 		WSERV::Location::get_autoindex( void ) const
 	return (this->_autoindex);
 }
 
-std::string WSERV::Location::get_allow_method( void ) const
+std::map<int, std::string> WSERV::Location::get_allow_method( void ) const
 {
 	return (this->_allow_method);
 }
@@ -112,9 +113,9 @@ void WSERV::Location::set_autoindex( bool const data)
 	this->_autoindex = data;
 }
 
-void WSERV::Location::set_allow_method( std::string const data)
+void WSERV::Location::set_allow_method( std::map<int, std::string> const  & data)
 {
-	this->_allow_method = data;
+	this->_allow_method = data;	
 }
 
 void WSERV::Location::set_index( std::string const data)
