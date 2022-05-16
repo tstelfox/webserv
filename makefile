@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/05/13 17:40:51 by akramp        ########   odam.nl          #
+#    Updated: 2022/05/16 17:06:46 by akramp        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/parsing \
 		-Isrc/exceptions -Isrc/responseHandler
 ifdef DEBUG
-  FLAGS += -g -fsanitize=address
+  FLAGS += -g 
 endif
 
 X           = \033[38;5;
@@ -40,7 +40,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@echo " ───── ❝ 𝗰𝗼𝗺𝗽𝗶𝗹𝗶𝗻𝗴 𝗪𝗲𝗯𝗦𝗲𝗿𝘃 ❞ ───── "
 	@echo "$(GREY)"
-	$(CXX) $^ $(FLAGS) -fsanitize=address $(INCLUDES) -o $(NAME)
+	$(CXX) $^ $(FLAGS)  $(INCLUDES) -o $(NAME)
 	@echo "$(COLOR_RESET)"
 	@echo " ─────────── ❝ 𝗱𝗼𝗻𝗲 ❞ ──────────── \n"
 

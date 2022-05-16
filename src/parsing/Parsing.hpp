@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:36:00 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/13 12:28:10 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/16 17:03:45 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ namespace WSERV
 			size_t 			_server_count;
 			bool			_in_sev_bloc;
 			bool 			_in_loc_bloc;
+			int				_loc_count;
 			std::vector<std::map<std::string, std::string> > _serv_map_vec;
 			std::vector<std::vector<std::map<std::string, std::string> > >_loc_map_vec;
 		public:
@@ -71,6 +72,7 @@ namespace WSERV
 			bool	closing_server_block_check(std::string &line);
 			void	check_if_var_in_class_is_empty();
 			std::vector<WSERV::serverConfig>	get_serverConfig(void) const;
+			std::vector<std::string> get_loc_path(void) const;
 	};
 }
 

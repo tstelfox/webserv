@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/04 17:57:29 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/16 14:27:57 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,13 +96,13 @@ int poller::newConnection(int fd) {
     configVector relevant;
     std::string hostIp = host;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
-        if (it->get_port()[0] == port && (it->get_host() == hostIp || \
+        if (it->get_port() == port && (it->get_host() == hostIp || \
             ((it->get_host()) == "localhost" && !hostIp.compare("127.0.0.1"))))
             relevant.push_back(*it);
     }
     std::cout << "Relevant vectors are:" << std::endl;
     for (configVector::iterator iter = relevant.begin(); iter != relevant.end(); iter++) {
-        std::cout << "Port: " << iter->get_port()[0] << " host: " << iter->get_host() << \
+        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
             " and server_name: " << iter->get_server_name() << std::endl;
     }
 
@@ -123,7 +123,7 @@ std::set<int> poller::openPorts() {
     std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
-        ports.insert(std::make_pair(it->get_host(), it->get_port()[0]));
+        ports.insert(std::make_pair(it->get_host(), it->get_port()));
         /*It's still here that I should be managing to keep track of the configs as well or is it???*/
     }
     for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++) {

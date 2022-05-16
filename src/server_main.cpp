@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/13 18:06:43 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/16 17:16:23 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,7 @@
 void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         for (size_t i = 0; i < S.size(); i++) {
         std::cout << RED << "< ---------  Server Block --------- >" << RESET_COLOUR << std::endl;
-        for(size_t vi = 0; vi < S[i].get_port().size(); vi++)
-        {
-            std::cout << "port= " << S[i].get_port()[vi] << std::endl;
-        }
+        std::cout << "port= " << S[i].get_port() << std::endl;
         std::cout << "host= " << S[i].get_host() << std::endl;
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
         std::cout << "maxfilesize= " << S[i].get_maxfilesize() << std::endl;
@@ -45,7 +42,7 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             for (it = temp.begin();
                 it != temp.end(); ++it)
             {
-                std::cout << " " << it->second << " " << "\n";
+                std::cout << it->first << " " << it->second << " " << "\n";
             }
             std::cout << "index= " << S[i].get_Location_vec()[x].get_index() << std::endl;
             std::cout << "error_page= " << S[i].get_Location_vec()[x].get_error_page() << std::endl;
@@ -54,6 +51,8 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             std::cout << "default_cgi_path= " << S[i].get_Location_vec()[x].get_default_cgi_path() << std::endl;
             std::cout << "php_cgi= " << S[i].get_Location_vec()[x].get_php_cgi() << std::endl;
             std::cout << "auth_basic= " << S[i].get_Location_vec()[x].get_auth_basic() << std::endl;
+            std::pair <std::string, std::string> temp_pair = S[i].get_Location_vec()[x].get_redirect();
+            std::cout << "redirect= " << temp_pair.first << " " << temp_pair.second << std::endl;
             std::cout << std::endl;
         }
         std::cout << std::endl;
@@ -68,7 +67,6 @@ int main(int argc, char *argv[]) {
     try {
         WSERV::Parser p(argc, argv);
         S = p.get_serverConfig();
-
     }
     catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
