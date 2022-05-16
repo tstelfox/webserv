@@ -126,10 +126,13 @@ std::string responseHandler::getResponse(std::string uri) {
     /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
 
     std::string tempRed = "/takemehome";
+//    if (_location.get_redirection().empty()) {}
     if (!uri.compare(tempRed)) {
         std::cout << "Redirection stuff for " << uri << std::endl;
         return redirectionResponse();
     }
+
+
 
     std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
               << std::endl;
