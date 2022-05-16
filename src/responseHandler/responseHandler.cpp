@@ -42,12 +42,22 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     /* TODO Check that method is allowed in this location - get input in a map or something */
     /* if (_method is not in location list of methods)
         set method to 0 and triggers a 405 */
+    std::map<int, std::string> allowedMethod = _location.get_allow_method();
+    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
+//        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
+//    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
+//    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
+    if (allowedMethod.count(method - 1) == 0) {
+        std::cout << "Nah then" << std::endl;
+        method = 0;
+    }
 
 
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
         case 0:
+            std::cout << "Should enter here" << std::endl;
             return respondError(405);
         case 1:
             return getResponse(uri);
