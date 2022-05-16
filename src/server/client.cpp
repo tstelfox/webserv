@@ -154,10 +154,10 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-//    std::cout << std::endl;
+    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+    std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
     routeConfig(fields);
 }
