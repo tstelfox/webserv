@@ -53,7 +53,7 @@ int poller::newConnection(int fd) {
     struct sockaddr_in addr;
     bzero(&addr, sizeof(struct sockaddr_in));
     std::cout << RED << "fd: " << fd << RESET_COLOUR << std::endl;
-    int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);  // TODO Something here is causing an abort with fsanitize
+    int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);
 
     if (newConnection < 0) {
         if (errno != EWOULDBLOCK) {
@@ -176,6 +176,7 @@ void poller::pollConnections() {
                 if (valRead) {
 //                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
+
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
@@ -187,12 +188,15 @@ void poller::pollConnections() {
                     break;
                 }
             } else if (it->revents & POLLOUT) {
+//                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) { // Still unsure about the body
+//                    std::cout << "When in here?" << std::endl;
                     currentClient.parseRequestHeader();
                     if (respondToClient(it->fd, currentClient.getResponse()) < 0) { // TODO check also for 0
                         perror("send() failed");
                         break;
                     }
+                    currentClient.resetClient();
 //                    return ; // Just for now
                     /* Do the parsing here (Check if there is a body)
                      * When parsing is done, respond.

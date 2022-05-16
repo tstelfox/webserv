@@ -45,16 +45,20 @@ private:
     /* POST request */
     std::string postResponse(std::string uri);
 
+    /* Redirection Response */
+    std::string redirectionResponse();
+
     /* Response header building utils */
     std::string buildHttpLine(int status);
 
     std::string buildDateLine();
 
     /* Create html for Directory listing */
-    std::string buildDirectoryListing(std::string &directory, std::string &uri);
+    std::string buildDirectoryListing(std::string &directory);
 
     std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                      std::set <std::vector<std::string> > &files, std::string directory, std::string uri);
+                                      std::set <std::vector<std::string> > &files, std::string directory);
+
 
     /* General utils */
     bool    isDirectory(std::string path);

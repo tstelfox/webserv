@@ -47,6 +47,7 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
     _buffer[temp] = '\0';
     if (fullHeaderReceived())
         _isBuffFull = true; // Check if there's a body or nah
+//    std::cout << YELLOW << "Buffsizeeee" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived() {
@@ -62,12 +63,14 @@ int client::fullHeaderReceived() {
     return 0;
 }
 
-//void client::resetClient() { // TODO
-//    /* Is it necessary to wipe it this way
-//     * or can I just delete the client entirely?
-//     * Perhaps this is in order to receive the favicon too
-//     */
-//}
+void client::resetClient() {
+
+
+//    _response.clear();
+    bzero(&_buffer, sizeof(_buffer));
+    _isBuffFull = false;
+    _buffSize = 0;
+}
 
 /* < --------- Request Parsing and Config Routing ------ > */
 
@@ -79,7 +82,7 @@ void client::parseRequestLine(std::string request) {
     /* 405 Method not allowed */
     if (!field.compare("POST")) {
         _method = POST;
-        std::cout << "Poche seghe, la richiesta POST: " << _buffer << std::endl;
+        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
     }
     else if (!field.compare("DELETE"))
         _method = DELETE;
@@ -151,10 +154,10 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-    std::cout << std::endl;
+//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+//    std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
     routeConfig(fields);
 }
@@ -180,9 +183,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     responseHandler response(_requestLine, rightConfig, fields);
     _response = response.parseAndRespond(_status, _method, _uri);
 
-    // Here I should reset
-    _isBuffFull = false; // TODO time to expand this reset
-
+//    resetClient();
 }
 
 char *client::getBuffer() {
