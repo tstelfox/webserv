@@ -25,7 +25,7 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/parsing \
 		-Isrc/exceptions -Isrc/responseHandler
 ifdef DEBUG
-  FLAGS += -g -j4
+  FLAGS += -g
 endif
 
 X           = \033[38;5;

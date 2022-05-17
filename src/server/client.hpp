@@ -39,7 +39,7 @@ public:
     void routeConfig(std::map<std::string, std::string> &fields);
 
     /* Getters */
-    char *getBuffer();
+    std::string getBuffer() const;
     std::string getResponse() const;
 
     /* Reset client */
@@ -58,7 +58,8 @@ private:
     configVector _configs;
 
     /* Buffer variables */
-    char _buffer[1024]; // How am I gonna do that
+//    char _buffer[1024]; // How am I gonna do that
+    std::string _buffer;
 
     int _buffSize;
     bool _isBuffFull;

@@ -19,7 +19,7 @@
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
-    memset(_buffer, 0, 1024);
+//    memset(_buffer, 0, 1024);
     _buffSize = 0;
     _isBuffFull = false;
     _status = 200;
@@ -38,13 +38,17 @@ client::~client() {}
 
 /* Questions still hang over this implementation when there is a body */
 void client::fillBuffer(const char *buff, ssize_t valRead) {
-    int temp = _buffSize;
-    _buffSize += valRead;
-    for (int i = 0; i < valRead; i++) {
-        _buffer[temp] = buff[i];
-        temp++;
-    }
-    _buffer[temp] = '\0';
+    // Ok there has to be a c++ way of doing this
+    (void)valRead;
+    std::string buffRead(buff);
+    _buffer.append(buffRead);
+//    int temp = _buffSize;
+//    _buffSize += valRead;
+//    for (int i = 0; i < valRead; i++) {
+//        _buffer[temp] = buff[i];
+//        temp++;
+//    }
+//    _buffer[temp] = '\0';
     if (fullHeaderReceived())
         _isBuffFull = true; // Check if there's a body or nah
     std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
@@ -67,7 +71,8 @@ void client::resetClient() {
 
 
 //    _response.clear();
-    bzero(&_buffer, sizeof(_buffer));
+//    bzero(&_buffer, sizeof(_buffer));
+    _buffer.clear();
     _isBuffFull = false;
     _buffSize = 0;
 }
@@ -82,7 +87,7 @@ void client::parseRequestLine(std::string request) {
     /* 405 Method not allowed */
     if (!field.compare("POST")) {
         _method = POST;
-        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
+//        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
     }
     else if (!field.compare("DELETE"))
         _method = DELETE;
@@ -193,7 +198,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 //    resetClient();
 }
 
-char *client::getBuffer() {
+std::string client::getBuffer() const {
     return _buffer;
 }
 
