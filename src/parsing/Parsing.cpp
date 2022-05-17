@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:51:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/13 12:32:47 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:42:12 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,14 @@ void set_max_file_size_func(WSERV::Location  &L_temp, std::string data);
 void set_auth_basic_func(WSERV::Location  &L_temp, std::string data);
 void set_loc_path(WSERV::Location  &L_temp, std::string data);
 
+// void set_redirection(WSERV::Location  &L_temp, std::string data, std::vector<std::string> loc_path, int loc_count);
+
+
+std::vector<std::string> WSERV::Parser::get_loc_path(void) const
+{
+    return (this->_loc_path);
+}
+
 std::vector<WSERV::serverConfig>	WSERV::Parser::get_serverConfig(void) const
 {
     return (this->_vec_servers);
@@ -101,7 +109,7 @@ void    WSERV::Parser::read_file_to_vect()
     std::vector<std::map<std::string, std::string> > temp;
     size_t start = 0;
     std::istringstream iss(_configfile);
-
+    
     _separator = "🔥";
     _prev_loc_count = 1;
     _server_count = 0;
@@ -173,7 +181,7 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
     std::string cmp_serv[] = {"port", "host", "server_name", "error_page", \
         "cgi_file_types", "time_out", "max_file_size", "location"};
     std::string cmp_loc[] = {"root", "allowed_method", "index", "autoindex", \
-        "max_file_size", "auth_basic"}; //location path
+        "max_file_size", "auth_basic", "return"}; //location path
     void (*set_funcs_serv[])(WSERV::serverConfig&, std::string) = {&set_port_func, \
         &set_host_func, &set_server_name_func, &set_error_page_func,\
         &set_cgi_file_types_func, &set_time_out_func, &set_maxfilesize_func};
@@ -207,11 +215,15 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
             L_temp = new Location;
             for (std::map<std::string,std::string>::iterator it=_loc_map_vec[servs][locs].begin(); it!=_loc_map_vec[servs][locs].end(); ++it)
             {
+                _loc_count = locs;
                 for (int var_name = 0; (unsigned int) var_name < (sizeof(cmp_loc)/sizeof(cmp_loc[0])); var_name++)
                 {
                     if (cmp_loc[var_name].compare(0, cmp_loc[var_name].length(), it->first) == 0)
                     {
-                        set_funcs_loc[var_name](*L_temp, it->second);
+                        if (cmp_loc[var_name] == "return")
+                            set_redirection(*L_temp, it->second, _loc_path[_loc_count]);
+                        else
+                            set_funcs_loc[var_name](*L_temp, it->second);
                     }
                 }
                 // count++;
@@ -237,12 +249,10 @@ void WSERV::Parser::check_if_var_in_class_is_empty()
 {
     for (unsigned int i = 0; i < _vec_servers.size(); i++)
     {
-        if (_vec_servers[i].get_port().empty() == true)
+        if (_vec_servers[i].get_port() == 0)
             throw IncorrectConfigExcep();
         if (_vec_servers[i].get_host().empty() == true)
             throw IncorrectConfigExcep();
-        // if (_vec_servers[i].get_server_name().empty() == true)
-        //     throw IncorrectConfigExcep();
         if (_vec_servers[i].get_maxfilesize() == 0)
             throw IncorrectConfigExcep();
         if (_vec_servers[i].get_error_page().empty() == true)

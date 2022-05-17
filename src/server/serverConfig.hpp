@@ -6,7 +6,7 @@
 /*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 19:42:04 by turloughmul   #+#    #+#                 */
-/*   Updated: 2022/05/09 14:39:09 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/16 14:21:06 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 namespace WSERV {
     class serverConfig {
     private:
-        std::vector<int> _port; // std::set<int>        _port; In the future
+        int _port; // std::set<int>        _port; In the future
         std::string _host;
         std::string _server_name;
         unsigned int _maxfilesize;
@@ -44,7 +44,7 @@ namespace WSERV {
 
         friend class Parser;
 
-        std::vector<int> get_port() const;
+        int get_port() const;
 
         std::string get_host() const;
 
@@ -60,7 +60,7 @@ namespace WSERV {
 
         std::vector<WSERV::Location> get_Location_vec() const;
 
-        void set_port(std::vector<int> const data);
+        void set_port(int const data);
 
         void set_host(std::string const &data);
 

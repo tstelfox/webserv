@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:37 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/13 17:31:22 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/16 17:14:29 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LOCATION_HPP
 # include <string>
 # include <map>
+# include <utility>
 
 namespace WSERV
 {
@@ -31,6 +32,7 @@ namespace WSERV
 			std::string _default_cgi_path;//
 			std::string _php_cgi;//
 			bool		 _auth_basic;
+			std::pair<std::string, std::string>	_redirect;
         public:
             Location(/* args */);
             ~Location();
@@ -49,6 +51,7 @@ namespace WSERV
 			std::string get_default_cgi_path( void ) const;
 			std::string get_php_cgi( void ) const;
 			bool get_auth_basic( void ) const;
+			std::pair<std::string, std::string> get_redirect( void ) const;
 
 			void set_root( std::string const data);
 			void set_location_path( std::string const data);
@@ -61,6 +64,7 @@ namespace WSERV
 			void set_default_cgi_path( std::string const data);
 			void set_php_cgi( std::string const data);
 			void set_auth_basic(bool const data);
+			void set_redirect(std::pair<std::string, std::string> const &data );
 	};
 }
 
