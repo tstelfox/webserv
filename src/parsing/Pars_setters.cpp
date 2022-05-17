@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/16 17:13:54 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:53:11 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,15 +160,12 @@ void set_auth_basic_func(WSERV::Location  &L_temp, std::string data)
     L_temp.set_auth_basic( convert );
 }
 
-void set_redirection(WSERV::Location  &L_temp, std::string data)
+void WSERV::Parser::set_redirection(WSERV::Location  &L_temp, std::string data, std::string loc_path)
 {
     std::pair<std::string, std::string> temp;
     size_t find_space = data.find(" ");
-    std::string temp_s = "lol";
+    std::string temp_s = loc_path;
 
-    std::cout << data.substr(find_space+1, data.length() - find_space+1) << std::endl;
-    std::cout << "------> "<< temp_s << std::endl;
     temp = std::make_pair(temp_s, data.substr(find_space+1, data.length() - find_space+1));
     L_temp.set_redirect(temp);
-    std::cout << "redirect= " << L_temp.get_redirect().first << " " << L_temp.get_redirect().second << std::endl;
 }

@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:36:00 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/16 17:03:45 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:40:36 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ namespace WSERV
 			void	check_if_var_in_class_is_empty();
 			std::vector<WSERV::serverConfig>	get_serverConfig(void) const;
 			std::vector<std::string> get_loc_path(void) const;
+			void set_redirection(WSERV::Location  &L_temp, std::string data, std::string loc_path);
 	};
 }
 

@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/07 17:51:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/16 17:12:48 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:42:12 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ void set_index_func(WSERV::Location  &L_temp, std::string data);
 void set_max_file_size_func(WSERV::Location  &L_temp, std::string data);
 void set_auth_basic_func(WSERV::Location  &L_temp, std::string data);
 void set_loc_path(WSERV::Location  &L_temp, std::string data);
-void set_redirection(WSERV::Location  &L_temp, std::string data);
+
+// void set_redirection(WSERV::Location  &L_temp, std::string data, std::vector<std::string> loc_path, int loc_count);
 
 
 std::vector<std::string> WSERV::Parser::get_loc_path(void) const
@@ -186,7 +187,7 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
         &set_cgi_file_types_func, &set_time_out_func, &set_maxfilesize_func};
     void (*set_funcs_loc[])(WSERV::Location&, std::string) = {&set_root_func, \
         &set_allow_method_func, &set_index_func, &set_autoindex_func, \
-        &set_max_file_size_func, &set_auth_basic_func, &set_redirection};
+        &set_max_file_size_func, &set_auth_basic_func};
 
     for (unsigned long servs = 0; servs < _serv_map_vec.size(); servs++)
     {
@@ -219,7 +220,10 @@ void    WSERV::Parser::add_vector_vars_to_server_class()
                 {
                     if (cmp_loc[var_name].compare(0, cmp_loc[var_name].length(), it->first) == 0)
                     {
-                        set_funcs_loc[var_name](*L_temp, it->second);
+                        if (cmp_loc[var_name] == "return")
+                            set_redirection(*L_temp, it->second, _loc_path[_loc_count]);
+                        else
+                            set_funcs_loc[var_name](*L_temp, it->second);
                     }
                 }
                 // count++;

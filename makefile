@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/05/16 17:06:46 by akramp        ########   odam.nl          #
+#    Updated: 2022/05/17 12:00:10 by akramp        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/parsing \
 		-Isrc/exceptions -Isrc/responseHandler
 ifdef DEBUG
-  FLAGS += -g 
+  FLAGS += -g -j4
 endif
 
 X           = \033[38;5;

@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/16 17:16:23 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:47:10 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,24 +34,26 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         std::cout << std::endl;
         for (size_t x = 0; x < S[i].get_Location_vec().size(); x++) {
             std::cout << GREEN << "< ----- Location [" << x << "] -------->" << RESET_COLOUR << std::endl;
-            std::cout << "root= " << S[i].get_Location_vec()[x].get_root() << std::endl;
-            std::cout << "location_path= " << S[i].get_Location_vec()[x].get_location_path() << std::endl;
-            std::cout << "autoindex= " << S[i].get_Location_vec()[x].get_autoindex() << std::endl;
-            std::map<int, std::string>::const_iterator it = S[i].get_Location_vec()[x].get_allow_method().begin();
-            std::map<int, std::string> temp = S[i].get_Location_vec()[x].get_allow_method();
+            WSERV::Location  L_temp = S[i].get_Location_vec()[x];
+            std::cout << "root= " << L_temp.get_root() << std::endl;
+            std::cout << "location_path= " << L_temp.get_location_path() << std::endl;
+            std::cout << "autoindex= " << L_temp.get_autoindex() << std::endl;
+            std::map<int, std::string>::const_iterator it = L_temp.get_allow_method().begin();
+            std::map<int, std::string> temp = L_temp.get_allow_method();
             for (it = temp.begin();
                 it != temp.end(); ++it)
             {
                 std::cout << it->first << " " << it->second << " " << "\n";
             }
-            std::cout << "index= " << S[i].get_Location_vec()[x].get_index() << std::endl;
-            std::cout << "error_page= " << S[i].get_Location_vec()[x].get_error_page() << std::endl;
-            std::cout << "max_file_size= " << S[i].get_Location_vec()[x].get_max_file_size() << std::endl;
-            std::cout << "cgi_allowed_extensions= " << S[i].get_Location_vec()[x].get_cgi_allowed_extensions() << std::endl;
-            std::cout << "default_cgi_path= " << S[i].get_Location_vec()[x].get_default_cgi_path() << std::endl;
-            std::cout << "php_cgi= " << S[i].get_Location_vec()[x].get_php_cgi() << std::endl;
-            std::cout << "auth_basic= " << S[i].get_Location_vec()[x].get_auth_basic() << std::endl;
-            std::pair <std::string, std::string> temp_pair = S[i].get_Location_vec()[x].get_redirect();
+            std::cout << "index= " << L_temp.get_index() << std::endl;
+            std::cout << "error_page= " << L_temp.get_error_page() << std::endl;
+            std::cout << "max_file_size= " << L_temp.get_max_file_size() << std::endl;
+            std::cout << "cgi_allowed_extensions= " << L_temp.get_cgi_allowed_extensions() << std::endl;
+            std::cout << "default_cgi_path= " << L_temp.get_default_cgi_path() << std::endl;
+            std::cout << "php_cgi= " << L_temp.get_php_cgi() << std::endl;
+            std::cout << "auth_basic= " << L_temp.get_auth_basic() << std::endl;
+
+            std::pair <std::string, std::string> temp_pair = L_temp.get_redirect();
             std::cout << "redirect= " << temp_pair.first << " " << temp_pair.second << std::endl;
             std::cout << std::endl;
         }
