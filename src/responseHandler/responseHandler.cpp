@@ -172,7 +172,7 @@ std::string responseHandler::getResponse(std::string uri) {
         return respondError(404);
     }
 
-    
+
 
 
     std::ostringstream fileContent;
