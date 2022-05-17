@@ -6,12 +6,13 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/09 15:03:00 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/13 18:06:16 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parsing.hpp"
 #include "exceptions.hpp"
+#include <map>
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
@@ -61,6 +62,8 @@ void set_time_out_func(WSERV::serverConfig  &S_temp, std::string data)
 
 void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
 {
+    if (data.find(" ") != std::string::npos)
+        throw IncorrectConfigExcep();
     S_temp.set_error_page( data );
 }
 
@@ -94,7 +97,25 @@ void set_autoindex_func(WSERV::Location  &L_temp, std::string data)
 
 void set_allow_method_func(WSERV::Location  &L_temp, std::string data)
 {
-    L_temp.set_allow_method( data );
+    std::map<int, std::string> temp;
+    size_t pos = 0;
+    size_t count = 1;
+    size_t i = 0;
+
+    pos = data.find(" ");
+    while (i < data.length())
+    {
+        temp.insert(std::make_pair(count, data.substr(i, pos-i)));
+        if (pos == std::string::npos)
+            break ;
+        i = pos;
+        pos = data.find(" ", i+1);
+        if (pos > data.length())
+            pos = data.length();
+        i++;
+        count++;
+    }
+    L_temp.set_allow_method( temp );
 }
 
 void set_index_func(WSERV::Location  &L_temp, std::string data)

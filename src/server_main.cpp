@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/09 14:39:56 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/13 18:06:43 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,17 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             std::cout << "root= " << S[i].get_Location_vec()[x].get_root() << std::endl;
             std::cout << "location_path= " << S[i].get_Location_vec()[x].get_location_path() << std::endl;
             std::cout << "autoindex= " << S[i].get_Location_vec()[x].get_autoindex() << std::endl;
-            std::cout << "allow_method= " << S[i].get_Location_vec()[x].get_allow_method() << std::endl;
+            std::map<int, std::string>::const_iterator it = S[i].get_Location_vec()[x].get_allow_method().begin();
+            std::map<int, std::string> temp = S[i].get_Location_vec()[x].get_allow_method();
+            for (it = temp.begin();
+                it != temp.end(); ++it)
+            {
+                std::cout << " " << it->second << " " << "\n";
+            }
             std::cout << "index= " << S[i].get_Location_vec()[x].get_index() << std::endl;
             std::cout << "error_page= " << S[i].get_Location_vec()[x].get_error_page() << std::endl;
             std::cout << "max_file_size= " << S[i].get_Location_vec()[x].get_max_file_size() << std::endl;
-            std::cout << "cgi_allowed_extensions= " << S[i].get_Location_vec()[x].get_cgi_allowed_extensions()
-                      << std::endl;
+            std::cout << "cgi_allowed_extensions= " << S[i].get_Location_vec()[x].get_cgi_allowed_extensions() << std::endl;
             std::cout << "default_cgi_path= " << S[i].get_Location_vec()[x].get_default_cgi_path() << std::endl;
             std::cout << "php_cgi= " << S[i].get_Location_vec()[x].get_php_cgi() << std::endl;
             std::cout << "auth_basic= " << S[i].get_Location_vec()[x].get_auth_basic() << std::endl;
