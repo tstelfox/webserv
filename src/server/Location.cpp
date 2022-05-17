@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:40 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/13 17:58:17 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:51:21 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ WSERV::Location & WSERV::Location::operator = (Location const & copy)
 	this->_default_cgi_path = 			copy._default_cgi_path;
 	this->_php_cgi = 					copy._php_cgi;
 	this->_auth_basic = 			copy._auth_basic;
+	this->_redirect =		copy._redirect;
 	return *this;
 }
 
@@ -97,6 +98,16 @@ bool WSERV::Location::get_auth_basic( void ) const
 	return (this->_auth_basic);
 }
 
+std::pair<std::string, std::string> WSERV::Location::get_redirect( void ) const
+{
+	return (this->_redirect);
+}
+
+
+void WSERV::Location::set_redirect(std::pair<std::string, std::string> const &data )
+{
+	this->_redirect = data;
+}
 
 void WSERV::Location::set_root( std::string const data)
 {

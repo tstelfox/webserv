@@ -6,7 +6,7 @@
 /*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 19:37:04 by turloughmul   #+#    #+#                 */
-/*   Updated: 2022/05/09 14:39:01 by ubuntu        ########   odam.nl         */
+/*   Updated: 2022/05/16 14:28:25 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ WSERV::serverConfig &WSERV::serverConfig::operator=(serverConfig const &copy) {
 
 /* Getters & Setters*/
 
-std::vector<int> WSERV::serverConfig::get_port() const {
+int WSERV::serverConfig::get_port() const {
     return (this->_port);
 }
 
-void WSERV::serverConfig::set_port(std::vector<int> const data) {
+void WSERV::serverConfig::set_port(int const data) {
     this->_port = data;
 }
 

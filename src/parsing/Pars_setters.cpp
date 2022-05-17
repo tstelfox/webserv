@@ -6,28 +6,34 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/13 18:06:16 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/17 11:53:11 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Parsing.hpp"
 #include "exceptions.hpp"
 #include <map>
+#include <utility>
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
-    int start = 0;
-    std::string delimiter = " ";
-    int end = data.find(delimiter);
-    std::vector<int> ports;
-    while (end != -1)
+    // int start = 0;
+    // std::string delimiter = " ";
+    // int end = data.find(delimiter);
+    // std::vector<int> ports;
+    // while (end != -1)
+    // {
+    //     ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
+    //     start = end + delimiter.size();
+    //     end = data.find(delimiter, start);
+    // }
+    // ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
+    if (data.find(" ") != std::string::npos)
     {
-        ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
-        start = end + delimiter.size();
-        end = data.find(delimiter, start);
+        std::cerr << COLOR_RED << "ONLY ONE PORTS PLS ..." << std::endl;
+        throw IncorrectConfigExcep();
     }
-    ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
-    S_temp.set_port(ports);
+    S_temp.set_port(std::atoi(data.c_str()));
 }
 
 void set_host_func(WSERV::serverConfig  &S_temp, std::string data)
@@ -101,11 +107,24 @@ void set_allow_method_func(WSERV::Location  &L_temp, std::string data)
     size_t pos = 0;
     size_t count = 1;
     size_t i = 0;
+    std::string temp_s;
 
     pos = data.find(" ");
     while (i < data.length())
     {
-        temp.insert(std::make_pair(count, data.substr(i, pos-i)));
+        temp_s = data.substr(i, pos-i);
+        if (temp_s == "GET")
+            count = 1;
+        else if (temp_s == "POST")
+            count = 2;
+        else if (temp_s == "DELETE")
+            count = 3;
+        else
+        {
+            std::cerr << COLOR_RED << "\n!!! ONLY \"GET\" \"POST\" \"DELETE\" ARE ALLOWED METHODS !!!" << std::endl;
+            throw IncorrectConfigExcep();
+        }    
+        temp.insert(std::make_pair(count, temp_s));
         if (pos == std::string::npos)
             break ;
         i = pos;
@@ -113,7 +132,6 @@ void set_allow_method_func(WSERV::Location  &L_temp, std::string data)
         if (pos > data.length())
             pos = data.length();
         i++;
-        count++;
     }
     L_temp.set_allow_method( temp );
 }
@@ -140,4 +158,14 @@ void set_auth_basic_func(WSERV::Location  &L_temp, std::string data)
     else
         throw IncorrectConfigExcep();
     L_temp.set_auth_basic( convert );
+}
+
+void WSERV::Parser::set_redirection(WSERV::Location  &L_temp, std::string data, std::string loc_path)
+{
+    std::pair<std::string, std::string> temp;
+    size_t find_space = data.find(" ");
+    std::string temp_s = loc_path;
+
+    temp = std::make_pair(temp_s, data.substr(find_space+1, data.length() - find_space+1));
+    L_temp.set_redirect(temp);
 }
