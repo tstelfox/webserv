@@ -45,10 +45,6 @@ public:
     /* Reset client */
     void resetClient();
 
-//    void resetClient();
-
-
-
 
 public:
     enum methodTypes {
@@ -58,37 +54,30 @@ public:
 private:
     client();
 
-    /* Initially wanted to put configs in a map but nah
-     * Actually a map would be a bad idea cause I have to use the
-     * first in the case there is no server_name match*/
-
     /* Variables needed for config routing */
     configVector _configs;
 
     /* Buffer variables */
-    char _buffer[1024]; // Maybe max client size can be enforced here?
+    char _buffer[1024]; // How am I gonna do that
 
     int _buffSize;
     bool _isBuffFull;
-    /* Perhaps client should contain a requestHandler */
 
-
-    /* Following things may be needed but am not 100% sure */
+    /* Host:port and Socket */
     std::string _hostIp;
     int _port;
     int _socket;
 
-
-//    /* Request line info */
+    /* Request line info */
     int _method;
     std::string _uri;
     std::string _http;
-//
-//    /* Request Header Fields */
+
+    /* Request Header Fields */
     std::string _requestedHost;
 //    bool _keepAlive;
 //
-//    /* Request Line and Status Info */
+    /* Request Line and Status Info */
     std::string _requestLine;
     int _status;
 //    std::string _name;

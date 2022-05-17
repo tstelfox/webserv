@@ -47,7 +47,7 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
     _buffer[temp] = '\0';
     if (fullHeaderReceived())
         _isBuffFull = true; // Check if there's a body or nah
-//    std::cout << YELLOW << "Buffsizeeee" << _buffer << RESET_COLOUR << std::endl;
+    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived() {
