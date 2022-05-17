@@ -58,8 +58,17 @@ int client::fullHeaderReceived() {
     std::string request(_buffer);
     std::istringstream ss(request);
     std::string line;
+
+//    std::stringstream stream;
     while (std::getline(ss, line)) {
+        std::stringstream stream(line);
+        std::string headerElement;
+        stream >> headerElement;
+        if (!headerElement.compare("Content-Length:"))
+            std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
+
         if (!line.compare("\r")) {
+            std::cout << MAGENTA << "FULL HEADER SET" << RESET_COLOUR << std::endl;
             // _isBuffFull = true   ; Request might have a body so not ready for this
             return 1;
         }
@@ -75,6 +84,7 @@ void client::resetClient() {
     _buffer.clear();
     _isBuffFull = false;
     _buffSize = 0;
+    _status = 200;
 }
 
 /* < --------- Request Parsing and Config Routing ------ > */

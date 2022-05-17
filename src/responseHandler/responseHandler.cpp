@@ -334,6 +334,7 @@ std::string responseHandler::buildHttpLine(int status) {
     statusCodes[403] = "Forbidden";
     statusCodes[404] = "Not Found";
     statusCodes[405] = "Method Not Allowed";
+    statusCodes[413] = "Request Entity Too Large";
     statusCodes[505] = "HTTP Version Not Supported";
 
     std::string response = "HTTP/1.1 ";
