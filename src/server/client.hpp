@@ -58,10 +58,8 @@ private:
     configVector _configs;
 
     /* Buffer variables */
-//    char _buffer[1024]; // How am I gonna do that
     std::string _buffer;
 
-    int _buffSize;
     bool _isBuffFull;
 
     /* Host:port and Socket */
