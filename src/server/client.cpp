@@ -154,10 +154,10 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-//    std::cout << std::endl;
+    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+    std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
     routeConfig(fields);
 }
@@ -169,13 +169,20 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     }
     // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
     WSERV::serverConfig  rightConfig;
+    WSERV::serverConfig  *namelessConfig = nullptr;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
         if (!_requestedHost.compare(iter->get_server_name())) {
             rightConfig = *iter;
             break;
         }
-        if ((iter + 1) == _configs.end())
-            rightConfig = *_configs.begin();
+        if (iter->get_server_name().empty())
+            namelessConfig = &(*iter);
+        if ((iter + 1) == _configs.end()) {
+            if (namelessConfig == nullptr)
+                rightConfig = *_configs.begin();
+            else
+                rightConfig = *namelessConfig;
+        }
     }
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 

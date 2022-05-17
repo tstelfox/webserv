@@ -176,7 +176,7 @@ void poller::pollConnections() {
                 if (valRead) {
 //                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
-
+//                    std::cout << CYAN << "The full buffer: " << buffer << RESET_COLOUR << std::endl;
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {

@@ -39,15 +39,25 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (locationStatus)
         return respondError(locationStatus);
 
-    /* TODO Check that method is allowed in this location - get input in a map or something */
+    /* TODO get Ange to put these in the same format as the enum i.e. allowedMethod[1] = GET | [2] = POST | [3] = DELETE */
     /* if (_method is not in location list of methods)
         set method to 0 and triggers a 405 */
+    std::map<int, std::string> allowedMethod = _location.get_allow_method();
+    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
+//        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
+//    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
+//    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
+    if (allowedMethod.count(method) == 0) {
+        std::cout << "Nah then" << std::endl;
+        method = 0;
+    }
 
 
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
         case 0:
+            std::cout << "Should enter here" << std::endl;
             return respondError(405);
         case 1:
             return getResponse(uri);
@@ -116,10 +126,13 @@ std::string responseHandler::getResponse(std::string uri) {
     /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
 
     std::string tempRed = "/takemehome";
+//    if (_location.get_redirection().empty()) {}
     if (!uri.compare(tempRed)) {
         std::cout << "Redirection stuff for " << uri << std::endl;
         return redirectionResponse();
     }
+
+
 
     std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
               << std::endl;
