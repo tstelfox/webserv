@@ -42,18 +42,21 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
 
     std::string buffRead(buff);
     _buffer.append(buffRead);
-    if (fullHeaderReceived()) {
+    if (fullHeaderReceived(buff)) {
         std::cout << CYAN << "Even with the body received" << RESET_COLOUR << std::endl;
         _isBuffFull = true; // Check if there's a body or nah
     }
     std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
-int client::fullHeaderReceived() {
-    std::string request(_buffer);
+int client::fullHeaderReceived(const char *buff) {
+//    std::string request(_buffer);
+    std::string request(buff);
     std::istringstream ss(request);
     std::string line;
-//    bool bodyPresent = false;
+//    std::istringstream::pos_type bodyPoint = ss.tellg();
+
+    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
     if (!_bodyPresent) {
         while (std::getline(ss, line)) {
@@ -69,25 +72,37 @@ int client::fullHeaderReceived() {
 
             if (!line.compare("\r")) {
                 // _isBuffFull = true   ; Request might have a body so not ready for this
-                if (_bodyPresent)
+                if (_bodyPresent) {
                     break;
+                }
                 std::cout << MAGENTA << "FULL HEADER SET" << RESET_COLOUR << std::endl;
                 return 1;
             }
         }
     }
     while (std::getline(ss, line)) {
-        std::cout << RED << "Line: " << line << RESET_COLOUR << std::endl;
+//        while(ss) {
+//        std::getline(temp, templine);
+//        std::cout << RED << "Line: " << line << RESET_COLOUR << std::endl;
+//        std::string temp;
+//        ss >> temp;
+//        _body.append(temp);
         _body.append(line + "\n");
+        if (ss.tellg() == -1)
+            _body.resize(_body.size() - 1);
         std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
-        if (_body.size() == (_bodySize + 1)) {
+        if (_body.size() == _bodySize) {
             std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
             return 1;
         }
-        std::cout << CYAN << "Bugs happening but the body: " << _body << RESET_COLOUR << std::endl;
-//        if (!line.compare("\n\n")) {
-//        }
     }
+//    bodyPoint = ss.tellg();
+//    ss.clear();
+//    ss.seekg(bodyPoint);
+//    std::string diocane = ss.rdbuf();
+//    std::cout << ss.str() << std::endl;
+//    _body.append(ss.str());
+    std::cout << CYAN << "Bugs happening but the body: " << _body << RESET_COLOUR << std::endl;
 
     return 0;
 }

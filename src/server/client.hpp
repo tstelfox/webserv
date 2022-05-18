@@ -28,7 +28,7 @@ public:
 
     /* Storing incoming client request */
     void fillBuffer(const char *buff, ssize_t valRead);
-    int fullHeaderReceived();
+    int fullHeaderReceived(const char *buff);
     bool isBufferFull() const;
 
     /* Parsing Request Header and Config Routing */

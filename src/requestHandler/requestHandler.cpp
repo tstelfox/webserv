@@ -129,10 +129,10 @@ void requestHandler::parseRequest() {
     std::string line;
 
     // std::cout << "Parse another thing:\n" << _buffer << std::endl;
-    if (!fullHeaderReceived()) {
-        // std::cout << "Not full yet" << std::endl;
-        return;
-    }
+//    if (!fullHeaderReceived()) {
+//        // std::cout << "Not full yet" << std::endl;
+//        return;
+//    }
 
     std::getline(ss, line);
     parseRequestLine(line);
