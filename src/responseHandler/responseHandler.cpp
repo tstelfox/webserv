@@ -375,7 +375,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+            htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                         iter[2] + "\n";
         }
     }
@@ -387,7 +387,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+        htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                     iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";
