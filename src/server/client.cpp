@@ -19,9 +19,11 @@
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
+    _bodyPresent = false;
     _isBuffFull = false;
     _status = 200;
     _method = 0;
+    _bodySize = 0;
 }
 
 client::client() {
@@ -40,8 +42,10 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
 
     std::string buffRead(buff);
     _buffer.append(buffRead);
-    if (fullHeaderReceived())
+    if (fullHeaderReceived()) {
+        std::cout << CYAN << "Even with the body received" << RESET_COLOUR << std::endl;
         _isBuffFull = true; // Check if there's a body or nah
+    }
     std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
@@ -49,20 +53,39 @@ int client::fullHeaderReceived() {
     std::string request(_buffer);
     std::istringstream ss(request);
     std::string line;
+//    bool bodyPresent = false;
 
-//    std::stringstream stream;
+    if (!_bodyPresent) {
+        while (std::getline(ss, line)) {
+            std::stringstream stream(line);
+            std::string headerElement;
+            stream >> headerElement;
+            if (!headerElement.compare("Content-Length:")) {
+                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
+                stream >> _bodySize;
+                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+                _bodyPresent = true;
+            }
+
+            if (!line.compare("\r")) {
+                // _isBuffFull = true   ; Request might have a body so not ready for this
+                if (_bodyPresent)
+                    break;
+                std::cout << MAGENTA << "FULL HEADER SET" << RESET_COLOUR << std::endl;
+                return 1;
+            }
+        }
+    }
     while (std::getline(ss, line)) {
-        std::stringstream stream(line);
-        std::string headerElement;
-        stream >> headerElement;
-        if (!headerElement.compare("Content-Length:"))
-            std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
-
-        if (!line.compare("\r")) {
-            std::cout << MAGENTA << "FULL HEADER SET" << RESET_COLOUR << std::endl;
-            // _isBuffFull = true   ; Request might have a body so not ready for this
+        _body.append(line + "\n");
+        std::cout << MAGENTA << "Size: " << _body.size() << RESET_COLOUR << std::endl;
+        if (_body.size() == (_bodySize + 1)) {
+            std::cout << MAGENTA << "Request is completed and it has a body" << RESET_COLOUR << std::endl;
             return 1;
         }
+
+//        if (!line.compare("\n\n")) {
+//        }
     }
     return 0;
 }
@@ -74,7 +97,9 @@ void client::resetClient() {
 //    bzero(&_buffer, sizeof(_buffer));
     _buffer.clear();
     _isBuffFull = false;
+    _bodyPresent = false;
     _status = 200;
+    _bodySize = 0;
 }
 
 /* < --------- Request Parsing and Config Routing ------ > */

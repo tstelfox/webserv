@@ -59,8 +59,13 @@ private:
 
     /* Buffer variables */
     std::string _buffer;
-
+    bool _bodyPresent;
     bool _isBuffFull;
+    size_t _bodySize;
+
+
+    /* Body */
+    std::string _body;
 
     /* Host:port and Socket */
     std::string _hostIp;
@@ -69,22 +74,16 @@ private:
 
     /* Request line info */
     int _method;
+    int _status;
     std::string _uri;
     std::string _http;
+    std::string _requestLine;
 
     /* Request Header Fields */
     std::string _requestedHost;
 //    bool _keepAlive;
-//
-    /* Request Line and Status Info */
-    std::string _requestLine;
-    int _status;
-//    std::string _name;
-//
-////    bool _autoIndex;
-////    set<int> _acceptedMethods;
-//
-//    /* Final response string */
+
+    /* Final response string */
     std::string _response;
 };
 
