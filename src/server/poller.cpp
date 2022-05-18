@@ -172,7 +172,7 @@ void poller::pollConnections() {
                     break;
                 }
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                size_t valRead = recv(it->fd, buffer, 1024, 0);
+                size_t valRead = recv(it->fd, buffer, 1000, 0);
                 if (valRead) {
 //                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);

@@ -77,16 +77,18 @@ int client::fullHeaderReceived() {
         }
     }
     while (std::getline(ss, line)) {
+        std::cout << RED << "Line: " << line << RESET_COLOUR << std::endl;
         _body.append(line + "\n");
-        std::cout << MAGENTA << "Size: " << _body.size() << RESET_COLOUR << std::endl;
+        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
         if (_body.size() == (_bodySize + 1)) {
-            std::cout << MAGENTA << "Request is completed and it has a body" << RESET_COLOUR << std::endl;
+            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
             return 1;
         }
-
+        std::cout << CYAN << "Bugs happening but the body: " << _body << RESET_COLOUR << std::endl;
 //        if (!line.compare("\n\n")) {
 //        }
     }
+
     return 0;
 }
 
