@@ -39,14 +39,18 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (locationStatus)
         return respondError(locationStatus);
 
-    /* TODO get Ange to put these in the same format as the enum i.e. allowedMethod[1] = GET | [2] = POST | [3] = DELETE */
-    /* if (_method is not in location list of methods)
-        set method to 0 and triggers a 405 */
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
+
 //    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
 //        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
 //    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
 //    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
+
+
+    /* if (_method is not in location list of methods)
+        set method to 0 and triggers a 405 */
+    if (allowedMethod.empty())
+        allowedMethod[1] = "GET";
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
@@ -88,16 +92,16 @@ int responseHandler::matchLocation(std::string uri) {
         }
         /* location is incorporated into uri */
 //        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
-        if (uri.find(locIter->get_location_path()) != std::string::npos) {
-//            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
-            location = *locIter;
-            aMatch = true;
-//            if ((locIter + 1) == locationsVec.end())
-//                break;
-        }
+//        if (uri.find(locIter->get_location_path()) != std::string::npos) {
+////            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
+//            location = *locIter;
+//            aMatch = true;
+////            if ((locIter + 1) == locationsVec.end())
+////                break;
+//        }
     }
-    if (!aMatch)
-        return 404;
+//    if (!aMatch)
+//        return 404;
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
@@ -123,13 +127,14 @@ std::string responseHandler::getResponse(std::string uri) {
      *
      * Requested path is root + location + uri
      * */
-    /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
 
-    std::string tempRed = "/takemehome";
-//    if (_location.get_redirection().empty()) {}
-    if (!uri.compare(tempRed)) {
-        std::cout << "Redirection stuff for " << uri << std::endl;
-        return redirectionResponse();
+    std::string redirection = _location.get_redirect().first;
+    if (!redirection.empty()) {
+        std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
+        if (!uri.compare(redirection)) {
+            std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
+            return redirectionResponse(_location.get_redirect().second);
+        }
     }
 
 
@@ -137,15 +142,12 @@ std::string responseHandler::getResponse(std::string uri) {
     std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
               << std::endl;
 
-    std::string finalUri = uri.substr(_location.get_location_path().length());
     std::string requestedPath;
-    if (uri.find(_location.get_root()) != std::string::npos)
-        requestedPath = finalUri;
-    else {
-        // TODO The adding of the slash may be hacky and not always work
-        requestedPath = _location.get_root() + "/" + finalUri;
-    }
-    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
+    if (!_location.get_root().empty())
+        requestedPath = _location.get_root();
+    else
+        requestedPath = uri;
+    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << uri << RESET_COLOUR << std::endl;
 
 
     /* Check for index -
@@ -158,30 +160,27 @@ std::string responseHandler::getResponse(std::string uri) {
             look for root plus index
             */
     // CHeck if index absent
-    if (_location.get_index().empty()) {
-        // if directory
-        if (isDirectory(requestedPath)) {
-            // Directory Listing
-            if (!_location.get_autoindex()) {
-                return respondError(403);
-            } else {
-                return buildDirectoryListing(requestedPath);
-            }
-        }
-//        else { // return 404
-//            std::cout << "Not in here right?" << std::endl;
-//            return respondError(404);
-//        }
-    }
     std::string requestedFile;
-    if (isDirectory(requestedPath))
+    if (isDirectory(requestedPath) && !_location.get_index().empty())
         requestedFile = requestedPath + _location.get_index();
     else
         requestedFile = requestedPath;
+    if (requestedFile[0] == '/')
+        requestedFile.erase(0, 1);
     std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
+    if (isDirectory(requestedFile)) {
+        std::cout << "Should come here" << std::endl;
+        // Directory Listing
+        if (!_location.get_autoindex()) {
+            return respondError(403);
+        } else {
+            return buildDirectoryListing(requestedFile);
+        }
+    }
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) {
+        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
         return respondError(404);
     }
 
@@ -312,14 +311,14 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     return directoryResponse;
 }
 
-std::string responseHandler::redirectionResponse() {
-    std::string placeHolder = "put_test/index.html";
+std::string responseHandler::redirectionResponse(std::string redirectionUri) {
+//    std::string placeHolder = "put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
 //    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
 
-    redirectResponse += placeHolder + "\n\n";
+    redirectResponse += redirectionUri + "\n\n";
 
     std::cout << redirectResponse << std::endl;
     return redirectResponse;
@@ -376,7 +375,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
             firstPad.append(justification, ' ');
             std::string padding = " ";
             padding.append(20, ' ');
-            htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+            htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                         iter[2] + "\n";
         }
     }
@@ -388,7 +387,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         firstPad.append(justification, ' ');
         std::string padding = " ";
         padding.append(20, ' ');
-        htmlFile += "<a href =\"" + directory + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
+        htmlFile += "<a href =\"" + directory + "/" + iter[0] + "\">" + iter[0] + "</a>" + firstPad + iter[1] + padding +
                     iter[2] + "\n";
     }
     htmlFile += "</pre>\n<hr/>\n";

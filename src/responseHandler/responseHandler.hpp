@@ -46,7 +46,7 @@ private:
     std::string postResponse(std::string uri);
 
     /* Redirection Response */
-    std::string redirectionResponse();
+    std::string redirectionResponse(std::string redirectionUri);
 
     /* Response header building utils */
     std::string buildHttpLine(int status);
