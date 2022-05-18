@@ -47,11 +47,8 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 //        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
 //    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
 //    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
-    if (allowedMethod.empty()) {
+    if (allowedMethod.empty())
         allowedMethod[1] = "GET";
-        allowedMethod[2] = "POST";
-        allowedMethod[3] = "DELETE";
-    }
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
