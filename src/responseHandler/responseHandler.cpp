@@ -128,7 +128,6 @@ std::string responseHandler::getResponse(std::string uri) {
      * Requested path is root + location + uri
      * */
 
-//    if (_location.get_redirect())
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
         std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
@@ -143,15 +142,12 @@ std::string responseHandler::getResponse(std::string uri) {
     std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
               << std::endl;
 
-    std::string finalUri = uri.substr(_location.get_location_path().length());
     std::string requestedPath;
-    if (uri.find(_location.get_root()) != std::string::npos)
-        requestedPath = finalUri;
-    else {
-        // TODO The adding of the slash may be hacky and not always work
-        requestedPath = _location.get_root() + "/" + finalUri;
-    }
-    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << finalUri << RESET_COLOUR << std::endl;
+    if (!_location.get_root().empty())
+        requestedPath = _location.get_root();
+    else
+        requestedPath = uri;
+    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << uri << RESET_COLOUR << std::endl;
 
 
     /* Check for index -
@@ -164,29 +160,23 @@ std::string responseHandler::getResponse(std::string uri) {
             look for root plus index
             */
     // CHeck if index absent
-    if (_location.get_index().empty()) {
-        // if directory
-        if (isDirectory(requestedPath)) {
-            // Directory Listing
-            if (!_location.get_autoindex()) {
-                return respondError(403);
-            } else {
-                return buildDirectoryListing(requestedPath);
-            }
-        }
-//        else { // return 404
-//            std::cout << "Not in here right?" << std::endl;
-//            return respondError(404);
-//        }
-    }
     std::string requestedFile;
-    if (isDirectory(requestedPath))
+    if (isDirectory(requestedPath) && !_location.get_index().empty())
         requestedFile = requestedPath + _location.get_index();
     else
         requestedFile = requestedPath;
-    std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
     if (requestedFile[0] == '/')
         requestedFile.erase(0, 1);
+    std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
+    if (isDirectory(requestedFile)) {
+        std::cout << "Should come here" << std::endl;
+        // Directory Listing
+        if (!_location.get_autoindex()) {
+            return respondError(403);
+        } else {
+            return buildDirectoryListing(requestedFile);
+        }
+    }
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) {
