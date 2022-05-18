@@ -47,6 +47,11 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 //        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
 //    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
 //    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
+    if (allowedMethod.empty()) {
+        allowedMethod[1] = "GET";
+        allowedMethod[2] = "POST";
+        allowedMethod[3] = "DELETE";
+    }
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
@@ -125,10 +130,10 @@ std::string responseHandler::getResponse(std::string uri) {
      * */
     /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
 
-    std::string tempRed = "/takemehome";
+    std::string redirection = _location.get_redirect().first;
 //    if (_location.get_redirection().empty()) {}
-    if (!uri.compare(tempRed)) {
-        std::cout << "Redirection stuff for " << uri << std::endl;
+    if (!uri.compare(redirection)) {
+        std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
         return redirectionResponse();
     }
 
