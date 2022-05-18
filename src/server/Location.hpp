@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:37 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/16 17:14:29 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 14:33:48 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,7 @@ namespace WSERV
 			std::string _index;
 			std::string _error_page; //
 			unsigned int 		_max_file_size;
-			bool 		_cgi_allowed_extensions;//
-			std::string _default_cgi_path;//
-			std::string _php_cgi;//
+			std::string _cgi;//
 			bool		 _auth_basic;
 			std::pair<std::string, std::string>	_redirect;
         public:
@@ -47,11 +45,9 @@ namespace WSERV
 			std::string get_index( void ) const;
 			std::string get_error_page( void ) const;
 			unsigned int 		get_max_file_size( void ) const;
-			bool 		get_cgi_allowed_extensions( void ) const;
-			std::string get_default_cgi_path( void ) const;
-			std::string get_php_cgi( void ) const;
 			bool get_auth_basic( void ) const;
 			std::pair<std::string, std::string> get_redirect( void ) const;
+			std::string get_cgi( void ) const;
 
 			void set_root( std::string const data);
 			void set_location_path( std::string const data);
@@ -60,11 +56,9 @@ namespace WSERV
 			void set_index( std::string const data);
 			void set_error_page( std::string const data);
 			void set_max_file_size( unsigned int const data);
-			void set_cgi_allowed_extensions( bool const data);
-			void set_default_cgi_path( std::string const data);
-			void set_php_cgi( std::string const data);
 			void set_auth_basic(bool const data);
 			void set_redirect(std::pair<std::string, std::string> const &data );
+			void set_cgi(std::string const data);
 	};
 }
 

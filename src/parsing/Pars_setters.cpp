@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/17 11:53:11 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 14:30:27 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
     S_temp.set_error_page( data );
 }
 
-void set_cgi_file_types_func(WSERV::serverConfig  &S_temp, std::string data)
+void set_cgi_func(WSERV::Location  &L_temp, std::string data)
 {
-    S_temp.set_cgi_file_types( data );
+    L_temp.set_cgi( data );
 }
 
 void set_root_func(WSERV::Location  &L_temp, std::string data)
