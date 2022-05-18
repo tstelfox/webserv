@@ -39,14 +39,16 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (locationStatus)
         return respondError(locationStatus);
 
-    /* TODO get Ange to put these in the same format as the enum i.e. allowedMethod[1] = GET | [2] = POST | [3] = DELETE */
-    /* if (_method is not in location list of methods)
-        set method to 0 and triggers a 405 */
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
+
 //    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
 //        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
 //    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
 //    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
+
+
+    /* if (_method is not in location list of methods)
+        set method to 0 and triggers a 405 */
     if (allowedMethod.empty())
         allowedMethod[1] = "GET";
     if (allowedMethod.count(method) == 0) {
@@ -131,7 +133,7 @@ std::string responseHandler::getResponse(std::string uri) {
 //    if (_location.get_redirection().empty()) {}
     if (!uri.compare(redirection)) {
         std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
-        return redirectionResponse();
+        return redirectionResponse(_location.get_redirect().second);
     }
 
 
@@ -314,14 +316,14 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     return directoryResponse;
 }
 
-std::string responseHandler::redirectionResponse() {
-    std::string placeHolder = "put_test/index.html";
+std::string responseHandler::redirectionResponse(std::string redirectionUri) {
+//    std::string placeHolder = "put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
 //    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
 
-    redirectResponse += placeHolder + "\n\n";
+    redirectResponse += redirectionUri + "\n\n";
 
     std::cout << redirectResponse << std::endl;
     return redirectResponse;
