@@ -127,13 +127,15 @@ std::string responseHandler::getResponse(std::string uri) {
      *
      * Requested path is root + location + uri
      * */
-    /* TODO if it is a redirection, does it matter if we're asking for a directory or a file or what? */
 
+//    if (_location.get_redirect())
     std::string redirection = _location.get_redirect().first;
-//    if (_location.get_redirection().empty()) {}
-    if (!uri.compare(redirection)) {
-        std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
-        return redirectionResponse(_location.get_redirect().second);
+    if (!redirection.empty()) {
+        std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
+        if (!uri.compare(redirection)) {
+            std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
+            return redirectionResponse(_location.get_redirect().second);
+        }
     }
 
 
