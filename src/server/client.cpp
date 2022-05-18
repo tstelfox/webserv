@@ -43,10 +43,10 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
     std::string buffRead(buff);
     _buffer.append(buffRead);
     if (fullHeaderReceived(buff)) {
-        std::cout << CYAN << "Even with the body received" << RESET_COLOUR << std::endl;
+        std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
         _isBuffFull = true; // Check if there's a body or nah
     }
-    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
+//    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
@@ -56,7 +56,7 @@ int client::fullHeaderReceived(const char *buff) {
     std::string line;
 //    std::istringstream::pos_type bodyPoint = ss.tellg();
 
-    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
+//    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
     if (!_bodyPresent) {
         while (std::getline(ss, line)) {
@@ -64,9 +64,9 @@ int client::fullHeaderReceived(const char *buff) {
             std::string headerElement;
             stream >> headerElement;
             if (!headerElement.compare("Content-Length:")) {
-                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
+//                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
-                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+//                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
 
@@ -75,34 +75,21 @@ int client::fullHeaderReceived(const char *buff) {
                 if (_bodyPresent) {
                     break;
                 }
-                std::cout << MAGENTA << "FULL HEADER SET" << RESET_COLOUR << std::endl;
+                std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
                 return 1;
             }
         }
     }
     while (std::getline(ss, line)) {
-//        while(ss) {
-//        std::getline(temp, templine);
-//        std::cout << RED << "Line: " << line << RESET_COLOUR << std::endl;
-//        std::string temp;
-//        ss >> temp;
-//        _body.append(temp);
         _body.append(line + "\n");
         if (ss.tellg() == -1)
             _body.resize(_body.size() - 1);
-        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
+//        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
         if (_body.size() == _bodySize) {
             std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
             return 1;
         }
     }
-//    bodyPoint = ss.tellg();
-//    ss.clear();
-//    ss.seekg(bodyPoint);
-//    std::string diocane = ss.rdbuf();
-//    std::cout << ss.str() << std::endl;
-//    _body.append(ss.str());
-    std::cout << CYAN << "Bugs happening but the body: " << _body << RESET_COLOUR << std::endl;
 
     return 0;
 }
@@ -180,8 +167,8 @@ void client::parseRequestHeader() {
     _requestLine = line;
 
     std::map<std::string, std::string> fields;
-//    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
-//            _method << " " << _uri << " " << _http << std::endl << std::endl;
+    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
+            _method << " " << _uri << " " << _http << std::endl << std::endl;
 
     while (std::getline(ss, line)) {
         if (!line.compare("\r"))
@@ -201,10 +188,10 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-//    std::cout << std::endl;
+    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+    std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
     routeConfig(fields);
 }
