@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/18 14:48:51 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/18 15:06:38 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 19:44:13 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,10 @@ namespace WSERV {
     {
         private:
             std::string _path;
-            int _cgi_fd;
+            int _cgi_in_fd;
+            int _cgi_out_fd;
         public:
-            Cgi();
+            Cgi(std::string path);
             ~Cgi();
             Cgi(Cgi const & copy);
 			Cgi & operator = (Cgi const & copy);
@@ -33,6 +34,7 @@ namespace WSERV {
 
             void set_path(std::string const data);
             void set_cgi_fd(int const data);
+            void open_file();
     };
 }
 

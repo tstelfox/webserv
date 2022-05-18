@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/18 14:45:50 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 19:26:32 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "serverConfig.hpp"
 #include "Parsing.hpp"
 #include "colours.hpp"
-
+#include "cgi/cgi.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <sstream>
@@ -71,13 +71,17 @@ int main(int argc, char *argv[]) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
+
     /*Print all configs*/
    parsedContents(S);
 
     /*Extract all the unique ports and put them into a set.*/
 
-    poller littyServer(S);
-    littyServer.pollConnections();
+
+    //poller littyServer(S);
+    //littyServer.pollConnections();
+
+    WSERV::Cgi cgi_yo;
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
