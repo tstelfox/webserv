@@ -92,16 +92,16 @@ int responseHandler::matchLocation(std::string uri) {
         }
         /* location is incorporated into uri */
 //        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
-        if (uri.find(locIter->get_location_path()) != std::string::npos) {
-//            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
-            location = *locIter;
-            aMatch = true;
-//            if ((locIter + 1) == locationsVec.end())
-//                break;
-        }
+//        if (uri.find(locIter->get_location_path()) != std::string::npos) {
+////            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
+//            location = *locIter;
+//            aMatch = true;
+////            if ((locIter + 1) == locationsVec.end())
+////                break;
+//        }
     }
-    if (!aMatch)
-        return 404;
+//    if (!aMatch)
+//        return 404;
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
@@ -185,9 +185,12 @@ std::string responseHandler::getResponse(std::string uri) {
     else
         requestedFile = requestedPath;
     std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
+    if (requestedFile[0] == '/')
+        requestedFile.erase(0, 1);
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) {
+        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
         return respondError(404);
     }
 
