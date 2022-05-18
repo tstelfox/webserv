@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:40 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/17 11:51:21 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 14:34:32 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,7 @@ WSERV::Location & WSERV::Location::operator = (Location const & copy)
 	this->_index = 			copy._index;
 	this->_error_page = 	copy._error_page;
 	this->_max_file_size = 	copy._max_file_size;
-	this->_cgi_allowed_extensions = 	copy._cgi_allowed_extensions;
-	this->_default_cgi_path = 			copy._default_cgi_path;
-	this->_php_cgi = 					copy._php_cgi;
+	this->_cgi = 					copy._cgi;
 	this->_auth_basic = 			copy._auth_basic;
 	this->_redirect =		copy._redirect;
 	return *this;
@@ -78,19 +76,11 @@ unsigned int 		WSERV::Location::get_max_file_size( void ) const
 	return (this->_max_file_size);
 }
 
-bool 		WSERV::Location::get_cgi_allowed_extensions( void ) const
-{
-	return (this->_cgi_allowed_extensions);
-}
 
-std::string WSERV::Location::get_default_cgi_path( void ) const
-{
-	return (this->_default_cgi_path);
-}
 
-std::string WSERV::Location::get_php_cgi( void ) const
+std::string WSERV::Location::get_cgi( void ) const
 {
-	return (this->_php_cgi);
+	return (this->_cgi);
 }
 
 bool WSERV::Location::get_auth_basic( void ) const
@@ -144,23 +134,11 @@ void WSERV::Location::set_max_file_size( unsigned int const data)
 	this->_max_file_size = data;
 }
 
-void WSERV::Location::set_cgi_allowed_extensions( bool const data)
-{
-	this->_cgi_allowed_extensions = data;
-}
-
-void WSERV::Location::set_default_cgi_path( std::string const data)
-{
-	this->_default_cgi_path = data;
-}
-
-void WSERV::Location::set_php_cgi( std::string const data)
-{
-	this->_php_cgi = data;
-}
-
 void WSERV::Location::set_auth_basic( bool const data)
 {
 	this->_auth_basic = data;
 }
 
+void WSERV::Location::set_cgi(std::string const data) {
+    this->_cgi = data;
+}

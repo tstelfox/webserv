@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/17 11:47:10 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 14:45:50 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
         std::cout << "maxfilesize= " << S[i].get_maxfilesize() << std::endl;
         std::cout << "error_page= " << S[i].get_error_page() << std::endl;
-        std::cout << "cgi_file_types= " << S[i].get_cgi_file_types() << std::endl;
         std::cout << "time_out= " << S[i].get_time_out() << std::endl;
         std::cout << std::endl;
         for (size_t x = 0; x < S[i].get_Location_vec().size(); x++) {
@@ -48,9 +47,7 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             std::cout << "index= " << L_temp.get_index() << std::endl;
             std::cout << "error_page= " << L_temp.get_error_page() << std::endl;
             std::cout << "max_file_size= " << L_temp.get_max_file_size() << std::endl;
-            std::cout << "cgi_allowed_extensions= " << L_temp.get_cgi_allowed_extensions() << std::endl;
-            std::cout << "default_cgi_path= " << L_temp.get_default_cgi_path() << std::endl;
-            std::cout << "php_cgi= " << L_temp.get_php_cgi() << std::endl;
+            std::cout << "cgi= " << L_temp.get_cgi() << std::endl;
             std::cout << "auth_basic= " << L_temp.get_auth_basic() << std::endl;
 
             std::pair <std::string, std::string> temp_pair = L_temp.get_redirect();
