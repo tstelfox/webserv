@@ -36,10 +36,6 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         return respondError(status);
 
     matchLocation(uri);
-//    int locationStatus =
-//    matchLocation(uri);
-//    if (!locationStatus)
-//        return respondError(locationStatus);
 
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
 
@@ -53,6 +49,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         set method to 0 and triggers a 405 */
     if (allowedMethod.empty())
         allowedMethod[1] = "GET";
+        allowedMethod[2] = "POST";
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
@@ -97,18 +94,8 @@ int responseHandler::matchLocation(std::string uri) {
             break;
 
         }
-        /* location is incorporated into uri */
-//        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
-//        if (uri.find(locIter->get_location_path()) != std::string::npos) {
-////            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
-//            location = *locIter;
-//            aMatch = true;
-////            if ((locIter + 1) == locationsVec.end())
-////                break;
-//        }
+        /* TODO location incorporated into uri according to the fucked up subject */
     }
-//    if (!aMatch)
-//        return 404;
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
