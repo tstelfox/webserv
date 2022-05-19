@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/19 12:54:46 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 16:02:01 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         std::cout << "port= " << S[i].get_port() << std::endl;
         std::cout << "host= " << S[i].get_host() << std::endl;
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
-        std::cout << "maxfilesize= " << S[i].get_maxfilesize() << std::endl;
         std::cout << "error_page= " << S[i].get_error_page() << std::endl;
         std::cout << std::endl;
         for (size_t x = 0; x < S[i].get_Location_vec().size(); x++) {
@@ -75,10 +74,19 @@ int main(int argc, char *argv[]) {
     /*Extract all the unique ports and put them into a set.*/
 
 
-    //poller littyServer(S);
-    //littyServer.pollConnections();
-
-    WSERV::Cgi cgi_yo;
+    poller littyServer(S);
+    littyServer.pollConnections();
+    
+    // try {
+    //     WSERV::Location L = S[0].get_Location_vec()[0];
+    //     std::string cgistr = L.get_cgi();
+    //     // std::cout << cgistr << std::endl;
+    //     WSERV::Cgi cgi_yo(cgistr);
+    // }
+    // catch (const std::exception &e) {
+    //     std::cerr << e.what() << '\n';
+    //     return EXIT_FAILURE;
+    // }
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

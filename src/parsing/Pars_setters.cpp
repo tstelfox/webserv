@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/19 12:54:55 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 13:56:19 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,10 @@ void set_Location_vec_func(WSERV::serverConfig  &S_temp, std::vector<WSERV::Loca
     S_temp.set_Location_vec( data );
 }
 
-void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
-{
-    S_temp.set_maxfilesize(std::atoi( data.c_str() ));
-}
+// void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
+// {
+//     S_temp.set_maxfilesize(std::atoi( data.c_str() ));
+// }
 
 void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
 {

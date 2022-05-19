@@ -7,10 +7,12 @@
 		<title>Python Upload Test</title>
 	</head>
 	<body>
-		<form action="../cgi/cgi.py" method="post" enctype="multiport/form-data">
-			<input type="file" name="filename">
-			<input types="submit">
-		</form>
+		<form action = "/cgi-bin/hello_get.py" method = "get">
+			First Name: <input type = "text" name = "first_name">  <br />
+			
+			Last Name: <input type = "text" name = "last_name" />
+			<input type = "submit" value = "Submit" />
+			</form>
 	</body>
 </html>
 <!-- 

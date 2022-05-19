@@ -49,8 +49,10 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 
     /* if (_method is not in location list of methods)
         set method to 0 and triggers a 405 */
-    if (allowedMethod.empty())
+    if (allowedMethod.empty()) {
         allowedMethod[1] = "GET";
+        allowedMethod[2] = "POST";
+    }
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
