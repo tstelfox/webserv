@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/15 17:44:40 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/18 14:34:32 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 12:55:25 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ WSERV::Location & WSERV::Location::operator = (Location const & copy)
 	this->_error_page = 	copy._error_page;
 	this->_max_file_size = 	copy._max_file_size;
 	this->_cgi = 					copy._cgi;
-	this->_auth_basic = 			copy._auth_basic;
 	this->_redirect =		copy._redirect;
 	return *this;
 }
@@ -83,11 +82,6 @@ std::string WSERV::Location::get_cgi( void ) const
 	return (this->_cgi);
 }
 
-bool WSERV::Location::get_auth_basic( void ) const
-{
-	return (this->_auth_basic);
-}
-
 std::pair<std::string, std::string> WSERV::Location::get_redirect( void ) const
 {
 	return (this->_redirect);
@@ -132,11 +126,6 @@ void WSERV::Location::set_error_page( std::string const data)
 void WSERV::Location::set_max_file_size( unsigned int const data)
 {
 	this->_max_file_size = data;
-}
-
-void WSERV::Location::set_auth_basic( bool const data)
-{
-	this->_auth_basic = data;
 }
 
 void WSERV::Location::set_cgi(std::string const data) {

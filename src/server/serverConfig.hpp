@@ -6,7 +6,7 @@
 /*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 19:42:04 by turloughmul   #+#    #+#                 */
-/*   Updated: 2022/05/18 14:35:24 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 12:54:31 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ namespace WSERV {
         std::string _server_name;
         unsigned int _maxfilesize;
         std::string _error_page;
-        int _time_out;
         std::vector<WSERV::Location> _Location_vec;
 
     public:
@@ -53,8 +52,6 @@ namespace WSERV {
 
         std::string get_error_page() const;
 
-        int get_time_out() const;
-
         std::vector<WSERV::Location> get_Location_vec() const;
 
         void set_port(int const data);
@@ -66,8 +63,6 @@ namespace WSERV {
         void set_Location_vec(std::vector<WSERV::Location> const data);
 
         void set_maxfilesize(int const data);
-
-        void set_time_out(int const data);
 
         void set_error_page(std::string const data);
     };

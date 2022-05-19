@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/18 19:26:32 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 12:54:46 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
         std::cout << "server_name= " << S[i].get_server_name() << std::endl;
         std::cout << "maxfilesize= " << S[i].get_maxfilesize() << std::endl;
         std::cout << "error_page= " << S[i].get_error_page() << std::endl;
-        std::cout << "time_out= " << S[i].get_time_out() << std::endl;
         std::cout << std::endl;
         for (size_t x = 0; x < S[i].get_Location_vec().size(); x++) {
             std::cout << GREEN << "< ----- Location [" << x << "] -------->" << RESET_COLOUR << std::endl;
@@ -48,8 +47,6 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             std::cout << "error_page= " << L_temp.get_error_page() << std::endl;
             std::cout << "max_file_size= " << L_temp.get_max_file_size() << std::endl;
             std::cout << "cgi= " << L_temp.get_cgi() << std::endl;
-            std::cout << "auth_basic= " << L_temp.get_auth_basic() << std::endl;
-
             std::pair <std::string, std::string> temp_pair = L_temp.get_redirect();
             std::cout << "redirect= " << temp_pair.first << " " << temp_pair.second << std::endl;
             std::cout << std::endl;
