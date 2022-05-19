@@ -66,7 +66,7 @@ int client::fullHeaderReceived(const char *buff) {
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
-//                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
 
@@ -82,6 +82,7 @@ int client::fullHeaderReceived(const char *buff) {
     }
     while (std::getline(ss, line)) {
         _body.append(line + "\n");
+//        std::cout << RED << line << RESET_COLOUR << std::endl;
         if (ss.tellg() == -1)
             _body.resize(_body.size() - 1);
 //        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
@@ -90,7 +91,7 @@ int client::fullHeaderReceived(const char *buff) {
             return 1;
         }
     }
-
+    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
