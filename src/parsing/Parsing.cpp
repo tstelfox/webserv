@@ -253,12 +253,16 @@ void WSERV::Parser::check_if_var_in_class_is_empty()
             throw IncorrectConfigExcep();
         if (_vec_servers[i].get_host().empty() == true)
             throw IncorrectConfigExcep();
-        if (_vec_servers[i].get_maxfilesize() == 0)
-            throw IncorrectConfigExcep();
-        if (_vec_servers[i].get_error_page().empty() == true)
-            throw IncorrectConfigExcep();
-        if (_vec_servers[i].get_time_out() == 0)
-            throw IncorrectConfigExcep();
+        if (_vec_servers[i].get_maxfilesize() == 0) {
+            _vec_servers[i].set_maxfilesize(100);
+//            throw IncorrectConfigExcep();
+        }
+        if (_vec_servers[i].get_error_page().empty() == true) {
+            _vec_servers[i].set_error_page("pages/errorPages/");
+        }
+//            throw IncorrectConfigExcep();
+//        if (_vec_servers[i].get_time_out() == 0)
+//            throw IncorrectConfigExcep();
         if (_vec_servers[i].get_Location_vec().empty() == true)
             throw IncorrectConfigExcep();
     }
