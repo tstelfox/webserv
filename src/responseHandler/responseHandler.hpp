@@ -21,7 +21,7 @@ class responseHandler {
 public:
 
     responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                    std::map <std::string, std::string> &request);
+                    std::map <std::string, std::string> &request, std::string body);
 
     ~responseHandler();
 
@@ -67,6 +67,7 @@ private:
     std::string _requestLine;
     WSERV::serverConfig _config;
     std::map <std::string, std::string> _requestFields;
+    std::string _body;
 
     /* Correct Location */
     WSERV::Location _location;

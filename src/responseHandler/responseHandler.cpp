@@ -22,8 +22,8 @@
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                                 std::map <std::string, std::string> &fields)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields) {
+                                 std::map <std::string, std::string> &fields, std::string body)
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {
 //    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
 }
 
@@ -66,7 +66,9 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         case 1:
             return getResponse(uri);
         case 2:
-            std::cout << "POST request" << std::endl;
+//            std::cout << "POST request" << std::endl;
+            if (_body.size() > _location.get_max_file_size())
+                return respondError(413);
             return postResponse(uri);
 //            break;
         case 3:
@@ -220,7 +222,7 @@ std::string responseHandler::postResponse(std::string uri) {
 
 std::string responseHandler::respondError(int status) {
 
-    std::cout << MAGENTA << "We be responding to an error" << RESET_COLOUR << std::endl;
+    std::cout << MAGENTA << "We be responding to an error: " << status << RESET_COLOUR << std::endl;
     std::string response;
     response = buildHttpLine(status);
     response += buildDateLine();
@@ -238,6 +240,7 @@ std::string responseHandler::respondError(int status) {
     response.append("\n\n");
 //    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
     response.append(body + "\n");
+//    std::cout << RED << "<<<<-------- The response ------->>>>\n" << RESET_COLOUR << response << std::endl;
     return response;
 }
 

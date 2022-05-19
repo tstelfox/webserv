@@ -87,11 +87,11 @@ int client::fullHeaderReceived(const char *buff) {
             _body.resize(_body.size() - 1);
 //        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
         if (_body.size() == _bodySize) {
-            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
+//            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
             return 1;
         }
     }
-    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
+//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
@@ -222,7 +222,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
 
-    responseHandler response(_requestLine, rightConfig, fields);
+    responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);
 
 //    resetClient();
