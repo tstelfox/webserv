@@ -43,7 +43,7 @@ private:
     std::string getResponse(std::string uri);
 
     /* POST request */
-    std::string postResponse(std::string uri);
+    std::string postResponse();
 
     /* Redirection Response */
     std::string redirectionResponse(std::string redirectionUri);

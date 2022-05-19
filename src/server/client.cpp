@@ -154,6 +154,10 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _status = 400;
     } else
         _requestedHost = fields["host"];
+
+    if (fields.count("content-length"))
+        if (fields["content-type"].compare("text/plain"))
+            _status = 415;
 }
 
 void client::parseRequestHeader() {
