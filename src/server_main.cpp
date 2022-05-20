@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/19 16:02:01 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/20 16:16:42 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,19 +74,19 @@ int main(int argc, char *argv[]) {
     /*Extract all the unique ports and put them into a set.*/
 
 
-    poller littyServer(S);
-    littyServer.pollConnections();
+    // poller littyServer(S);
+    // littyServer.pollConnections();
     
-    // try {
-    //     WSERV::Location L = S[0].get_Location_vec()[0];
-    //     std::string cgistr = L.get_cgi();
-    //     // std::cout << cgistr << std::endl;
-    //     WSERV::Cgi cgi_yo(cgistr);
-    // }
-    // catch (const std::exception &e) {
-    //     std::cerr << e.what() << '\n';
-    //     return EXIT_FAILURE;
-    // }
+    try {
+        WSERV::Location L = S[0].get_Location_vec()[0];
+        std::string cgistr = L.get_cgi();
+        // std::cout << cgistr << std::endl;
+        WSERV::Cgi cgi_yo(cgistr, "17", "3");
+    }
+    catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
 
     /*Functioning main pre restructure*/
 //    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);

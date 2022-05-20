@@ -1,20 +1,19 @@
 #!/usr/bin/python
 # Import modules for CGI handling 
-import cgi, cgitb 
-
-# Create instance of FieldStorage 
-form = cgi.FieldStorage() 
+import sys, ctypes
 
 # Get data from fields
-first_name = form.getvalue('first_name')
-last_name  = form.getvalue('last_name')
+
+num1 = int(sys.argv[1]);
+num2  = int(sys.argv[2]);
+result = num1 + num2;
 
 print "Content-type:text/html\r\n\r\n"
 print "<html>"
 print "<head>"
-print "<title>Hello - Second CGI Program</title>"
+print "<title>CGI Program</title>"
 print "</head>"
 print "<body>"
-print "<h2>Hello %s %s</h2>" % (first_name, last_name)
+print "<h2>Result: %d + %d = %d</h2>" % (num1, num2, result)
 print "</body>"
 print "</html>"
