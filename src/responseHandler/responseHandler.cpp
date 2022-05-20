@@ -19,6 +19,7 @@
 #include <sys/stat.h> // For checking if directory
 #include <dirent.h> // For getting directory contents
 #include <time.h> // time for time
+#include <stdio.h> // remove()
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
@@ -240,8 +241,15 @@ std::string responseHandler::postResponse(std::string const& uri) {
 
 std::string responseHandler::deleteResponse(std::string uri) {
 
-    std::string properUri = rootResolution(uri);
-    std::cout << RED << "Delete tae fack: " << properUri << RESET_COLOUR << std::endl;
+    std::string filePath = rootResolution(uri);
+    std::cout << RED << "Delete tae fack: " << filePath << RESET_COLOUR << std::endl;
+
+    // 404 not found
+    // 410 gone (?)
+    // 403 Forbidden (God knows how)
+    if (remove(filePath.c_str())) {
+        std::cout << "It didn't delete shit" << std::endl;
+    }
     return "placeholder";
 }
 
