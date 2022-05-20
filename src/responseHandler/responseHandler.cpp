@@ -244,13 +244,23 @@ std::string responseHandler::deleteResponse(std::string uri) {
     std::string filePath = rootResolution(uri);
     std::cout << RED << "Delete tae fack: " << filePath << RESET_COLOUR << std::endl;
 
+    std::string response;
     // 404 not found
     // 410 gone (?)
     // 403 Forbidden (God knows how)
     if (remove(filePath.c_str())) {
         std::cout << "It didn't delete shit" << std::endl;
+        std::cout << errno << std::endl;
+        perror("wassup: ");
+        if (errno == 2)
+            return respondError(404);
     }
-    return "placeholder";
+    else {
+        response = "HTTP/1.1 200 OK\n" + buildDateLine() + "\n";
+        response += "<html>\n   <body>\n        <h1>That shit has been duly yote.</h1>\n    </body>\n</html>";
+    }
+    std::cout << "Successful delete: " << response << std::endl;
+    return response;
 }
 
 std::string responseHandler::respondError(int status) {
