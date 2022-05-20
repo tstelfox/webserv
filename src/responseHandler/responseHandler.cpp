@@ -142,15 +142,20 @@ std::string responseHandler::getResponse(std::string uri) {
 
 
 
-    std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
-              << std::endl;
+    std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
+              << RESET_COLOUR << std::endl;
 
     std::string requestedPath;
-    if (!_location.get_root().empty())
-        requestedPath = _location.get_root();
-    else
+    if (!_location.get_root().empty()) {
+        if (!uri.compare(_location.get_location_path()))
+            requestedPath = _location.get_root();
+        else
+            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+    }
+    else {
         requestedPath = uri;
-    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << uri << RESET_COLOUR << std::endl;
+    }
+    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
 
     /* Check for index -
