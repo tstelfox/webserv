@@ -85,9 +85,11 @@ int responseHandler::matchLocation(std::string uri) {
     bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
          locIter != locationsVec.end(); locIter++) {
+        std::string path = locIter->get_location_path();
+        std::cout << "The fucking path is: " << path << std::endl;
         /* Exact match */
-        if (!uri.compare(locIter->get_location_path())) {
-            std::cout << "Exact Location match" << std::endl;
+        if (!uri.compare(path)) {
+            std::cout << GREEN << "Exact Location match" << RESET_COLOUR << std::endl;
             location = *locIter;
             aMatch = true;
             success = 1;
@@ -96,6 +98,12 @@ int responseHandler::matchLocation(std::string uri) {
         }
         /* TODO location incorporated into uri according to the fucked up subject */
         /* Check if the first part of the uri is an exact match of the location */
+//        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
+//        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
+        if (path.length() > 1 && !uri.compare(0, path.size(), path)) {
+            std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
+            location = *locIter;
+        }
     }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
