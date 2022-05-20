@@ -40,13 +40,13 @@ private:
     std::string extractErrorFile(int status);
 
     /* GET request*/
-    std::string getResponse(std::string uri);
+    std::string getResponse(std::string const& uri);
 
     /* POST request */
-    std::string postResponse();
+    std::string postResponse(std::string const& uri);
 
     /* DELETE request */
-    std::string deleteResponse();
+    std::string deleteResponse(std::string uri);
 
     /* Redirection Response */
     std::string redirectionResponse(std::string redirectionUri);
@@ -64,7 +64,8 @@ private:
 
 
     /* General utils */
-    bool    isDirectory(std::string path);
+    bool    isDirectory(std::string const& path);
+    std::string rootResolution(std::string const& uri);
 
     /* Should probably send in the request line tbh */
     std::string _requestLine;

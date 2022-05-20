@@ -67,9 +67,9 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         case 2:
             if (_body.size() > _location.get_max_file_size())
                 return respondError(413);
-            return postResponse();
+            return postResponse(uri);
         case 3:
-            return deleteResponse();
+            return deleteResponse(uri);
         default:
             return "Absolutely fuckin nvm"; // TODO IUNKNOW
     }
@@ -127,7 +127,7 @@ int responseHandler::matchLocation(std::string uri) {
      * Requested path is root + location + uri
      * */
 
-std::string responseHandler::getResponse(std::string uri) {
+std::string responseHandler::getResponse(std::string const& uri) {
 
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
@@ -143,16 +143,16 @@ std::string responseHandler::getResponse(std::string uri) {
     std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() <<
                 " and, if present, index is: " << _location.get_index() << RESET_COLOUR << std::endl;
 
-    std::string requestedPath;
-    if (!_location.get_root().empty()) {
-        if (!uri.compare(_location.get_location_path()))
-            requestedPath = _location.get_root();
-        else
-            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
-    }
-    else {
-        requestedPath = uri;
-    }
+    std::string requestedPath = rootResolution(uri);
+//    if (!_location.get_root().empty()) {
+//        if (!uri.compare(_location.get_location_path()))
+//            requestedPath = _location.get_root();
+//        else
+//            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+//    }
+//    else {
+//        requestedPath = uri;
+//    }
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
     /* Check for index -
@@ -210,13 +210,13 @@ std::string responseHandler::getResponse(std::string uri) {
     return responseHeader;
 }
 
-std::string responseHandler::postResponse() {
+std::string responseHandler::postResponse(std::string const& uri) {
 
-    std::string path;
-    if (_location.get_root().empty())
-        path = _location.get_location_path();
-    else
-        path = _location.get_root();
+    std::string path = rootResolution(uri);
+//    if (_location.get_root().empty())
+//        path = _location.get_location_path();
+//    else
+//        path = _location.get_root();
 
     std::string fileName = path + "/Madonna";
     if (std::ifstream(fileName))
@@ -238,10 +238,10 @@ std::string responseHandler::postResponse() {
     return response;
 }
 
-std::string responseHandler::deleteResponse() {
+std::string responseHandler::deleteResponse(std::string uri) {
 
-
-
+    std::string properUri = rootResolution(uri);
+    std::cout << RED << "Delete tae fack: " << properUri << RESET_COLOUR << std::endl;
     return "placeholder";
 }
 
@@ -432,7 +432,9 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
     return header;
 }
 
-bool responseHandler::isDirectory(std::string path) {
+/* < ---------- GENERIC UTILS ---------- > */
+
+bool responseHandler::isDirectory(std::string const& path) {
     struct stat s;
     if (lstat(path.c_str(), &s) == 0) {
         if (S_ISDIR(s.st_mode))
@@ -441,4 +443,19 @@ bool responseHandler::isDirectory(std::string path) {
             return false;
     }
     return false;
+}
+
+std::string responseHandler::rootResolution(std::string const& uri) {
+
+    std::string requestedPath;
+    if (!_location.get_root().empty()) {
+        if (!uri.compare(_location.get_location_path()))
+            requestedPath = _location.get_root();
+        else
+            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+    }
+    else {
+        requestedPath = uri;
+    }
+    return requestedPath;
 }
