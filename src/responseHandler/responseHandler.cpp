@@ -47,9 +47,10 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 
     /* if (_method is not in location list of methods)
         set method to 0 and triggers a 405 */
-    if (allowedMethod.empty())
+    if (allowedMethod.empty()) {
         allowedMethod[1] = "GET";
         allowedMethod[2] = "POST";
+    }
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
@@ -60,21 +61,18 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
         case 0:
-            std::cout << "Should enter here" << std::endl;
             return respondError(405);
         case 1:
             return getResponse(uri);
         case 2:
-//            std::cout << "POST request" << std::endl;
             if (_body.size() > _location.get_max_file_size())
                 return respondError(413);
             return postResponse();
-//            break;
         case 3:
-            std::cout << "DELETE request" << std::endl;
-//            return deleteResponse(uri);
+            return deleteResponse();
+        default:
+            return "Absolutely fuckin nvm"; // TODO IUNKNOW
     }
-    return "Placeholder"; // TODO ths thing
 }
 
 int responseHandler::matchLocation(std::string uri) {
@@ -111,8 +109,6 @@ int responseHandler::matchLocation(std::string uri) {
     return success;
 }
 
-std::string responseHandler::getResponse(std::string uri) {
-
      /*
      * nginx behaviour:
      *      - Directory listing only if there is no set index for that directory
@@ -131,10 +127,13 @@ std::string responseHandler::getResponse(std::string uri) {
      * Requested path is root + location + uri
      * */
 
+std::string responseHandler::getResponse(std::string uri) {
+
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
         std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
-        if (!uri.compare(redirection)) {
+//        if (!uri.compare(redirection)) {
+        if (uri == redirection) {
             std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
             return redirectionResponse(_location.get_redirect().second);
         }
@@ -156,7 +155,6 @@ std::string responseHandler::getResponse(std::string uri) {
     }
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
-
     /* Check for index -
         if there is no index
             if root is directory:
@@ -166,7 +164,7 @@ std::string responseHandler::getResponse(std::string uri) {
         else
             look for root plus index
             */
-    // CHeck if index absent
+
     std::string requestedFile;
     if (isDirectory(requestedPath) && !_location.get_index().empty())
         requestedFile = requestedPath + _location.get_index();
@@ -192,8 +190,6 @@ std::string responseHandler::getResponse(std::string uri) {
     }
 
 
-
-
     std::ostringstream fileContent;
     fileContent << myFile.rdbuf();
     std::string responseBody = fileContent.str();
@@ -210,11 +206,6 @@ std::string responseHandler::getResponse(std::string uri) {
               << responseHeader << std::endl;
     responseHeader.append(responseBody + "\n");
 
-    /*Check that the method in question is an allowed method*/
-
-    /* Max file Size will only be important for POST I believe */
-
-    /* Default file when a directory is requested is just the index - Include in parsing */
 
     return responseHeader;
 }
@@ -245,6 +236,13 @@ std::string responseHandler::postResponse() {
 
 
     return response;
+}
+
+std::string responseHandler::deleteResponse() {
+
+
+
+    return "placeholder";
 }
 
 std::string responseHandler::respondError(int status) {

@@ -45,6 +45,9 @@ private:
     /* POST request */
     std::string postResponse();
 
+    /* DELETE request */
+    std::string deleteResponse();
+
     /* Redirection Response */
     std::string redirectionResponse(std::string redirectionUri);
 
