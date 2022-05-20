@@ -95,6 +95,7 @@ int responseHandler::matchLocation(std::string uri) {
 
         }
         /* TODO location incorporated into uri according to the fucked up subject */
+        /* Check if the first part of the uri is an exact match of the location */
     }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
