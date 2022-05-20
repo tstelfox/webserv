@@ -141,9 +141,8 @@ std::string responseHandler::getResponse(std::string uri) {
     }
 
 
-
-    std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
-              << RESET_COLOUR << std::endl;
+    std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() <<
+                " and, if present, index is: " << _location.get_index() << RESET_COLOUR << std::endl;
 
     std::string requestedPath;
     if (!_location.get_root().empty()) {
