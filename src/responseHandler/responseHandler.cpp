@@ -84,7 +84,7 @@ int responseHandler::matchLocation(std::string uri) {
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
          locIter != locationsVec.end(); locIter++) {
         std::string path = locIter->get_location_path();
-        std::cout << "The fucking path is: " << path << std::endl;
+//        std::cout << "The fucking path is: " << path << std::endl;
         /* Exact match */
         if (!uri.compare(path)) {
             std::cout << GREEN << "Exact Location match" << RESET_COLOUR << std::endl;

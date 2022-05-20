@@ -172,8 +172,8 @@ void client::parseRequestHeader() {
     _requestLine = line;
 
     std::map<std::string, std::string> fields;
-    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
-            _method << " " << _uri << " " << _http << std::endl << std::endl;
+//    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
+//            _method << " " << _uri << " " << _http << std::endl << std::endl;
 
     while (std::getline(ss, line)) {
         if (!line.compare("\r"))
@@ -193,19 +193,19 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
     std::cout << std::endl;
     requestedHost(fields); // If something is invalid in the request line just respond immediately.
     routeConfig(fields);
 }
 
 void client::routeConfig(std::map<std::string, std::string> &fields) {
-    std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
-    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
-        std::cout << "server_name: " << iter->get_server_name() << std::endl;
-    }
+//    std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
+//    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
+////        std::cout << "server_name: " << iter->get_server_name() << std::endl;
+//    }
     // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
     WSERV::serverConfig  rightConfig;
     WSERV::serverConfig  *namelessConfig = nullptr;

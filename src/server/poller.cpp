@@ -100,11 +100,11 @@ int poller::newConnection(int fd) {
             ((it->get_host()) == "localhost" && !hostIp.compare("127.0.0.1"))))
             relevant.push_back(*it);
     }
-    std::cout << "Relevant vectors are:" << std::endl;
-    for (configVector::iterator iter = relevant.begin(); iter != relevant.end(); iter++) {
-        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
-            " and server_name: " << iter->get_server_name() << std::endl;
-    }
+//    std::cout << "Relevant vectors are:" << std::endl;
+//    for (configVector::iterator iter = relevant.begin(); iter != relevant.end(); iter++) {
+//        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
+//            " and server_name: " << iter->get_server_name() << std::endl;
+//    }
 
 
     std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
