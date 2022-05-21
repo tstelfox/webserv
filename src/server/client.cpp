@@ -46,7 +46,7 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
         _isBuffFull = true; // Check if there's a body or nah
     }
-//    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
+    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
@@ -54,7 +54,6 @@ int client::fullHeaderReceived(const char *buff) {
     std::string request(buff);
     std::istringstream ss(request);
     std::string line;
-//    std::istringstream::pos_type bodyPoint = ss.tellg();
 
 //    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
@@ -63,6 +62,13 @@ int client::fullHeaderReceived(const char *buff) {
             std::stringstream stream(line);
             std::string headerElement;
             stream >> headerElement;
+            if(!headerElement.compare("Transfer-Encoding:")) {
+                stream >> headerElement;
+                if (!headerElement.compare("chunked")) {
+                    std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
+                    // return chunkedHeaderReceieved(buff); // Something like this
+                }
+            }
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
@@ -91,7 +97,7 @@ int client::fullHeaderReceived(const char *buff) {
             return 1;
         }
     }
-//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
+    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
