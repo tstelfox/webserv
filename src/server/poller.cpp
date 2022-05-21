@@ -47,6 +47,13 @@ int poller::connectionError(short revents) const {
            (!(revents & (POLLIN)) && revents & POLLHUP);
 };
 
+void poller::deleteConnection(int fd) {
+    std::map<int, client>::iterator clientIt = _clients.find(fd);
+    if (clientIt != _clients.end()) {
+        _clients.erase(clientIt);
+        close(fd);
+    }
+}
 
 int poller::newConnection(int fd) {
     socklen_t addrLen;
@@ -173,7 +180,8 @@ void poller::pollConnections() {
                     break;
                 }
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                size_t valRead = recv(it->fd, buffer, 1000, 0);
+//                size_t valRead = recv(it->fd, buffer, 1000, 0);
+                int valRead = recv(it->fd, buffer, 1000, 0);
                 if (valRead) {
 //                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
@@ -181,11 +189,14 @@ void poller::pollConnections() {
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
+//                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
                     // Do nothing for now - Maybe close connection if required.
                 }
                 if (valRead < 0) {
-                    std::cout << "No bytes to read" << std::endl;
-                    perror("What ");
+                    std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
+//                    perror("Error: ");
+
+                    deleteConnection(it->fd);
                     break;
                 }
             } else if (it->revents & POLLOUT) {
@@ -193,8 +204,13 @@ void poller::pollConnections() {
                 if (currentClient.isBufferFull()) { // Still unsure about the body
 //                    std::cout << "When in here?" << std::endl;
                     currentClient.parseRequestHeader();
-                    if (respondToClient(it->fd, currentClient.getResponse()) < 0) { // TODO check also for 0
-                        perror("send() failed");
+                    int valSent = respondToClient(it->fd, currentClient.getResponse());
+                    if (!valSent)
+                        std::cout << "Nothing more to send" << std::endl;
+                    if (valSent < 0) { // TODO check also for 0
+                        std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
+//                        perror("send() failed");
+                        deleteConnection(it->fd);
                         break;
                     }
                     currentClient.resetClient();

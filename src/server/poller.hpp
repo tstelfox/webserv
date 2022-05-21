@@ -42,6 +42,8 @@ public:
 
     void pollConnections();
 
+    void deleteConnection(int fd);
+
     // serverSock		*getSocket() const;
 
     // int				respondToClient(int sock); // This shit is temporary bollocks
