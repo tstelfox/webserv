@@ -59,6 +59,7 @@ private:
 
     /* Buffer variables */
     std::string _buffer;
+    bool _isChunked;
     bool _bodyPresent;
     bool _isBuffFull;
     size_t _bodySize;

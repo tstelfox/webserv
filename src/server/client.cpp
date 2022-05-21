@@ -19,6 +19,7 @@
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
+    _isChunked = false;
     _bodyPresent = false;
     _isBuffFull = false;
     _status = 200;
@@ -66,7 +67,8 @@ int client::fullHeaderReceived(const char *buff) {
                 stream >> headerElement;
                 if (!headerElement.compare("chunked")) {
                     std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
-                    // return chunkedHeaderReceieved(buff); // Something like this
+                    _isChunked = true;
+                    // return chunkedHeaderReceieved(buff); // Something like this;
                 }
             }
             if (!headerElement.compare("Content-Length:")) {
@@ -78,13 +80,17 @@ int client::fullHeaderReceived(const char *buff) {
 
             if (!line.compare("\r")) {
                 // _isBuffFull = true   ; Request might have a body so not ready for this
-                if (_bodyPresent) {
+                if (_bodyPresent || _isChunked) {
                     break;
                 }
                 std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
                 return 1;
             }
         }
+    }
+    if (_isChunked) {
+        std::cout << MAGENTA << "Chunked body bro" << RESET_COLOUR << std::endl;
+//        return chunkedBody();
     }
     while (std::getline(ss, line)) {
         _body.append(line + "\n");
@@ -107,6 +113,7 @@ void client::resetClient() {
 //    _response.clear();
 //    bzero(&_buffer, sizeof(_buffer));
     _buffer.clear();
+    _isChunked = false;
     _isBuffFull = false;
     _bodyPresent = false;
     _status = 200;
