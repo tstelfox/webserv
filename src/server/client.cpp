@@ -44,6 +44,7 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
 
     std::string buffRead(buff);
     _buffer.append(buffRead);
+//    std::cout << "Lellety lollety" << std::endl;
     if (fullHeaderReceived(buff)) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
         _isBuffFull = true;
@@ -89,7 +90,7 @@ int client::fullHeaderReceived(const char *buff) {
         }
     }
     if (_isChunked) {
-        std::cout << CYAN << "Loopyloop?: " << _chunk << RESET_COLOUR << std::endl;
+//        std::cout << CYAN << "Loopyloop?: " << ss << RESET_COLOUR << std::endl;
         if (_chunk.empty()) {
             std::getline(ss, line);
             std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
@@ -121,7 +122,17 @@ int client::fullHeaderReceived(const char *buff) {
                 _body.append(_chunk);
                 _chunk.clear();
                 _chunkSize = 0;
-
+                std::getline(ss, line);
+                std::getline(ss, line);
+                int end;
+                std::stringstream streamy;
+                streamy << line;
+                streamy >> end;
+                if (end == 0) {
+                    std::cout << "SERIOUSLY???" << std::endl;
+                    return 1;
+                }
+//                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
             }
         }
     }
