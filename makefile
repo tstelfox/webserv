@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/05/19 13:04:03 by akramp        ########   odam.nl          #
+#    Updated: 2022/05/23 15:44:26 by akramp        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ CGI = cgi.cpp
 OBJ_DIR = obj
 SRC_DIR = src
 OBJ = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRC))
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/parsing \
 		-Isrc/exceptions -Isrc/responseHandler
 ifdef DEBUG

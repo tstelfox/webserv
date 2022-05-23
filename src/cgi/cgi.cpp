@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/18 14:48:55 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/23 12:43:49 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/23 15:52:35 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <sys/types.h>
 #include <iostream>
 #include <strings.h>
+#include <sys/stat.h>
+#include <stdio.h>
 
 WSERV::Cgi::Cgi(std::string &path, std::string first, std::string second) : _path(path)
 {
@@ -36,21 +38,15 @@ WSERV::Cgi::Cgi(std::string &path, std::string first, std::string second) : _pat
 		throw std::runtime_error("Fork Failed in cgi");
     if (pid == 0)
     {
-        std::cout << "test!!" << std::endl;
-        if (execve(_path.c_str(), _argv, newenviron) == -1)
-            throw std::runtime_error("Error: execve failed in cgi");
         if (dup2(_cgi_fd[READ], STDOUT_FILENO) == -1 || close(_cgi_fd[READ]) == -1)
 			throw std::runtime_error("Error: dup2/close failed");
         if (dup2(_cgi_fd[WRITE], STDOUT_FILENO) == -1 || close(_cgi_fd[WRITE]) == -1)
 			throw std::runtime_error("Error: dup2/close failed");
+        if (execve(_path.c_str(), _argv, newenviron) == -1)
+            throw std::runtime_error("Error: execve failed in cgi");
 		exit(0);
     }
     waitpid(0, &status, 0);
-    // char string[sizeof(_cgi_fd[WRITE])];
-    // bzero(string, sizeof(string));
-    // int ret = read(_cgi_fd[WRITE], string, sizeof(_cgi_fd[WRITE]));
-    // string[ret] = '\0';
-    // std::cout << string << std::endl;
 }
 
 WSERV::Cgi::~Cgi()
@@ -73,4 +69,19 @@ WSERV::Cgi & WSERV::Cgi::operator = (Cgi const & copy)
     this->_path = copy._path;
     this->_argv = copy._argv;
 	return *this;
+}
+
+int *WSERV::Cgi::get_cgi_fd(void) const
+{
+    return (this->_cgi_fd);
+}
+
+std::string WSERV::Cgi::get_path(void) const
+{
+    return (this->_path);
+}
+
+char **WSERV::Cgi::get_argv(void) const
+{
+    return (this->_argv);
 }

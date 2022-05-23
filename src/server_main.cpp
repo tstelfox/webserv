@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/20 16:16:42 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/23 15:53:19 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,10 @@ int main(int argc, char *argv[]) {
         std::string cgistr = L.get_cgi();
         // std::cout << cgistr << std::endl;
         WSERV::Cgi cgi_yo(cgistr, "17", "3");
+        char string[150];
+        bzero(string, 150);
+        read(cgi_yo.get_cgi_fd()[READ], string, 150);
+        std::cout << string << std::endl;
     }
     catch (const std::exception &e) {
         std::cerr << e.what() << '\n';

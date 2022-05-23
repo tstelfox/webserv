@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/18 14:48:51 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/23 12:42:35 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/23 12:54:30 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,8 @@ namespace WSERV {
             friend class poller; //?
             
             std::string get_path(void) const;
-            int get_cgi_fd(void) const;
-
-            void set_path(std::string const data);
-            void set_cgi_fd(int const data);
+            int *get_cgi_fd(void) const;
+            char **get_argv(void) const;
     };
 }
 
