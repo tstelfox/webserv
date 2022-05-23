@@ -45,13 +45,12 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
     _buffer.append(buffRead);
     if (fullHeaderReceived(buff)) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
-        _isBuffFull = true; // Check if there's a body or nah
+        _isBuffFull = true;
     }
     std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
-//    std::string request(_buffer);
     std::string request(buff);
     std::istringstream ss(request);
     std::string line;
