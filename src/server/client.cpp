@@ -20,6 +20,7 @@ client::client(std::string hostIp, int port, configVector const& configs, int so
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
     _isChunked = false;
+    _chunkSize = 0;
     _bodyPresent = false;
     _isBuffFull = false;
     _status = 200;
@@ -47,7 +48,7 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
         _isBuffFull = true;
     }
-    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
+//    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
@@ -88,41 +89,56 @@ int client::fullHeaderReceived(const char *buff) {
         }
     }
     if (_isChunked) {
-        std::getline(ss, line);
-        if (line == "0") {
-//            std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
-            return 1;
+        std::cout << CYAN << "Loopyloop?: " << _chunk << RESET_COLOUR << std::endl;
+        if (_chunk.empty()) {
+            std::getline(ss, line);
+            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
+            if (line.empty())
+                return 0;
+//            if (line == "0") {
+//                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+//                return 1;
+//            }
+            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
+                      << RESET_COLOUR << std::endl;
+            std::stringstream sizeStream;
+            sizeStream << std::hex << line;
+            sizeStream >> _chunkSize;
+            if (_chunkSize == 0) {
+                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+                return 1;
+            }
+            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
         }
-        std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line << RESET_COLOUR << std::endl;
-        unsigned int currentChunkSize;
-        std::stringstream sizeStream;
-        sizeStream << std::hex << line;
-        sizeStream >> currentChunkSize;
-        std::cout << MAGENTA << "Chunk size converted to int: " << currentChunkSize << RESET_COLOUR << std::endl;
+
         while (std::getline(ss, line)) {
-//            std::cout << "Chunk of size " << currentChunkSize << " Line by line: " << line << std::endl;
-            _body.append(line + "\n");
+//            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
+            _chunk.append(line + "\n");
             if (ss.tellg() == -1)
-                _body.resize(_body.size() - 1);
-            if (_body.size() == currentChunkSize) {
-                std::cout << "FULL CHUNK OF SIZE:" << currentChunkSize << " RECEIVED" << std::endl;
-                break;
+                _chunk.resize(_chunk.size() - 1);
+            if (_chunk.size() == _chunkSize) {
+                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
+                _body.append(_chunk);
+                _chunk.clear();
+                _chunkSize = 0;
+
             }
         }
-        return 0;
     }
-    while (std::getline(ss, line)) {
-        _body.append(line + "\n");
-//        std::cout << RED << line << RESET_COLOUR << std::endl;
-        if (ss.tellg() == -1)
-            _body.resize(_body.size() - 1);
-//        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
-        if (_body.size() == _bodySize) {
-//            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
-            return 1;
+    else {
+        while (std::getline(ss, line)) {
+            _body.append(line + "\n");
+    //        std::cout << RED << line << RESET_COLOUR << std::endl;
+            if (ss.tellg() == -1)
+                _body.resize(_body.size() - 1);
+    //        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
+            if (_body.size() == _bodySize) {
+    //            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
+                return 1;
+            }
         }
+    //    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     }
-//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
@@ -133,6 +149,8 @@ void client::resetClient() {
 //    bzero(&_buffer, sizeof(_buffer));
     _buffer.clear();
     _isChunked = false;
+    _chunk.clear();
+    _chunkSize = 0;
     _isBuffFull = false;
     _bodyPresent = false;
     _status = 200;
