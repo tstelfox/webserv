@@ -19,6 +19,7 @@
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
+    _isChunked = false;
     _bodyPresent = false;
     _isBuffFull = false;
     _status = 200;
@@ -44,17 +45,15 @@ void client::fillBuffer(const char *buff, ssize_t valRead) {
     _buffer.append(buffRead);
     if (fullHeaderReceived(buff)) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
-        _isBuffFull = true; // Check if there's a body or nah
+        _isBuffFull = true;
     }
-//    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
+    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
-//    std::string request(_buffer);
     std::string request(buff);
     std::istringstream ss(request);
     std::string line;
-//    std::istringstream::pos_type bodyPoint = ss.tellg();
 
 //    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
@@ -63,6 +62,14 @@ int client::fullHeaderReceived(const char *buff) {
             std::stringstream stream(line);
             std::string headerElement;
             stream >> headerElement;
+            if(!headerElement.compare("Transfer-Encoding:")) {
+                stream >> headerElement;
+                if (!headerElement.compare("chunked")) {
+                    std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
+                    _isChunked = true;
+                    // return chunkedHeaderReceieved(buff); // Something like this;
+                }
+            }
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
@@ -72,13 +79,17 @@ int client::fullHeaderReceived(const char *buff) {
 
             if (!line.compare("\r")) {
                 // _isBuffFull = true   ; Request might have a body so not ready for this
-                if (_bodyPresent) {
+                if (_bodyPresent || _isChunked) {
                     break;
                 }
                 std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
                 return 1;
             }
         }
+    }
+    if (_isChunked) {
+        std::cout << MAGENTA << "Chunked body bro" << RESET_COLOUR << std::endl;
+//        return chunkedBody();
     }
     while (std::getline(ss, line)) {
         _body.append(line + "\n");
@@ -91,7 +102,7 @@ int client::fullHeaderReceived(const char *buff) {
             return 1;
         }
     }
-//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
+    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
@@ -101,6 +112,7 @@ void client::resetClient() {
 //    _response.clear();
 //    bzero(&_buffer, sizeof(_buffer));
     _buffer.clear();
+    _isChunked = false;
     _isBuffFull = false;
     _bodyPresent = false;
     _status = 200;

@@ -47,6 +47,13 @@ int poller::connectionError(short revents) const {
            (!(revents & (POLLIN)) && revents & POLLHUP);
 };
 
+void poller::deleteConnection(int fd) {
+    std::map<int, client>::iterator clientIt = _clients.find(fd);
+    if (clientIt != _clients.end()) {
+        _clients.erase(clientIt);
+        close(fd);
+    }
+}
 
 int poller::newConnection(int fd) {
     socklen_t addrLen;
@@ -88,7 +95,6 @@ int poller::newConnection(int fd) {
         std::cout << "New connection from port: " << port << \
             " on host: " << host << std::endl;
     }
-
     /*
         Make a vector of only the configs relevant to the host:port combination
         And pass that into the client class
@@ -109,10 +115,6 @@ int poller::newConnection(int fd) {
 
     std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
 
-    /*
-        Here is where I should just create an instance of a client connection that also contains
-        the accepted socket?
-    */
     client  newClient(hostIp, port, relevant, newConnection);
     _clients.insert(std::make_pair(newConnection, newClient));
 
@@ -124,7 +126,6 @@ std::set<int> poller::openPorts() {
     std::set<int> listenSockets;
     for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
         ports.insert(std::make_pair(it->get_host(), it->get_port()));
-        /*It's still here that I should be managing to keep track of the configs as well or is it???*/
     }
     for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++) {
         std::cout << "Host: " << i->first << " Port: " << i->second << std::endl;
@@ -144,7 +145,6 @@ std::set<int> poller::openPorts() {
 
 int poller::respondToClient(int socket, std::string response) {
 
-//    std::cout << "About to be sent: " << response << std::endl;
     char toSend[response.length() + 1];
     std::strcpy(toSend, response.c_str());
 
@@ -173,36 +173,36 @@ void poller::pollConnections() {
                     break;
                 }
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-                size_t valRead = recv(it->fd, buffer, 1000, 0);
+//                size_t valRead = recv(it->fd, buffer, 1000, 0);
+                int valRead = recv(it->fd, buffer, 1000, 0);
                 if (valRead) {
-//                    std::cout << BLUE << "Can't be in here right?" << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
 //                    std::cout << CYAN << "The full buffer: " << buffer << RESET_COLOUR << std::endl;
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
-                    // Do nothing for now - Maybe close connection if required.
+//                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
                 }
                 if (valRead < 0) {
-                    std::cout << "No bytes to read" << std::endl;
-                    perror("What ");
+                    std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
+//                    perror("Error: ");
+                    deleteConnection(it->fd);
                     break;
                 }
             } else if (it->revents & POLLOUT) {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
-                if (currentClient.isBufferFull()) { // Still unsure about the body
-//                    std::cout << "When in here?" << std::endl;
+                if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
-                    if (respondToClient(it->fd, currentClient.getResponse()) < 0) { // TODO check also for 0
-                        perror("send() failed");
+                    int valSent = respondToClient(it->fd, currentClient.getResponse());
+                    if (!valSent)
+                        std::cout << "Nothing more to send" << std::endl;
+                    if (valSent < 0) {
+                        std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
+//                        perror("send() failed");
+                        deleteConnection(it->fd);
                         break;
                     }
                     currentClient.resetClient();
-//                    return ; // Just for now
-                    /* Do the parsing here (Check if there is a body)
-                     * When parsing is done, respond.
-                     */
-//                    std::cout << "Appesi come Caravaggio" << std::endl;
                 }
             }
         }

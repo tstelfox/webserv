@@ -19,6 +19,7 @@
 #include <sys/stat.h> // For checking if directory
 #include <dirent.h> // For getting directory contents
 #include <time.h> // time for time
+#include <stdio.h> // remove()
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
@@ -240,9 +241,26 @@ std::string responseHandler::postResponse(std::string const& uri) {
 
 std::string responseHandler::deleteResponse(std::string uri) {
 
-    std::string properUri = rootResolution(uri);
-    std::cout << RED << "Delete tae fack: " << properUri << RESET_COLOUR << std::endl;
-    return "placeholder";
+    std::string filePath = rootResolution(uri);
+    std::cout << RED << "Delete tae fack: " << filePath << RESET_COLOUR << std::endl;
+
+    std::string response;
+    // 404 not found
+    // 410 gone (?)
+    // 403 Forbidden (God knows how)
+    if (remove(filePath.c_str())) {
+        std::cout << "It didn't delete shit" << std::endl;
+        std::cout << errno << std::endl;
+        perror("wassup: ");
+        if (errno == 2)
+            return respondError(404);
+    }
+    else {
+        response = "HTTP/1.1 200 OK\n" + buildDateLine() + "\n";
+        response += "<html>\n   <body>\n        <h1>That shit has been duly yote.</h1>\n    </body>\n</html>";
+    }
+    std::cout << "Successful delete: " << response << std::endl;
+    return response;
 }
 
 std::string responseHandler::respondError(int status) {
