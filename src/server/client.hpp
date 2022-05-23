@@ -60,6 +60,7 @@ private:
     /* Buffer variables */
     std::string _buffer;
     bool _isChunked;
+//    size_t _chunkSize;
     bool _bodyPresent;
     bool _isBuffFull;
     size_t _bodySize;

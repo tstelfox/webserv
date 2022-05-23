@@ -57,7 +57,7 @@ int client::fullHeaderReceived(const char *buff) {
 
 //    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
-    if (!_bodyPresent) {
+    if (!_bodyPresent && !_isChunked) {
         while (std::getline(ss, line)) {
             std::stringstream stream(line);
             std::string headerElement;
@@ -88,8 +88,28 @@ int client::fullHeaderReceived(const char *buff) {
         }
     }
     if (_isChunked) {
-        std::cout << MAGENTA << "Chunked body bro" << RESET_COLOUR << std::endl;
-//        return chunkedBody();
+        std::getline(ss, line);
+        if (line == "0") {
+//            std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+            return 1;
+        }
+        std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line << RESET_COLOUR << std::endl;
+        unsigned int currentChunkSize;
+        std::stringstream sizeStream;
+        sizeStream << std::hex << line;
+        sizeStream >> currentChunkSize;
+        std::cout << MAGENTA << "Chunk size converted to int: " << currentChunkSize << RESET_COLOUR << std::endl;
+        while (std::getline(ss, line)) {
+//            std::cout << "Chunk of size " << currentChunkSize << " Line by line: " << line << std::endl;
+            _body.append(line + "\n");
+            if (ss.tellg() == -1)
+                _body.resize(_body.size() - 1);
+            if (_body.size() == currentChunkSize) {
+                std::cout << "FULL CHUNK OF SIZE:" << currentChunkSize << " RECEIVED" << std::endl;
+                break;
+            }
+        }
+        return 0;
     }
     while (std::getline(ss, line)) {
         _body.append(line + "\n");
@@ -102,7 +122,7 @@ int client::fullHeaderReceived(const char *buff) {
             return 1;
         }
     }
-    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
+//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
