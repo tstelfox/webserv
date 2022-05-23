@@ -66,7 +66,7 @@ int client::fullHeaderReceived(const char *buff) {
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
-//                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
 
@@ -82,15 +82,16 @@ int client::fullHeaderReceived(const char *buff) {
     }
     while (std::getline(ss, line)) {
         _body.append(line + "\n");
+//        std::cout << RED << line << RESET_COLOUR << std::endl;
         if (ss.tellg() == -1)
             _body.resize(_body.size() - 1);
 //        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
         if (_body.size() == _bodySize) {
-            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
+//            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
             return 1;
         }
     }
-
+//    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     return 0;
 }
 
@@ -153,6 +154,10 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _status = 400;
     } else
         _requestedHost = fields["host"];
+
+    if (fields.count("content-length"))
+        if (fields["content-type"].compare("text/plain"))
+            _status = 415;
 }
 
 void client::parseRequestHeader() {
@@ -221,7 +226,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
 
-    responseHandler response(_requestLine, rightConfig, fields);
+    responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);
 
 //    resetClient();

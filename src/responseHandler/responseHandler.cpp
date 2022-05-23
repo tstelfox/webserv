@@ -22,8 +22,8 @@
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                                 std::map <std::string, std::string> &fields)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields) {
+                                 std::map <std::string, std::string> &fields, std::string body)
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {
 //    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
 }
 
@@ -35,9 +35,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (status != 200)
         return respondError(status);
 
-    int locationStatus = matchLocation(uri);
-    if (locationStatus)
-        return respondError(locationStatus);
+    matchLocation(uri);
 
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
 
@@ -52,7 +50,6 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (allowedMethod.empty()) {
         allowedMethod[1] = "GET";
         allowedMethod[2] = "POST";
-    }
     if (allowedMethod.count(method) == 0) {
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
@@ -68,8 +65,10 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         case 1:
             return getResponse(uri);
         case 2:
-            std::cout << "POST request" << std::endl;
-            return postResponse(uri);
+//            std::cout << "POST request" << std::endl;
+            if (_body.size() > _location.get_max_file_size())
+                return respondError(413);
+            return postResponse();
 //            break;
         case 3:
             std::cout << "DELETE request" << std::endl;
@@ -81,33 +80,35 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 int responseHandler::matchLocation(std::string uri) {
     std::vector <WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
+    int success = 0;
 
     bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
          locIter != locationsVec.end(); locIter++) {
+        std::string path = locIter->get_location_path();
+        std::cout << "The fucking path is: " << path << std::endl;
         /* Exact match */
-        if (!uri.compare(locIter->get_location_path())) {
-            std::cout << "Exact Location match" << std::endl;
+        if (!uri.compare(path)) {
+            std::cout << GREEN << "Exact Location match" << RESET_COLOUR << std::endl;
             location = *locIter;
             aMatch = true;
+            success = 1;
             break;
+
         }
-        /* location is incorporated into uri */
-//        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
-//        if (uri.find(locIter->get_location_path()) != std::string::npos) {
-////            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
-//            location = *locIter;
-//            aMatch = true;
-////            if ((locIter + 1) == locationsVec.end())
-////                break;
-//        }
+        /* TODO location incorporated into uri according to the fucked up subject */
+        /* Check if the first part of the uri is an exact match of the location */
+//        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
+//        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
+        if (path.length() > 1 && !uri.compare(0, path.size(), path)) {
+            std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
+            location = *locIter;
+        }
     }
-//    if (!aMatch)
-//        return 404;
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
-    return 0;
+    return success;
 }
 
 std::string responseHandler::getResponse(std::string uri) {
@@ -141,15 +142,20 @@ std::string responseHandler::getResponse(std::string uri) {
 
 
 
-    std::cout << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
-              << std::endl;
+    std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() << " and, if present, index is: " << _location.get_index()
+              << RESET_COLOUR << std::endl;
 
     std::string requestedPath;
-    if (!_location.get_root().empty())
-        requestedPath = _location.get_root();
-    else
+    if (!_location.get_root().empty()) {
+        if (!uri.compare(_location.get_location_path()))
+            requestedPath = _location.get_root();
+        else
+            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+    }
+    else {
         requestedPath = uri;
-    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the finalUri: " << uri << RESET_COLOUR << std::endl;
+    }
+    std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
 
     /* Check for index -
@@ -214,15 +220,37 @@ std::string responseHandler::getResponse(std::string uri) {
     return responseHeader;
 }
 
-std::string responseHandler::postResponse(std::string uri) {
-//    std::cout << "Poche seghe: " <<
-    (void) uri;
-    return "placeholder";
+std::string responseHandler::postResponse() {
+
+    std::string path;
+    if (_location.get_root().empty())
+        path = _location.get_location_path();
+    else
+        path = _location.get_root();
+
+    std::string fileName = path + "/Madonna";
+    if (std::ifstream(fileName))
+        fileName += "Maiala";
+    std::ofstream file(fileName);
+    if (!file) {
+        std::cout << "File creation failed" << std::endl;
+        return "dé";
+        /* if it fails, give some sort of error ffs */
+        //        return respondError();
+    }
+    file << _body;
+
+    std::string response = "HTTP/1.1 201 Created\n";
+    response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
+            + std::to_string(_config.get_port()) + "/" + fileName;
+
+
+    return response;
 }
 
 std::string responseHandler::respondError(int status) {
 
-    std::cout << MAGENTA << "We be responding to an error" << RESET_COLOUR << std::endl;
+    std::cout << MAGENTA << "We be responding to an error: " << status << RESET_COLOUR << std::endl;
     std::string response;
     response = buildHttpLine(status);
     response += buildDateLine();
@@ -240,6 +268,7 @@ std::string responseHandler::respondError(int status) {
     response.append("\n\n");
 //    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
     response.append(body + "\n");
+    std::cout << RED << "<<<<-------- The response ------->>>>\n" << RESET_COLOUR << response << std::endl;
     return response;
 }
 
@@ -336,6 +365,7 @@ std::string responseHandler::buildHttpLine(int status) {
     statusCodes[404] = "Not Found";
     statusCodes[405] = "Method Not Allowed";
     statusCodes[413] = "Request Entity Too Large";
+    statusCodes[415] = "Unsupported Media Type";
     statusCodes[505] = "HTTP Version Not Supported";
 
     std::string response = "HTTP/1.1 ";

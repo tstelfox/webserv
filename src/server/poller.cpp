@@ -144,6 +144,7 @@ std::set<int> poller::openPorts() {
 
 int poller::respondToClient(int socket, std::string response) {
 
+//    std::cout << "About to be sent: " << response << std::endl;
     char toSend[response.length() + 1];
     std::strcpy(toSend, response.c_str());
 
