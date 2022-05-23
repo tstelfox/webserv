@@ -86,47 +86,50 @@ int client::fullHeaderReceived(const char *buff) {
         }
     }
     if (_isChunked) {
-        return chunkedRequest(ss);
-//        if (_chunk.empty()) {
-//            std::getline(ss, line);
-//            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
-//            if (line.empty())
-//                return 0;
-//            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
-//                      << RESET_COLOUR << std::endl;
-//            std::stringstream sizeStream;
-//            sizeStream << std::hex << line;
-//            sizeStream >> _chunkSize;
-//            if (_chunkSize == 0) {
-//                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
-//                return 1;
-//            }
-//            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
-//        }
-//
-//        while (std::getline(ss, line)) {
-////            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
-//            _chunk.append(line + "\n");
-//            if (ss.tellg() == -1)
-//                _chunk.resize(_chunk.size() - 1);
-//            if (_chunk.size() == _chunkSize) {
-//                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
-//                _body.append(_chunk);
-//                _chunk.clear();
-//                std::getline(ss, line);
-//                std::getline(ss, line);
-//                if (!line.empty()) {
-//                    std::stringstream streamy;
-//                    streamy << line;
-//                    streamy >> _chunkSize;
-//                    if (_chunkSize == 0) {
-//                        std::cout << CYAN << "Reached the end of the chunked body" << RESET_COLOUR << std::endl;
-//                        return 1;
-//                    }
-//                }
-////                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
-//            }
-//        }
+//        return chunkedRequest(ss);
+        if (_chunk.empty()) {
+            std::getline(ss, line);
+            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
+            if (line.empty())
+                return 0;
+            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
+                      << RESET_COLOUR << std::endl;
+            std::stringstream sizeStream;
+            sizeStream << std::hex << line;
+            sizeStream >> _chunkSize;
+            if (_chunkSize == 0) {
+                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+                return 1;
+            }
+            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
+        }
+        int i = 0;
+        while (std::getline(ss, line)) {
+//            int i = 0;
+            std::cout << "working on it " << i++ << std::endl;
+            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
+            std::cout << "size of the chunk: " << _chunk.size() << std::endl;
+            _chunk.append(line + "\n");
+            if (ss.tellg() == -1)
+                _chunk.resize(_chunk.size() - 1);
+            if (_chunk.size() == _chunkSize) {
+                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
+                _body.append(_chunk);
+                _chunk.clear();
+                std::getline(ss, line);
+                std::getline(ss, line);
+                if (!line.empty()) {
+                    std::stringstream streamy;
+                    streamy << line;
+                    streamy >> _chunkSize;
+                    if (_chunkSize == 0) {
+                        std::cout << CYAN << "Reached the end of the chunked body" << RESET_COLOUR << std::endl;
+                        return 1;
+                    }
+                }
+//                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
+            }
+        }
     }
     else {
         while (std::getline(ss, line)) {
