@@ -69,7 +69,6 @@ int client::fullHeaderReceived(const char *buff) {
                 if (!headerElement.compare("chunked")) {
                     std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
                     _isChunked = true;
-                    // return chunkedHeaderReceieved(buff); // Something like this;
                 }
             }
             if (!headerElement.compare("Content-Length:")) {
@@ -96,10 +95,6 @@ int client::fullHeaderReceived(const char *buff) {
             std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
             if (line.empty())
                 return 0;
-//            if (line == "0") {
-//                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
-//                return 1;
-//            }
             std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
                       << RESET_COLOUR << std::endl;
             std::stringstream sizeStream;
