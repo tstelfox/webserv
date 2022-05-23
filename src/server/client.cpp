@@ -37,8 +37,6 @@ client::~client() {}
 
 /* < ---------- Manage Incoming Request Buffer ----------- > */
 
-
-/* Questions still hang over this implementation when there is a body */
 void client::fillBuffer(const char *buff, ssize_t valRead) {
     (void)valRead;
 
@@ -77,7 +75,6 @@ int client::fullHeaderReceived(const char *buff) {
                 std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
-
             if (!line.compare("\r")) {
                 // _isBuffFull = true   ; Request might have a body so not ready for this
                 if (_bodyPresent || _isChunked) {
@@ -89,48 +86,47 @@ int client::fullHeaderReceived(const char *buff) {
         }
     }
     if (_isChunked) {
-//        std::cout << CYAN << "Loopyloop?: " << ss << RESET_COLOUR << std::endl;
-        if (_chunk.empty()) {
-            std::getline(ss, line);
-            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
-            if (line.empty())
-                return 0;
-            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
-                      << RESET_COLOUR << std::endl;
-            std::stringstream sizeStream;
-            sizeStream << std::hex << line;
-            sizeStream >> _chunkSize;
-            if (_chunkSize == 0) {
-                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
-                return 1;
-            }
-            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
-        }
-
-        while (std::getline(ss, line)) {
-//            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
-            _chunk.append(line + "\n");
-            if (ss.tellg() == -1)
-                _chunk.resize(_chunk.size() - 1);
-            if (_chunk.size() == _chunkSize) {
-                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
-                _body.append(_chunk);
-                _chunk.clear();
-//                _chunkSize = 0;
-                std::getline(ss, line);
-                std::getline(ss, line);
-                if (!line.empty()) {
-                    std::stringstream streamy;
-                    streamy << line;
-                    streamy >> _chunkSize;
-                    if (_chunkSize == 0) {
-                        std::cout << "SERIOUSLY???" << std::endl;
-                        return 1;
-                    }
-                }
-//                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
-            }
-        }
+        return chunkedRequest(ss);
+//        if (_chunk.empty()) {
+//            std::getline(ss, line);
+//            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
+//            if (line.empty())
+//                return 0;
+//            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
+//                      << RESET_COLOUR << std::endl;
+//            std::stringstream sizeStream;
+//            sizeStream << std::hex << line;
+//            sizeStream >> _chunkSize;
+//            if (_chunkSize == 0) {
+//                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+//                return 1;
+//            }
+//            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
+//        }
+//
+//        while (std::getline(ss, line)) {
+////            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
+//            _chunk.append(line + "\n");
+//            if (ss.tellg() == -1)
+//                _chunk.resize(_chunk.size() - 1);
+//            if (_chunk.size() == _chunkSize) {
+//                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
+//                _body.append(_chunk);
+//                _chunk.clear();
+//                std::getline(ss, line);
+//                std::getline(ss, line);
+//                if (!line.empty()) {
+//                    std::stringstream streamy;
+//                    streamy << line;
+//                    streamy >> _chunkSize;
+//                    if (_chunkSize == 0) {
+//                        std::cout << CYAN << "Reached the end of the chunked body" << RESET_COLOUR << std::endl;
+//                        return 1;
+//                    }
+//                }
+////                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
+//            }
+//        }
     }
     else {
         while (std::getline(ss, line)) {
@@ -149,19 +145,49 @@ int client::fullHeaderReceived(const char *buff) {
     return 0;
 }
 
-void client::resetClient() {
+int client::chunkedRequest(std::istringstream &ss) {
+    std::string line;
 
-
-//    _response.clear();
-//    bzero(&_buffer, sizeof(_buffer));
-    _buffer.clear();
-    _isChunked = false;
-    _chunk.clear();
-    _chunkSize = 0;
-    _isBuffFull = false;
-    _bodyPresent = false;
-    _status = 200;
-    _bodySize = 0;
+    if (_chunk.empty()) {
+        std::getline(ss, line);
+        std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
+        if (line.empty())
+            return 0;
+        std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
+                  << RESET_COLOUR << std::endl;
+        std::stringstream sizeStream;
+        sizeStream << std::hex << line;
+        sizeStream >> _chunkSize;
+        if (_chunkSize == 0) {
+            std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
+            return 1;
+        }
+        std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
+    }
+    while (std::getline(ss, line)) {
+//            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
+        _chunk.append(line + "\n");
+        if (ss.tellg() == -1)
+            _chunk.resize(_chunk.size() - 1);
+        if (_chunk.size() == _chunkSize) {
+            std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
+            _body.append(_chunk);
+            _chunk.clear();
+            std::getline(ss, line);
+            std::getline(ss, line);
+            if (!line.empty()) {
+                std::stringstream streamy;
+                streamy << line;
+                streamy >> _chunkSize;
+                if (_chunkSize == 0) {
+                    std::cout << CYAN << "Reached the end of the chunked body" << RESET_COLOUR << std::endl;
+                    return 1;
+                }
+            }
+//                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
+        }
+    }
+    return 0;
 }
 
 /* < --------- Request Parsing and Config Routing ------ > */
@@ -182,7 +208,6 @@ void client::parseRequestLine(std::string request) {
         _method = GET;
     ss >> _uri;
     if (!_uri.empty() && _uri[0] != '/') {
-        // Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
         _status = 400;
     }
     ss >> _http;
@@ -190,7 +215,7 @@ void client::parseRequestLine(std::string request) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
     }
     if (_status != 200) {
-        //Ya know the drill
+        //Ya know the drill todo
     }
 }
 
@@ -203,9 +228,6 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _status = 400;
         return;
     }
-    /* Test the following with no host
-        It may be that if the Uri is an absolute path then
-        host can actually be omitted (?) */
     if (fields["host"].empty() || !fields["host"].compare(" ")) {
         std::cout << "No host" << std::endl;
         _status = 400;
@@ -254,7 +276,7 @@ void client::parseRequestHeader() {
 //    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 //        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
     std::cout << std::endl;
-    requestedHost(fields); // If something is invalid in the request line just respond immediately.
+    requestedHost(fields);
     routeConfig(fields);
 }
 
@@ -263,7 +285,6 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 //    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
 ////        std::cout << "server_name: " << iter->get_server_name() << std::endl;
 //    }
-    // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
     WSERV::serverConfig  rightConfig;
     WSERV::serverConfig  *namelessConfig = nullptr;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
@@ -286,8 +307,9 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);
 
-//    resetClient();
 }
+
+/* < --------- GENERAL UTILS ------ > */
 
 std::string client::getBuffer() const {
     return _buffer;
@@ -299,4 +321,19 @@ std::string client::getResponse() const {
 
 bool client::isBufferFull() const {
     return _isBuffFull;
+}
+
+void client::resetClient() {
+
+
+//    _response.clear();
+//    bzero(&_buffer, sizeof(_buffer));
+    _buffer.clear();
+    _isChunked = false;
+    _chunk.clear();
+    _chunkSize = 0;
+    _isBuffFull = false;
+    _bodyPresent = false;
+    _status = 200;
+    _bodySize = 0;
 }

@@ -95,7 +95,6 @@ int responseHandler::matchLocation(std::string uri) {
             break;
 
         }
-        /* TODO location incorporated into uri according to the fucked up subject */
         /* Check if the first part of the uri is an exact match of the location */
 //        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
 //        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
