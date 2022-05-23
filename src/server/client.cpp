@@ -121,16 +121,17 @@ int client::fullHeaderReceived(const char *buff) {
                 std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
                 _body.append(_chunk);
                 _chunk.clear();
-                _chunkSize = 0;
+//                _chunkSize = 0;
                 std::getline(ss, line);
                 std::getline(ss, line);
-                int end;
-                std::stringstream streamy;
-                streamy << line;
-                streamy >> end;
-                if (end == 0) {
-                    std::cout << "SERIOUSLY???" << std::endl;
-                    return 1;
+                if (!line.empty()) {
+                    std::stringstream streamy;
+                    streamy << line;
+                    streamy >> _chunkSize;
+                    if (_chunkSize == 0) {
+                        std::cout << "SERIOUSLY???" << std::endl;
+                        return 1;
+                    }
                 }
 //                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
             }
