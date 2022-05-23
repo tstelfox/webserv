@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/18 14:48:51 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/20 16:27:55 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/23 12:42:35 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ namespace WSERV {
 
             void set_path(std::string const data);
             void set_cgi_fd(int const data);
-            void open_file(int rw);
     };
 }
 
