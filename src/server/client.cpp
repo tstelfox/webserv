@@ -103,17 +103,20 @@ int client::fullHeaderReceived(const char *buff) {
             }
             std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
         }
-        int i = 0;
         while (std::getline(ss, line)) {
-//            int i = 0;
-            std::cout << "working on it " << i++ << std::endl;
+            _chunk.append(line + "\n");
+            if (ss.tellg() == -1) {
+                std::cout << "Not in here?" << std::endl;
+//                std::cout << GREEN << "Chunk before: [" << line +"\n" << "]" << RESET_COLOUR << std::endl;
+                _chunk.resize(_chunk.size() - 1);
+//                std::cout << RED << "Chunk after: [" << line << "]" << RESET_COLOUR << std::endl;
+            }
             std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
             std::cout << "size of the chunk: " << _chunk.size() << std::endl;
-            _chunk.append(line + "\n");
-            if (ss.tellg() == -1)
-                _chunk.resize(_chunk.size() - 1);
+//            if (_chunkSize < _chunk.size()) // todo debug
+//            return 0;
             if (_chunk.size() == _chunkSize) {
-                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
+//                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
                 _body.append(_chunk);
                 _chunk.clear();
                 std::getline(ss, line);
@@ -143,7 +146,7 @@ int client::fullHeaderReceived(const char *buff) {
                 return 1;
             }
         }
-    //    std::cout << CYAN << _body << RESET_COLOUR << std::endl;
+//        std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     }
     return 0;
 }
@@ -238,7 +241,7 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _requestedHost = fields["host"];
 
     if (fields.count("content-length"))
-        if (fields["content-type"].compare("text/plain"))
+        if (fields["content-type"].compare("text/plain") && fields["content-type"].compare("text/html"))
             _status = 415;
 }
 
