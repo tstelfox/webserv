@@ -54,10 +54,7 @@ int client::fullHeaderReceived(const char *buff) {
     std::string request(buff);
     std::istringstream ss(request);
     std::string line;
-
     bool onlyBody = true;
-
-//    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
 
     if (!_bodyPresent && !_isChunked) {
         while (std::getline(ss, line)) {
@@ -78,7 +75,6 @@ int client::fullHeaderReceived(const char *buff) {
                 _bodyPresent = true;
             }
             if (!line.compare("\r")) {
-                // _isBuffFull = true   ; Request might have a body so not ready for this
                 onlyBody = false;
                 if (_bodyPresent || _isChunked) {
                     break;
@@ -88,55 +84,8 @@ int client::fullHeaderReceived(const char *buff) {
             }
         }
     }
-    if (_isChunked) {
+    if (_isChunked)
         return chunkedRequest(request, onlyBody);
-//        if (_chunk.empty()) {
-//            std::getline(ss, line);
-//            std::cout << RED << "Content of the fucking line please: [" << line << "]" << RESET_COLOUR << std::endl;
-//            if (line.empty())
-//                return 0;
-//            std::cout << MAGENTA << "Chunked body bro and this should be the size of the chunk in Hex: " << line
-//                      << RESET_COLOUR << std::endl;
-//            std::stringstream sizeStream;
-//            sizeStream << std::hex << line;
-//            sizeStream >> _chunkSize;
-//            if (_chunkSize == 0) {
-//                std::cout << RED << "Full body built from chunks: " << _body << RESET_COLOUR << std::endl;
-//                return 1;
-//            }
-//            std::cout << MAGENTA << "Chunk size converted to int: " << _chunkSize << RESET_COLOUR << std::endl;
-//        }
-//        while (std::getline(ss, line)) {
-//            _chunk.append(line + "\n");
-//            if (ss.tellg() == -1) {
-////                std::cout << "Not in here?" << std::endl;
-////                std::cout << GREEN << "Chunk before: [" << line +"\n" << "]" << RESET_COLOUR << std::endl;
-//                _chunk.resize(_chunk.size() - 1);
-////                std::cout << RED << "Chunk after: [" << line << "]" << RESET_COLOUR << std::endl;
-//            }
-//            std::cout << "Chunk of size " << _chunkSize << " Line by line: " << line << std::endl;
-////            std::cout << "size of the chunk: " << _chunk.size() << std::endl;
-////            if (_chunkSize < _chunk.size()) // todo debug
-////            return 0;
-//            if (_chunk.size() == _chunkSize) {
-//                std::cout << "FULL CHUNK OF SIZE:" << _chunkSize << " RECEIVED:\n" << _chunk << std::endl;
-//                _body.append(_chunk);
-//                _chunk.clear();
-//                std::getline(ss, line);
-//                std::getline(ss, line);
-//                if (!line.empty()) {
-//                    std::stringstream streamy;
-//                    streamy << line;
-//                    streamy >> _chunkSize;
-//                    if (_chunkSize == 0) {
-//                        std::cout << CYAN << "Reached the end of the chunked body" << RESET_COLOUR << std::endl;
-//                        return 1;
-//                    }
-//                }
-////                std::cout << GREEN << "Line after full chunk: " << line << RESET_COLOUR << std::endl;
-//            }
-//        }
-    }
     else {
         while (std::getline(ss, line)) {
             _body.append(line + "\n");
@@ -154,19 +103,17 @@ int client::fullHeaderReceived(const char *buff) {
     return 0;
 }
 
-//int client::chunkedRequest(std::istringstream &ss) {
 int client::chunkedRequest(std::string buffer, bool onlyBody) {
     std::string chunkLenStr;
     std::stringstream sizeStream;
     std::stringstream ss;
-//    std::cout << CYAN << "Buffer before [" << buffer << "]" << RESET_COLOUR << std::endl;
+
     if (!onlyBody) {
         size_t pos = buffer.find("\r\n\r\n");
         buffer.erase(0, pos + 4);
         if (buffer.empty())
             return 0;
         std::cout << GREEN << "Correctly removed header? [" << buffer << "]" << RESET_COLOUR << std::endl;
-//        std::stringstream ss(buffer);
     }
     if (!_chunkSize) {
         ss.str(buffer);
@@ -182,9 +129,9 @@ int client::chunkedRequest(std::string buffer, bool onlyBody) {
             return 1;
         }
         buffer.erase(0, chunkLenStr.size() + 2);
-        std::cout << YELLOW << "The size of this new chunk is: " << _chunkSize << RESET_COLOUR << std::endl;
+//        std::cout << YELLOW << "The size of this new chunk is: " << _chunkSize << RESET_COLOUR << std::endl;
         int missingSize = _chunkSize - _chunk.size();
-        std::cout << MAGENTA << "Missing size is: " << missingSize << RESET_COLOUR << std::endl;
+//        std::cout << MAGENTA << "Missing size is: " << missingSize << RESET_COLOUR << std::endl;
         _chunk.append(buffer, 0, missingSize);
         _body.append(_chunk);
         buffer.erase(0, missingSize + 2);
