@@ -134,6 +134,8 @@ int client::chunkedRequest(std::string buffer, bool onlyBody) {
 //        std::cout << MAGENTA << "Missing size is: " << missingSize << RESET_COLOUR << std::endl;
         _chunk.append(buffer, 0, missingSize);
         _body.append(_chunk);
+        _chunk.clear();
+        _chunkSize = 0;
         buffer.erase(0, missingSize + 2);
         if (buffer == "0\r\n\r\n") {
             std::cout << "All chunks received" << std::endl;
