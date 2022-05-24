@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/18 14:30:27 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/19 13:56:19 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,10 @@ void set_Location_vec_func(WSERV::serverConfig  &S_temp, std::vector<WSERV::Loca
     S_temp.set_Location_vec( data );
 }
 
-void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
-{
-    S_temp.set_maxfilesize(std::atoi( data.c_str() ));
-}
-
-void set_time_out_func(WSERV::serverConfig  &S_temp, std::string data)
-{
-    S_temp.set_time_out(std::atoi( data.c_str() ));;
-}
+// void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
+// {
+//     S_temp.set_maxfilesize(std::atoi( data.c_str() ));
+// }
 
 void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
 {
@@ -145,19 +140,6 @@ void set_index_func(WSERV::Location  &L_temp, std::string data)
 void set_max_file_size_func(WSERV::Location  &L_temp, std::string data)
 {
     L_temp.set_max_file_size( std::atoi(data.c_str()) );
-}
-
-void set_auth_basic_func(WSERV::Location  &L_temp, std::string data)
-{
-    bool convert;
-
-    if (data.compare(0, 2, "on"))
-        convert = true;
-    else if (data.compare(0, 3, "off"))
-        convert = false;
-    else
-        throw IncorrectConfigExcep();
-    L_temp.set_auth_basic( convert );
 }
 
 void WSERV::Parser::set_redirection(WSERV::Location  &L_temp, std::string data, std::string loc_path)

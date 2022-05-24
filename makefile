@@ -6,16 +6,17 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/05/17 12:00:10 by akramp        ########   odam.nl          #
+#    Updated: 2022/05/24 19:30:13 by akramp        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = c++
 SRC = server_main.cpp sockets/socket.cpp responseHandler/responseHandler.cpp \
-		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX)
+		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX) $(CGI_PREFIX)
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
+CGI_PREFIX = $(addprefix cgi/, $(CGI))
 SERV = client.cpp poller.cpp serverConfig.cpp Location.cpp
 PARSE = Pars_add_vars_to_vec.cpp Pars_helper_funcs.cpp Pars_setters.cpp Parsing.cpp
 OBJ_DIR = obj
