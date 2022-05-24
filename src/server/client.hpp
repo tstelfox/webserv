@@ -14,6 +14,7 @@
 #define WEBSERV_CLIENT_HPP
 
 #include "serverConfig.hpp"
+#define BUFF_SIZE 2000
 
 
 class client {
@@ -28,7 +29,6 @@ public:
 
     /* Storing incoming client request */
     void fillBuffer(const char *buff, ssize_t valRead);
-    int fullHeaderReceived(const char *buff);
     bool isBufferFull() const;
 
     /* Parsing Request Header and Config Routing */
@@ -53,6 +53,11 @@ public:
 
 private:
     client();
+
+    /* Header retrieval */
+    int fullHeaderReceived(const char *buff);
+//    int chunkedRequest(std::istringstream &ss);
+    int chunkedRequest(std::string buffer, bool onlyBody);
 
     /* Variables needed for config routing */
     configVector _configs;

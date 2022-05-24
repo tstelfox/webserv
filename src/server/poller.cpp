@@ -145,6 +145,7 @@ std::set<int> poller::openPorts() {
 
 int poller::respondToClient(int socket, std::string response) {
 
+//    std::cout << "RESPONSE:\n" << response << std::endl;
     char toSend[response.length() + 1];
     std::strcpy(toSend, response.c_str());
 
@@ -155,7 +156,7 @@ int poller::respondToClient(int socket, std::string response) {
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
-    char buffer[1024] = {0};
+    char buffer[BUFF_SIZE] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
             perror("poll");
@@ -174,10 +175,10 @@ void poller::pollConnections() {
                 }
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
 //                size_t valRead = recv(it->fd, buffer, 1000, 0);
-                int valRead = recv(it->fd, buffer, 1000, 0);
+                int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
+//                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
                     currentClient.fillBuffer(buffer, valRead);
-//                    std::cout << CYAN << "The full buffer: " << buffer << RESET_COLOUR << std::endl;
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {

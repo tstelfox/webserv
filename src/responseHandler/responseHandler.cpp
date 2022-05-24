@@ -95,7 +95,6 @@ int responseHandler::matchLocation(std::string uri) {
             break;
 
         }
-        /* TODO location incorporated into uri according to the fucked up subject */
         /* Check if the first part of the uri is an exact match of the location */
 //        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
 //        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
@@ -233,7 +232,7 @@ std::string responseHandler::postResponse(std::string const& uri) {
 
     std::string response = "HTTP/1.1 201 Created\n";
     response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
-            + std::to_string(_config.get_port()) + "/" + fileName;
+            + std::to_string(_config.get_port()) + "/" + fileName + "\n\n";
 
 
     return response;
