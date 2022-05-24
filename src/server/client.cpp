@@ -19,6 +19,8 @@
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
     : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
 
+    _isChunked = false;
+    _chunkSize = 0;
     _bodyPresent = false;
     _isBuffFull = false;
     _status = 200;
@@ -35,44 +37,46 @@ client::~client() {}
 
 /* < ---------- Manage Incoming Request Buffer ----------- > */
 
-
-/* Questions still hang over this implementation when there is a body */
 void client::fillBuffer(const char *buff, ssize_t valRead) {
     (void)valRead;
 
     std::string buffRead(buff);
     _buffer.append(buffRead);
+//    std::cout << "Lellety lollety" << std::endl;
     if (fullHeaderReceived(buff)) {
         std::cout << CYAN << "Request Received in full" << RESET_COLOUR << std::endl;
-        _isBuffFull = true; // Check if there's a body or nah
+        _isBuffFull = true;
     }
 //    std::cout << YELLOW << "Buffer:\n" << _buffer << RESET_COLOUR << std::endl;
 }
 
 int client::fullHeaderReceived(const char *buff) {
-//    std::string request(_buffer);
     std::string request(buff);
     std::istringstream ss(request);
     std::string line;
-//    std::istringstream::pos_type bodyPoint = ss.tellg();
+    bool onlyBody = true;
 
-//    std::cout << RED << "Before we begin the buff is: " << buff << RESET_COLOUR << std::endl;
-
-    if (!_bodyPresent) {
+    if (!_bodyPresent && !_isChunked) {
         while (std::getline(ss, line)) {
             std::stringstream stream(line);
             std::string headerElement;
             stream >> headerElement;
+            if(!headerElement.compare("Transfer-Encoding:")) {
+                stream >> headerElement;
+                if (!headerElement.compare("chunked")) {
+                    std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
+                    _isChunked = true;
+                }
+            }
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
 //                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
-
             if (!line.compare("\r")) {
-                // _isBuffFull = true   ; Request might have a body so not ready for this
-                if (_bodyPresent) {
+                onlyBody = false;
+                if (_bodyPresent || _isChunked) {
                     break;
                 }
                 std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
@@ -80,30 +84,68 @@ int client::fullHeaderReceived(const char *buff) {
             }
         }
     }
-    while (std::getline(ss, line)) {
-        _body.append(line + "\n");
-        if (ss.tellg() == -1)
-            _body.resize(_body.size() - 1);
-//        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
-        if (_body.size() == _bodySize) {
-            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
-            return 1;
+    if (_isChunked)
+        return chunkedRequest(request, onlyBody);
+    else {
+        while (std::getline(ss, line)) {
+            _body.append(line + "\n");
+    //        std::cout << RED << line << RESET_COLOUR << std::endl;
+            if (ss.tellg() == -1)
+                _body.resize(_body.size() - 1);
+    //        std::cout << MAGENTA << "Size of body registered so far: " << _body.size() << RESET_COLOUR << std::endl;
+            if (_body.size() == _bodySize) {
+    //            std::cout << MAGENTA << "Request is completed and it has a body: " << _body << RESET_COLOUR << std::endl;
+                return 1;
+            }
         }
+//        std::cout << CYAN << _body << RESET_COLOUR << std::endl;
     }
-
     return 0;
 }
 
-void client::resetClient() {
+int client::chunkedRequest(std::string buffer, bool onlyBody) {
+    std::string chunkLenStr;
+    std::stringstream sizeStream;
+    std::stringstream ss;
 
-
-//    _response.clear();
-//    bzero(&_buffer, sizeof(_buffer));
-    _buffer.clear();
-    _isBuffFull = false;
-    _bodyPresent = false;
-    _status = 200;
-    _bodySize = 0;
+    if (!onlyBody) {
+        size_t pos = buffer.find("\r\n\r\n");
+        buffer.erase(0, pos + 4);
+        if (buffer.empty())
+            return 0;
+        std::cout << GREEN << "Correctly removed header? [" << buffer << "]" << RESET_COLOUR << std::endl;
+    }
+    if (!_chunkSize) {
+        ss.str(buffer);
+        ss >> chunkLenStr;
+        sizeStream << std::hex << chunkLenStr;
+        sizeStream >> _chunkSize;
+        if (_chunkSize == 0){
+            std::cout << "All chunks received" << std::endl;
+            return 1;
+        }
+        if (_chunkSize > BUFF_SIZE) {
+            _status = 400;
+            return 1;
+        }
+        buffer.erase(0, chunkLenStr.size() + 2);
+//        std::cout << YELLOW << "The size of this new chunk is: " << _chunkSize << RESET_COLOUR << std::endl;
+        int missingSize = _chunkSize - _chunk.size();
+//        std::cout << MAGENTA << "Missing size is: " << missingSize << RESET_COLOUR << std::endl;
+        _chunk.append(buffer, 0, missingSize);
+        _body.append(_chunk);
+        _chunk.clear();
+        _chunkSize = 0;
+        buffer.erase(0, missingSize + 2);
+        if (buffer == "0\r\n\r\n") {
+            std::cout << "All chunks received" << std::endl;
+            std::cout << COLOR_PINK << "Full body de-chunked:\n" << _body << std::endl;
+            return 1;
+        }
+//        std::cout << "Chunk at end" << _chunk << std::endl;
+//        std::cout << "Buffer at the end [" << buffer << "]"<< std::endl;
+    }
+    return 0;
 }
 
 /* < --------- Request Parsing and Config Routing ------ > */
@@ -124,7 +166,6 @@ void client::parseRequestLine(std::string request) {
         _method = GET;
     ss >> _uri;
     if (!_uri.empty() && _uri[0] != '/') {
-        // Consider also the possibility of an absolute uri e.g. http://github.com/tstelfox
         _status = 400;
     }
     ss >> _http;
@@ -132,7 +173,7 @@ void client::parseRequestLine(std::string request) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
     }
     if (_status != 200) {
-        //Ya know the drill
+        //Ya know the drill todo
     }
 }
 
@@ -145,14 +186,14 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _status = 400;
         return;
     }
-    /* Test the following with no host
-        It may be that if the Uri is an absolute path then
-        host can actually be omitted (?) */
     if (fields["host"].empty() || !fields["host"].compare(" ")) {
         std::cout << "No host" << std::endl;
         _status = 400;
     } else
         _requestedHost = fields["host"];
+    if (fields.count("content-length"))
+        if (fields["content-type"].compare("text/plain") && fields["content-type"].compare("text/html"))
+            _status = 415;
 }
 
 void client::parseRequestHeader() {
@@ -167,8 +208,8 @@ void client::parseRequestHeader() {
     _requestLine = line;
 
     std::map<std::string, std::string> fields;
-    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
-            _method << " " << _uri << " " << _http << std::endl << std::endl;
+//    std::cout << CYAN << "<-------Request line-------->\n" << RESET_COLOUR << \
+//            _method << " " << _uri << " " << _http << std::endl << std::endl;
 
     while (std::getline(ss, line)) {
         if (!line.compare("\r"))
@@ -188,20 +229,19 @@ void client::parseRequestHeader() {
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }
-    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
-    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
+//    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
+//    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+//        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
     std::cout << std::endl;
-    requestedHost(fields); // If something is invalid in the request line just respond immediately.
+    requestedHost(fields);
     routeConfig(fields);
 }
 
 void client::routeConfig(std::map<std::string, std::string> &fields) {
-    std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
-    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
-        std::cout << "server_name: " << iter->get_server_name() << std::endl;
-    }
-    // What if there is no server_name? Probs just exit and fuck off. Ask Angie what she's doing when it's left empty
+//    std::cout << "Must find config matching " << _requestedHost << " in one of" << std::endl;
+//    for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
+////        std::cout << "server_name: " << iter->get_server_name() << std::endl;
+//    }
     WSERV::serverConfig  rightConfig;
     WSERV::serverConfig  *namelessConfig = nullptr;
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++) {
@@ -224,8 +264,9 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     responseHandler response(_requestLine, rightConfig, fields);
     _response = response.parseAndRespond(_status, _method, _uri);
 
-//    resetClient();
 }
+
+/* < --------- GENERAL UTILS ------ > */
 
 std::string client::getBuffer() const {
     return _buffer;
@@ -237,4 +278,19 @@ std::string client::getResponse() const {
 
 bool client::isBufferFull() const {
     return _isBuffFull;
+}
+
+void client::resetClient() {
+
+
+//    _response.clear();
+//    bzero(&_buffer, sizeof(_buffer));
+    _buffer.clear();
+    _isChunked = false;
+    _chunk.clear();
+    _chunkSize = 0;
+    _isBuffFull = false;
+    _bodyPresent = false;
+    _status = 200;
+    _bodySize = 0;
 }

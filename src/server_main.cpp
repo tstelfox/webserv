@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     }
 
     /*Print all configs*/
-   parsedContents(S);
+//   parsedContents(S);
 
     /*Extract all the unique ports and put them into a set.*/
 
