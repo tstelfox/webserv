@@ -14,6 +14,7 @@
 #define WEBSERV_CLIENT_HPP
 
 #include "serverConfig.hpp"
+#define BUFF_SIZE 2000
 
 
 class client {
