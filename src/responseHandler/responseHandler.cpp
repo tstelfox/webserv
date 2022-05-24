@@ -23,8 +23,8 @@
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                                 std::map <std::string, std::string> &fields)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields) {
+                                 std::map <std::string, std::string> &fields, std::string body)
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {
 //    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
 }
 
@@ -36,9 +36,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     if (status != 200)
         return respondError(status);
 
-    int locationStatus = matchLocation(uri);
-    if (locationStatus)
-        return respondError(locationStatus);
+    matchLocation(uri);
 
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
 
@@ -81,6 +79,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
 int responseHandler::matchLocation(std::string uri) {
     std::vector <WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
+    int success = 0;
 
     bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
@@ -88,11 +87,13 @@ int responseHandler::matchLocation(std::string uri) {
         std::string path = locIter->get_location_path();
 //        std::cout << "The fucking path is: " << path << std::endl;
         /* Exact match */
-        if (!uri.compare(locIter->get_location_path())) {
-            std::cout << "Exact Location match" << std::endl;
+        if (!uri.compare(path)) {
+            std::cout << GREEN << "Exact Location match" << RESET_COLOUR << std::endl;
             location = *locIter;
             aMatch = true;
+            success = 1;
             break;
+
         }
         /* Check if the first part of the uri is an exact match of the location */
 //        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
@@ -101,22 +102,11 @@ int responseHandler::matchLocation(std::string uri) {
             std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
             location = *locIter;
         }
-        /* location is incorporated into uri */
-//        std::cout << RED << "Location path is: " << locIter->get_location_path() << " and uri is: " << uri << RESET_COLOUR << std::endl;
-//        if (uri.find(locIter->get_location_path()) != std::string::npos) {
-////            std::cout << "Location is a part of the uri: " << locIter->get_location_path() << std::endl;
-//            location = *locIter;
-//            aMatch = true;
-////            if ((locIter + 1) == locationsVec.end())
-////                break;
-//        }
     }
-//    if (!aMatch)
-//        return 404;
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
 
-    return 0;
+    return success;
 }
 
      /*
@@ -274,7 +264,7 @@ std::string responseHandler::deleteResponse(std::string uri) {
 
 std::string responseHandler::respondError(int status) {
 
-    std::cout << MAGENTA << "We be responding to an error" << RESET_COLOUR << std::endl;
+    std::cout << MAGENTA << "We be responding to an error: " << status << RESET_COLOUR << std::endl;
     std::string response;
     response = buildHttpLine(status);
     response += buildDateLine();
@@ -292,6 +282,7 @@ std::string responseHandler::respondError(int status) {
     response.append("\n\n");
 //    std::cout << RED << "<<<<-------- The response header ------->>>>\n" << RESET_COLOUR << response << std::endl;
     response.append(body + "\n");
+    std::cout << RED << "<<<<-------- The response ------->>>>\n" << RESET_COLOUR << response << std::endl;
     return response;
 }
 
@@ -388,6 +379,7 @@ std::string responseHandler::buildHttpLine(int status) {
     statusCodes[404] = "Not Found";
     statusCodes[405] = "Method Not Allowed";
     statusCodes[413] = "Request Entity Too Large";
+    statusCodes[415] = "Unsupported Media Type";
     statusCodes[505] = "HTTP Version Not Supported";
 
     std::string response = "HTTP/1.1 ";

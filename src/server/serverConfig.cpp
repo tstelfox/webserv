@@ -6,7 +6,7 @@
 /*   By: turloughmullan <turloughmullan@student.      +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 19:37:04 by turloughmul   #+#    #+#                 */
-/*   Updated: 2022/05/19 13:56:58 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/18 14:35:35 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,9 @@ WSERV::serverConfig &WSERV::serverConfig::operator=(serverConfig const &copy) {
     this->_port = copy._port;
     this->_host = copy._host;
     this->_server_name = copy._server_name;
+    this->_maxfilesize = copy._maxfilesize;
     this->_error_page = copy._error_page;
+    this->_time_out = copy._time_out;
     this->_Location_vec = copy._Location_vec;
     return *this;
 }
@@ -59,13 +61,13 @@ void WSERV::serverConfig::set_server_name(std::string const data) {
     this->_server_name = data;
 }
 
-// unsigned int WSERV::serverConfig::get_maxfilesize() const {
-//     return (this->_maxfilesize);
-// }
+unsigned int WSERV::serverConfig::get_maxfilesize() const {
+    return (this->_maxfilesize);
+}
 
-// void WSERV::serverConfig::set_maxfilesize(int const data) {
-//     this->_maxfilesize = data;
-// }
+void WSERV::serverConfig::set_maxfilesize(int const data) {
+    this->_maxfilesize = data;
+}
 
 std::string WSERV::serverConfig::get_error_page() const {
     return (this->_error_page);
@@ -73,6 +75,14 @@ std::string WSERV::serverConfig::get_error_page() const {
 
 void WSERV::serverConfig::set_error_page(std::string const data) {
     this->_error_page = data;
+}
+
+int WSERV::serverConfig::get_time_out() const {
+    return (this->_time_out);
+}
+
+void WSERV::serverConfig::set_time_out(int const data) {
+    this->_time_out = data;
 }
 
 std::vector<WSERV::Location> WSERV::serverConfig::get_Location_vec() const {
