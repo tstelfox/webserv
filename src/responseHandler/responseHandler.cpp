@@ -232,7 +232,7 @@ std::string responseHandler::postResponse(std::string const& uri) {
 
     std::string response = "HTTP/1.1 201 Created\n";
     response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
-            + std::to_string(_config.get_port()) + "/" + fileName;
+            + std::to_string(_config.get_port()) + "/" + fileName + "\n\n";
 
 
     return response;

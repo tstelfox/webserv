@@ -55,7 +55,8 @@ private:
 
     /* Header retrieval */
     int fullHeaderReceived(const char *buff);
-    int chunkedRequest(std::istringstream &ss);
+//    int chunkedRequest(std::istringstream &ss);
+    int chunkedRequest(std::string buffer, bool onlyBody);
 
     /* Variables needed for config routing */
     configVector _configs;
