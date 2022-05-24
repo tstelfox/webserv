@@ -71,7 +71,7 @@ int client::fullHeaderReceived(const char *buff) {
             if (!headerElement.compare("Content-Length:")) {
 //                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
-                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+//                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
             if (!line.compare("\r")) {
@@ -191,7 +191,6 @@ void client::requestedHost(std::map<std::string, std::string> &fields) {
         _status = 400;
     } else
         _requestedHost = fields["host"];
-
     if (fields.count("content-length"))
         if (fields["content-type"].compare("text/plain") && fields["content-type"].compare("text/html"))
             _status = 415;
@@ -262,7 +261,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
 
 
-    responseHandler response(_requestLine, rightConfig, fields, _body);
+    responseHandler response(_requestLine, rightConfig, fields);
     _response = response.parseAndRespond(_status, _method, _uri);
 
 }
