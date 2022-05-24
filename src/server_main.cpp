@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/03 15:40:57 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/18 14:45:50 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/24 19:36:20 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "serverConfig.hpp"
 #include "Parsing.hpp"
 #include "colours.hpp"
+#include "cgi/cgi.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -76,6 +77,23 @@ int main(int argc, char *argv[]) {
 
     /*Extract all the unique ports and put them into a set.*/
 
+    /*      cgi     */
+    
+    // try {
+    //     WSERV::Location L = S[0].get_Location_vec()[0];
+    //     std::string cgistr = L.get_cgi();
+    //     // std::cout << cgistr << std::endl;
+    //     WSERV::Cgi cgi_yo(cgistr, "17", "3");
+    //     char string[150];
+    //     bzero(string, 150);
+    //     read(cgi_yo.get_cgi_fd()[READ], string, 150);
+    //     std::cout << string << std::endl;
+    // }
+    // catch (const std::exception &e) {
+    //     std::cerr << e.what() << '\n';
+    //     return EXIT_FAILURE;
+    // }
+    
     poller littyServer(S);
     littyServer.pollConnections();
 
