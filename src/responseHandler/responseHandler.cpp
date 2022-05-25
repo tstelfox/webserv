@@ -275,9 +275,23 @@ std::string responseHandler::respondError(int status) {
 
 int responseHandler::cgiRequest(std::string request) {
 
-    std::cout << "Ma diocane" << std::endl;
-    if (request.find(".py?") != std::string::npos)
-        std::cout << RED << "Holy friggin shit boys it's a cgi" << RESET_COLOUR << std::endl;
+    if (request.find(".py?") == std::string::npos) {
+        std::cout << "Nothing to see here, go about your business." << std::endl;
+        return -1;
+    }
+    std::cout << RED << "Holy friggin shit boys it's a cgi" << RESET_COLOUR << std::endl;
+    std::string executablePath = request.substr(0, request.find(".py") + 3); // hacky but lel
+    std::cout << executablePath << " dioganaccio INFAME" << std::endl;
+
+    std::string arguments = request.substr(request.find(".py?") + 4);
+    std::cout << "The arguments themselves are: " << arguments << std::endl;
+    /* get the path out of the location I guess (?)*/
+    /* Extract the arguments */
+
+    /* Cgi  cgiExec(path, arg1, arg2);
+     * int output = cgiExec.get_cgi_fd();
+     * */
+
     return 0; // Placeholder
 }
 
