@@ -132,27 +132,17 @@ std::string responseHandler::getResponse(std::string const& uri) {
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
         std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
-//        if (!uri.compare(redirection)) {
         if (uri == redirection) {
             std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
             return redirectionResponse(_location.get_redirect().second);
         }
     }
 
-
     std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() <<
                 " and, if present, index is: " << _location.get_index() << RESET_COLOUR << std::endl;
 
     std::string requestedPath = rootResolution(uri);
-//    if (!_location.get_root().empty()) {
-//        if (!uri.compare(_location.get_location_path()))
-//            requestedPath = _location.get_root();
-//        else
-//            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
-//    }
-//    else {
-//        requestedPath = uri;
-//    }
+
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
     /* Check for index -
@@ -213,10 +203,6 @@ std::string responseHandler::getResponse(std::string const& uri) {
 std::string responseHandler::postResponse(std::string const& uri) {
 
     std::string path = rootResolution(uri);
-//    if (_location.get_root().empty())
-//        path = _location.get_location_path();
-//    else
-//        path = _location.get_root();
 
     std::string fileName = path + "/Madonna";
     if (std::ifstream(fileName))
@@ -224,9 +210,7 @@ std::string responseHandler::postResponse(std::string const& uri) {
     std::ofstream file(fileName);
     if (!file) {
         std::cout << "File creation failed" << std::endl;
-        return "dé";
-        /* if it fails, give some sort of error ffs */
-        //        return respondError();
+        return respondError(404);
     }
     file << _body;
 
@@ -291,11 +275,9 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
     std::string path = _config.get_error_page();
 //    std::cout << "Error file path: " << path << std::endl;
     path += std::to_string(status) + ".html";
-//    std::cout << "Error File path: " << path << std::endl;
     errFile.open(path);
-    if (errFile.fail()) {
-        // panic hard
-    }
+    if (errFile.fail())
+        return "Even extracting the error file failed.";
     std::ostringstream fileContent;
     fileContent << errFile.rdbuf();
     return fileContent.str();
@@ -357,7 +339,6 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
 }
 
 std::string responseHandler::redirectionResponse(std::string redirectionUri) {
-//    std::string placeHolder = "put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
@@ -392,7 +373,7 @@ std::string responseHandler::buildHttpLine(int status) {
 std::string responseHandler::buildDateLine() {
 
     time_t now = time(0);
-    char *date = ctime(&now); // TODO check if it leaks
+    char *date = ctime(&now); // TODO check if it leaks (Doesn't seem to)
     std::string stringDate = date;
     stringDate.insert(3, ",");
     stringDate.resize(stringDate.size() - 1);
