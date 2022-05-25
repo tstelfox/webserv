@@ -72,7 +72,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         case 3:
             return deleteResponse(uri);
         default:
-            return "Absolutely fuckin nvm"; // TODO IUNKNOW
+            return respondError(405);
     }
 }
 

@@ -125,6 +125,7 @@ int client::chunkedRequest(std::string buffer, bool onlyBody) {
             return 1;
         }
         if (_chunkSize > BUFF_SIZE) {
+            std::cout << "Invalid chunked request larger than buffer size" << std::endl;
             _status = 400;
             return 1;
         }
@@ -156,24 +157,18 @@ void client::parseRequestLine(std::string request) {
 
     ss >> field;
     /* 405 Method not allowed */
-    if (!field.compare("POST")) {
+    if (!field.compare("POST"))
         _method = POST;
-//        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
-    }
     else if (!field.compare("DELETE"))
         _method = DELETE;
     else if (!field.compare("GET"))
         _method = GET;
     ss >> _uri;
-    if (!_uri.empty() && _uri[0] != '/') {
+    if (!_uri.empty() && _uri[0] != '/')
         _status = 400;
-    }
     ss >> _http;
     if (_http.empty() || (!_http.empty() && _http.compare("HTTP/1.1"))) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
-    }
-    if (_status != 200) {
-        //Ya know the drill todo
     }
 }
 
@@ -233,7 +228,7 @@ void client::parseRequestHeader() {
 //    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
 //    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 //        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-    std::cout << std::endl;
+//    std::cout << std::endl;
     requestedHost(fields);
     routeConfig(fields);
 }
