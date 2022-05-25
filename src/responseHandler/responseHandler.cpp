@@ -92,10 +92,12 @@ int responseHandler::matchLocation(std::string uri) {
         /* Check if the first part of the uri is an exact match of the location */
 //        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
 //        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
-        if (path.length() > 1 && !uri.compare(0, path.size(), path)) {
+        if ((path.length() > 1 && !uri.compare(0, path.size(), path))
+            || (path.length() == 1 && std::count(uri.begin(), uri.end(), '/') == 1)) {
             std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
             location = *locIter;
         }
+
     }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
@@ -440,8 +442,12 @@ std::string responseHandler::rootResolution(std::string const& uri) {
     if (!_location.get_root().empty()) {
         if (!uri.compare(_location.get_location_path()))
             requestedPath = _location.get_root();
-        else
-            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+        else {
+            if (std::count(uri.begin(), uri.end(), '/') > 1)
+                requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+            else
+                requestedPath = _location.get_root() + uri;
+        }
     }
     else {
         requestedPath = uri;
