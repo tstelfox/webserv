@@ -294,8 +294,26 @@ int responseHandler::cgiRequest(std::string request) {
         pos = arguments.find("&");
         args.push_back(arguments.substr(0, pos));
     }
-    for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++)
-        std::cout << "The arguments: " << *it << std::endl;
+    for (size_t i = 0; i < args.size(); i++) {
+        args[i] = args[i].substr(args[i].find("=") + 1);
+        std::cout << args[i] << std::endl;
+    }
+
+    // Hacky but living for it
+    WSERV::Cgi exec(executablePath, args[0], args[1]);
+//    try {
+//    }
+//    catch (const std::exception &e) {
+//        respondError();
+//    }
+
+
+//    exec.get_cgi_fd();
+
+//    for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++) {
+//        *it = it->substr(it->find("="), 0);
+//        std::cout << "The arguments: " << *it << std::endl;
+//    }
     /* get the path out of the location I guess (?)*/
     /* Extract the arguments */
 
