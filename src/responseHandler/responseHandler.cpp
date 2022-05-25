@@ -170,9 +170,16 @@ std::string responseHandler::getResponse(std::string const& uri) {
         }
     }
     std::ifstream myFile;
+
+    // TODO check if it is a cgi request.
+    int cgiFd;
+    cgiFd = cgiRequest(requestedFile);
+    if (cgiFd != -1)
+        std::cout << "Panic" << std::endl;
+
     myFile.open(requestedFile);
     if (myFile.fail()) {
-        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
+//        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
         return respondError(404);
     }
 
@@ -264,18 +271,17 @@ std::string responseHandler::respondError(int status) {
     return response;
 }
 
-std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
-    std::ifstream errFile;
-    std::string path = _config.get_error_page();
-//    std::cout << "Error file path: " << path << std::endl;
-    path += std::to_string(status) + ".html";
-    errFile.open(path);
-    if (errFile.fail())
-        return "Even extracting the error file failed.";
-    std::ostringstream fileContent;
-    fileContent << errFile.rdbuf();
-    return fileContent.str();
+/* < ---------- CGI HANDLER ---------- > */
+
+int responseHandler::cgiRequest(std::string request) {
+
+    std::cout << "Ma diocane" << std::endl;
+    if (request.find(".py?") != std::string::npos)
+        std::cout << RED << "Holy friggin shit boys it's a cgi" << RESET_COLOUR << std::endl;
+    return 0; // Placeholder
 }
+
+/* < ---------- DIRECTORY LISTING ---------- > */
 
 std::string responseHandler::buildDirectoryListing(std::string &directory) {
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
@@ -332,6 +338,8 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     return directoryResponse;
 }
 
+/* < ---------- REDIRECTION RESPONSE ---------- > */
+
 std::string responseHandler::redirectionResponse(std::string redirectionUri) {
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
@@ -343,7 +351,7 @@ std::string responseHandler::redirectionResponse(std::string redirectionUri) {
     return redirectResponse;
 }
 
-/* < ---------- Response header building utils ---------- > */
+/* < ---------- RESPONSE HEADER BUILDING UTILS ---------- > */
 
 std::string responseHandler::buildHttpLine(int status) {
     std::map<int, std::string> statusCodes;
@@ -372,6 +380,19 @@ std::string responseHandler::buildDateLine() {
     stringDate.resize(stringDate.size() - 1);
     stringDate = "Date: " + stringDate + " GMT\n";
     return stringDate;
+}
+
+std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
+    std::ifstream errFile;
+    std::string path = _config.get_error_page();
+//    std::cout << "Error file path: " << path << std::endl;
+    path += std::to_string(status) + ".html";
+    errFile.open(path);
+    if (errFile.fail())
+        return "Even extracting the error file failed.";
+    std::ostringstream fileContent;
+    fileContent << errFile.rdbuf();
+    return fileContent.str();
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,

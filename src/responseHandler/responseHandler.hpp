@@ -48,6 +48,9 @@ private:
     /* DELETE request */
     std::string deleteResponse(std::string uri);
 
+    /* CGI request */
+    int cgiRequest(std::string request);
+
     /* Redirection Response */
     std::string redirectionResponse(std::string redirectionUri);
 

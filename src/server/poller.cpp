@@ -164,6 +164,7 @@ void poller::pollConnections() {
             client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+                deleteConnection(it->fd);
                 break;
             }
             if (it->revents & POLLIN) {
