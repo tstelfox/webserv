@@ -13,6 +13,7 @@
 #include "responseHandler.hpp"
 #include "colours.hpp"
 #include <iostream>
+#include <string>
 #include <map>
 #include <fstream>
 #include <sstream>
@@ -20,6 +21,9 @@
 #include <dirent.h> // For getting directory contents
 #include <time.h> // time for time
 #include <stdio.h> // remove()
+#include "../cgi/cgi.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
@@ -57,7 +61,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         method = 0;
     }
 
-
+std::cout << method << std::endl;
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
@@ -182,6 +186,44 @@ std::string responseHandler::getResponse(std::string const& uri) {
             return buildDirectoryListing(requestedFile);
         }
     }
+
+    // std::cout << "____________" << requestedFile << "__________" << std::endl;
+    // if (requestedFile.find("cgi_test.py", 0) != std::string::npos)
+    // {
+    //     try {
+    //     std::string cgistr = "./pages/cgi_test.py";
+    //     size_t i = 0;
+    //     std::string str = &uri[uri.find("num1", 0) + 4];
+    //     for ( ; i < str.length(); i++ ){ if ( isdigit(str[i]) ) break; }
+    //     str = str.substr(i, str.length() - i );
+    //     int num1 = atoi(str.c_str());
+    //     str = num1;
+    //     std::string str1 = std::to_string(num1);
+    //     std::cout << str1 << std::endl;
+    //     cgistr = "./pages/cgi_test.py";
+
+    //     i = 0;
+    //     str = &uri[uri.find("num2", 0) + 4];
+    //     for ( ; i < str.length(); i++ ){ if ( isdigit(str[i]) ) break; }
+    //     str = str.substr(i, str.length() - i );
+    //     int num2 = atoi(str.c_str());
+    //     std::string str2 = std::to_string(num2);
+    //     std::cout << str2 << std::endl;
+
+    //     WSERV::Cgi cgi_yo(cgistr, str1, str2);
+    //     char string[150];
+    //     bzero(string, 150);
+    //     read(cgi_yo.get_cgi_fd()[READ], string, 150);
+    //     std::cout << string << std::endl;
+    //     int fd = open("./pages/cgi_resp.html", O_WRONLY | O_APPEND | O_CREAT, 0644);
+    //     write(fd, string, strlen(string));
+    //     requestedFile = "./pages/cgi_resp.html";
+    // }
+    // catch (const std::exception &e) {
+    //     std::cerr << e.what() << '\n';
+    //     // exit( EXIT_FAILURE );
+    // }
+    // }    
     std::ifstream myFile;
     myFile.open(requestedFile);
     if (myFile.fail()) {

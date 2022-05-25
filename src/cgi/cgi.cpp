@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/18 14:48:55 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/24 16:05:44 by akramp        ########   odam.nl         */
+/*   Updated: 2022/05/25 17:47:30 by akramp        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,17 @@ WSERV::Cgi::Cgi(std::string &path, std::string first, std::string second) : _pat
     pid_t	pid;
     int status;
     char *newenviron[] = { NULL };
+
+
+    if (first.find_first_not_of("0123456789") == std::string::npos \
+        || second.find_first_not_of("0123456789") == std::string::npos)
+        throw std::runtime_error("Error: Not valid cgi numbers add digits only...");
     _cgi_fd = new int [2];
     _argv = new char* [4];
     _argv[0] = strdup(path.c_str());
     _argv[1] = strdup(first.c_str());
     _argv[2] = strdup(second.c_str());
     _argv[3] = 0;
-
     pipe(_cgi_fd);
     pid = fork();
 	if (pid == -1)
