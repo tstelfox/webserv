@@ -24,9 +24,7 @@
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
                                  std::map <std::string, std::string> &fields, std::string body)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {
-//    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
-}
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {}
 
 responseHandler::responseHandler() {}
 
@@ -35,9 +33,7 @@ responseHandler::~responseHandler() {}
 std::string responseHandler::parseAndRespond(int status, int method, std::string uri) {
     if (status != 200)
         return respondError(status);
-
     matchLocation(uri);
-
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
 
 //    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
@@ -56,8 +52,6 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
     }
-
-
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
@@ -124,10 +118,11 @@ int responseHandler::matchLocation(std::string uri) {
      *          - If uri leads to root which is a folder with index then display index
      *
      *
-     * Requested path is root + location + uri
      * */
 
 std::string responseHandler::getResponse(std::string const& uri) {
+
+    /* TODO clean up and split this func */
 
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
@@ -179,7 +174,6 @@ std::string responseHandler::getResponse(std::string const& uri) {
         return respondError(404);
     }
 
-
     std::ostringstream fileContent;
     fileContent << myFile.rdbuf();
     std::string responseBody = fileContent.str();
@@ -196,16 +190,15 @@ std::string responseHandler::getResponse(std::string const& uri) {
               << responseHeader << std::endl;
     responseHeader.append(responseBody + "\n");
 
-
     return responseHeader;
 }
 
 std::string responseHandler::postResponse(std::string const& uri) {
 
     std::string path = rootResolution(uri);
-
     std::string fileName = path + "/Madonna";
-    if (std::ifstream(fileName))
+
+    while (std::ifstream(fileName))
         fileName += "Maiala";
     std::ofstream file(fileName);
     if (!file) {
@@ -213,11 +206,10 @@ std::string responseHandler::postResponse(std::string const& uri) {
         return respondError(404);
     }
     file << _body;
-
+    file.close();
     std::string response = "HTTP/1.1 201 Created\n";
     response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
             + std::to_string(_config.get_port()) + "/" + fileName + "\n\n";
-
 
     return response;
 }
@@ -345,7 +337,6 @@ std::string responseHandler::redirectionResponse(std::string redirectionUri) {
 //    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
 
     redirectResponse += redirectionUri + "\n\n";
-
     std::cout << redirectResponse << std::endl;
     return redirectResponse;
 }

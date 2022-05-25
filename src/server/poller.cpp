@@ -56,6 +56,7 @@ void poller::deleteConnection(int fd) {
 }
 
 int poller::newConnection(int fd) {
+    /* TODO cleanup and split this function after cgi */
     socklen_t addrLen;
     struct sockaddr_in addr;
     bzero(&addr, sizeof(struct sockaddr_in));
@@ -78,13 +79,12 @@ int poller::newConnection(int fd) {
         return 0;
     }
     setPollFd(newConnection, (POLLIN | POLLOUT));
-
     /* Retrieving the host:port this connection is coming from
      * This could Perhaps even be its own function
     */
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
-    int port; // This might not work?
+    int port;
     char *host = NULL;
 
     if (getsockname(newConnection, (struct sockaddr *)&sin, &len))
@@ -97,7 +97,7 @@ int poller::newConnection(int fd) {
     }
     /*
         Make a vector of only the configs relevant to the host:port combination
-        And pass that into the client class
+        And pass that into the client class for server block routing
     */
     configVector relevant;
     std::string hostIp = host;
@@ -111,7 +111,6 @@ int poller::newConnection(int fd) {
 //        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
 //            " and server_name: " << iter->get_server_name() << std::endl;
 //    }
-
 
     std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
 
@@ -145,7 +144,6 @@ std::set<int> poller::openPorts() {
 
 int poller::respondToClient(int socket, std::string response) {
 
-//    std::cout << "RESPONSE:\n" << response << std::endl;
     char toSend[response.length() + 1];
     std::strcpy(toSend, response.c_str());
 
@@ -186,7 +184,6 @@ void poller::pollConnections() {
                 }
                 if (valRead < 0) {
                     std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
-//                    perror("Error: ");
                     deleteConnection(it->fd);
                     break;
                 }
@@ -199,7 +196,6 @@ void poller::pollConnections() {
                         std::cout << "Nothing more to send" << std::endl;
                     if (valSent < 0) {
                         std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
-//                        perror("send() failed");
                         deleteConnection(it->fd);
                         break;
                     }
