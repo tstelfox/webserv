@@ -285,6 +285,17 @@ int responseHandler::cgiRequest(std::string request) {
 
     std::string arguments = request.substr(request.find(".py?") + 4);
     std::cout << "The arguments themselves are: " << arguments << std::endl;
+    // Make a vector of arguments?
+    std::vector<std::string> args;
+    size_t pos = arguments.find("&");
+    args.push_back(arguments.substr(0, pos));
+    arguments.erase(0, pos + 1);
+    while (pos != std::string::npos) {
+        pos = arguments.find("&");
+        args.push_back(arguments.substr(0, pos));
+    }
+    for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++)
+        std::cout << "The arguments: " << *it << std::endl;
     /* get the path out of the location I guess (?)*/
     /* Extract the arguments */
 
