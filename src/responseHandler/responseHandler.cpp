@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "responseHandler.hpp"
+#include "cgi.hpp"
 #include "colours.hpp"
 #include <iostream>
 #include <map>
