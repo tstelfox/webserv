@@ -73,6 +73,7 @@ int poller::newConnection(int fd) {
         return 0;
     }
     int on = 1;
+//    if ((setsockopt(newConnection, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0)) {
     if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int)) < 0)) {
         std::cout << "sockoptions got fucked" << std::endl;
         return 0;
@@ -200,13 +201,18 @@ void poller::pollConnections() {
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
                     int valSent = respondToClient(it->fd, currentClient.getResponse());
-                    if (!valSent) {
+                    if (valSent) { // TODO this was introduced to fix siege issues but hmmmm
+                        deleteConnection(it->fd);
+                        _sockets.erase(it);
+                        break;
+                    }
+                    else if (!valSent) {
                         deleteConnection(it->fd);
                         _sockets.erase(it);
                         break;
                         std::cout << "Nothing more to send" << std::endl;
                     }
-                    if (valSent < 0) {
+                    else if (valSent < 0) {
                         std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
                         deleteConnection(it->fd);
                         _sockets.erase(it);
