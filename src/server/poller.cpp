@@ -167,18 +167,16 @@ void poller::pollConnections() {
             client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
-//                perror("Diocaneeee ");
                 deleteConnection(it->fd);
                 _sockets.erase(it);
                 break;
             }
             if (it->revents & POLLIN) {
-                if (portSockets.count(it->fd)) { // This should check that it's one of the listening sockets
+                if (portSockets.count(it->fd)) { // This checks that it's one of the listening sockets
                     newConnection(it->fd);
                     break;
                 }
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-//                size_t valRead = recv(it->fd, buffer, 1000, 0);
                 int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
 //                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
@@ -186,7 +184,7 @@ void poller::pollConnections() {
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
-                    deleteConnection(it->fd); // fix the siege problem please
+                    deleteConnection(it->fd);
                     _sockets.erase(it);
                     break;
 //                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
