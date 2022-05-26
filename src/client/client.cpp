@@ -17,7 +17,7 @@
 #include "responseHandler.hpp"
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
-    : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
+    : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket), _isCgi(false) {
 
     _isChunked = false;
     _chunkSize = 0;
@@ -26,6 +26,7 @@ client::client(std::string hostIp, int port, configVector const& configs, int so
     _status = 200;
     _method = 0;
     _bodySize = 0;
+    _cgiFd = -1;
 }
 
 client::client() {
@@ -259,6 +260,12 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 
     responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);
+    if (response.isCgiResponse()) {
+        _isCgi = true;
+        _cgiFd = response.getCgiFd();
+        std::cout << CYAN << "So cgi fd now in client is: " << _cgiFd << RESET_COLOUR << std::endl;
+    }
+
 
 }
 
@@ -280,11 +287,21 @@ bool client::isBufferFull() const {
     return _isBuffFull;
 }
 
+bool client::isCgi() const {
+    return _isCgi;
+}
+
+int client::getCgiFd() const {
+    return _cgiFd;
+}
+
 void client::resetClient() {
 
 
 //    _response.clear();
 //    bzero(&_buffer, sizeof(_buffer));
+    _isCgi = false;
+    _cgiFd = -1;
     _buffer.clear();
     _isChunked = false;
     _chunk.clear();

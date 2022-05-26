@@ -21,11 +21,12 @@
 #include <dirent.h> // For getting directory contents
 #include <time.h> // time for time
 #include <stdio.h> // remove()
+#include <unistd.h>
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
                                  std::map <std::string, std::string> &fields, std::string body)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {}
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body), _isCGI(false), _cgiFd(-1) {}
 
 responseHandler::responseHandler() {}
 
@@ -175,8 +176,14 @@ std::string responseHandler::getResponse(std::string const& uri) {
     // TODO check if it is a cgi request.
     int cgiFd;
     cgiFd = cgiRequest(requestedFile);
-    if (cgiFd != -1)
-        std::cout << "Panic" << std::endl;
+    if (cgiFd != -1) {
+//        std::cout << "Panic: " << cgiFd << std::endl;
+        _cgiFd = cgiFd;
+        _isCGI = true;
+        return "This-Is-a-CGI___frfr";
+    }
+    else if (cgiFd == -99)
+        return respondError(404);
 
     myFile.open(requestedFile);
     if (myFile.fail()) {
@@ -301,12 +308,19 @@ int responseHandler::cgiRequest(std::string request) {
     }
 
     // Hacky but living for it
-    WSERV::Cgi exec(executablePath, args[0], args[1]);
-//    try {
-//    }
-//    catch (const std::exception &e) {
-//        respondError();
-//    }
+//    char buffer[5000];
+//    read(*exec.get_cgi_fd(), &buffer, 5000);
+//    std::cout << buffer << std::endl;
+    int ret = -99;
+    try {
+        WSERV::Cgi exec(executablePath, args[0], args[1]);
+        ret = *exec.get_cgi_fd();
+    }
+    catch (const std::exception &e) {
+        return -99;
+    }
+
+    return ret;
 
 
 //    exec.get_cgi_fd();
@@ -518,4 +532,12 @@ std::string responseHandler::rootResolution(std::string const& uri) {
         requestedPath = uri;
     }
     return requestedPath;
+}
+
+bool responseHandler::isCgiResponse() const {
+    return _isCGI;
+}
+
+int responseHandler::getCgiFd() const {
+    return _cgiFd;
 }

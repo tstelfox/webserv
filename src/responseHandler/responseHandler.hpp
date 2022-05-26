@@ -27,6 +27,9 @@ public:
 
     std::string parseAndRespond(int status, int method, std::string uri);
 
+    bool    isCgiResponse() const;
+    int     getCgiFd() const;
+
 
 private:
     responseHandler();
@@ -70,6 +73,7 @@ private:
     bool    isDirectory(std::string const& path);
     std::string rootResolution(std::string const& uri);
 
+
     /* Should probably send in the request line tbh */
     std::string _requestLine;
     WSERV::serverConfig _config;
@@ -80,6 +84,9 @@ private:
     WSERV::Location _location;
     /* Status code */
 //    int _status;
+    /* CGI */
+    bool    _isCGI;
+    int     _cgiFd;
 
     /* Ultimate response to return */
     std::string _finalResponse;
