@@ -272,6 +272,10 @@ std::string client::getResponse() const {
     return _response;
 }
 
+int     client::getSocket() const {
+    return _socket;
+}
+
 bool client::isBufferFull() const {
     return _isBuffFull;
 }

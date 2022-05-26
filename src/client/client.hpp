@@ -41,6 +41,7 @@ public:
     /* Getters */
     std::string getBuffer() const;
     std::string getResponse() const;
+    int         getSocket() const;
 
     /* Reset client */
     void resetClient();

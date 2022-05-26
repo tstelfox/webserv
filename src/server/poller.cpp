@@ -49,10 +49,13 @@ int poller::connectionError(short revents) const {
 
 void poller::deleteConnection(int fd) {
     std::map<int, client>::iterator clientIt = _clients.find(fd);
+//    std::cout << "CLient size before: " << _clients.size() << std::endl;
+//    _client.erase()
     if (clientIt != _clients.end()) {
         _clients.erase(clientIt);
         close(fd);
     }
+//    std::cout << "CLient size after: " << _clients.size() << std::endl;
 }
 
 int poller::newConnection(int fd) {
@@ -164,7 +167,9 @@ void poller::pollConnections() {
             client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+//                perror("Diocaneeee ");
                 deleteConnection(it->fd);
+                _sockets.erase(it);
                 break;
             }
             if (it->revents & POLLIN) {
@@ -181,11 +186,15 @@ void poller::pollConnections() {
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
+                    deleteConnection(it->fd); // fix the siege problem please
+                    _sockets.erase(it);
+                    break;
 //                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
                 }
                 if (valRead < 0) {
                     std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
                     deleteConnection(it->fd);
+                    _sockets.erase(it);
                     break;
                 }
             } else if (it->revents & POLLOUT) {
@@ -193,11 +202,16 @@ void poller::pollConnections() {
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
                     int valSent = respondToClient(it->fd, currentClient.getResponse());
-                    if (!valSent)
+                    if (!valSent) {
+                        deleteConnection(it->fd);
+                        _sockets.erase(it);
+                        break;
                         std::cout << "Nothing more to send" << std::endl;
+                    }
                     if (valSent < 0) {
                         std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
                         deleteConnection(it->fd);
+                        _sockets.erase(it);
                         break;
                     }
                     currentClient.resetClient();
