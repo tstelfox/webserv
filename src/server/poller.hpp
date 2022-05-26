@@ -30,11 +30,13 @@ public:
 
     ~poller();
 
-    void setPollFd(int fd, short events);
+    socketVector::iterator setPollFd(int fd, short events);
 
     int connectionError(short revents) const;
 
     int newConnection(int fd);
+
+    int newCgiConnection(int fd);
 
     std::set<int> openPorts();
 

@@ -314,7 +314,7 @@ int responseHandler::cgiRequest(std::string request) {
     int ret = -99;
     try {
         WSERV::Cgi exec(executablePath, args[0], args[1]);
-        ret = &exec.get_cgi_fd();
+        ret = *exec.get_cgi_fd();
     }
     catch (const std::exception &e) {
         std::cout << e.what() << std::endl;

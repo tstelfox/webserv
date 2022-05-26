@@ -35,7 +35,7 @@ poller::poller(configVector const& configVector) : _serverConfigs(configVector) 
 
 poller::~poller() {}
 
-void poller::setPollFd(int fd, short events) {
+socketVector::iterator poller::setPollFd(int fd, short events) {
     struct pollfd newPollFd;
     newPollFd.fd = fd;
     newPollFd.events = events;
@@ -124,6 +124,11 @@ int poller::newConnection(int fd) {
     return 1;
 }
 
+int poller::newCgiConnection(int fd) {
+
+
+}
+
 std::set<int> poller::openPorts() {
     std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
     std::set<int> listenSockets;
@@ -202,8 +207,9 @@ void poller::pollConnections() {
                     currentClient.parseRequestHeader();
                     if (currentClient.isCgi()) {
                         std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd() << std::endl;
-//                        new_cgi_connection(currentClient.getCgiFd());
-                        return; // Temporary
+
+                        socketVector::iterator cgiIt = setPollFd(currentClient.getCgiFd(), POLLIN);
+//                        return; // Temporary
                         break;
                     }
                     int valSent = respondToClient(it->fd, currentClient.getResponse());
