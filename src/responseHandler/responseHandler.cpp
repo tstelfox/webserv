@@ -177,7 +177,7 @@ std::string responseHandler::getResponse(std::string const& uri) {
     int cgiFd;
     cgiFd = cgiRequest(requestedFile);
     if (cgiFd != -1) {
-//        std::cout << "Panic: " << cgiFd << std::endl;
+        std::cout << "Panic: " << cgiFd << std::endl;
         _cgiFd = cgiFd;
         _isCGI = true;
         return "This-Is-a-CGI___frfr";
@@ -314,9 +314,10 @@ int responseHandler::cgiRequest(std::string request) {
     int ret = -99;
     try {
         WSERV::Cgi exec(executablePath, args[0], args[1]);
-        ret = *exec.get_cgi_fd();
+        ret = &exec.get_cgi_fd();
     }
     catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
         return -99;
     }
 

@@ -200,6 +200,12 @@ void poller::pollConnections() {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
+                    if (currentClient.isCgi()) {
+                        std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd() << std::endl;
+//                        new_cgi_connection(currentClient.getCgiFd());
+                        return; // Temporary
+                        break;
+                    }
                     int valSent = respondToClient(it->fd, currentClient.getResponse());
                     if (valSent) { // TODO this was introduced to fix siege issues but hmmmm
                         deleteConnection(it->fd);
