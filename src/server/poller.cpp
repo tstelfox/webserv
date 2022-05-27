@@ -35,7 +35,7 @@ poller::poller(configVector const& configVector) : _serverConfigs(configVector) 
 
 poller::~poller() {}
 
-socketVector::iterator poller::setPollFd(int fd, short events) {
+void poller::setPollFd(int fd, short events) {
     struct pollfd newPollFd;
     newPollFd.fd = fd;
     newPollFd.events = events;
@@ -124,10 +124,10 @@ int poller::newConnection(int fd) {
     return 1;
 }
 
-int poller::newCgiConnection(int fd) {
-
-
-}
+//int poller::newCgiConnection(int fd) {
+//
+//
+//}
 
 std::set<int> poller::openPorts() {
     std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
@@ -163,6 +163,7 @@ int poller::respondToClient(int socket, std::string response) {
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
+    std::map<int, client*> cgiSockets;
     char buffer[BUFF_SIZE] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
@@ -182,6 +183,16 @@ void poller::pollConnections() {
                     newConnection(it->fd);
                     break;
                 }
+                if (cgiSockets.count(it->fd)) {
+                    char cgiBuffer[BUFF_SIZE];
+                    int cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
+                    std::cout << RED << "Cgi buffer" << cgiBuffer << RESET_COLOUR << std::endl;
+                    if (cgiRead)
+                        cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
+                    memset(cgiBuffer, 0, sizeof(buffer));
+                    continue;
+                }
+
 //                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
@@ -205,14 +216,29 @@ void poller::pollConnections() {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
+                    std::string response = currentClient.getResponse();
                     if (currentClient.isCgi()) {
-                        std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd() << std::endl;
+                        if (!currentClient.getCgiResponse().empty()) {
+                            response = currentClient.getCgiResponse();
+                        }
+                        else {
+                            std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd()
+                                      << std::endl;
 
-                        socketVector::iterator cgiIt = setPollFd(currentClient.getCgiFd(), POLLIN);
-//                        return; // Temporary
-                        break;
+                            int cgiFd = currentClient.getCgiFd();
+                            struct pollfd newCgiFd;
+                            newCgiFd.fd = cgiFd;
+                            newCgiFd.events = POLLIN;
+
+                            cgiSockets.insert(std::make_pair(cgiFd, &currentClient));
+                            _sockets.insert(_sockets.begin(), newCgiFd);
+
+                            //                        socketVector::iterator cgiIt = setPollFd(currentClient.getCgiFd(), POLLIN);
+                            //                        return; // Temporary
+                            break;
+                        }
                     }
-                    int valSent = respondToClient(it->fd, currentClient.getResponse());
+                    int valSent = respondToClient(it->fd, response);
                     if (valSent) { // TODO this was introduced to fix siege issues but hmmmm
                         deleteConnection(it->fd);
                         _sockets.erase(it);

@@ -44,6 +44,10 @@ public:
     int         getSocket() const;
     bool        isCgi() const;
     int         getCgiFd() const;
+    std::string getCgiResponse() const;
+
+    /* Set Cgi Response */
+    void        saveCgiResponse(char *buffer);
 
     /* Reset client */
     void resetClient();
@@ -100,6 +104,7 @@ private:
     /* CGI vars */
     bool _isCgi;
     int _cgiFd;
+    std::string _cgiResponse;
 };
 
 

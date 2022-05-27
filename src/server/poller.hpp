@@ -30,7 +30,7 @@ public:
 
     ~poller();
 
-    socketVector::iterator setPollFd(int fd, short events);
+    void setPollFd(int fd, short events);
 
     int connectionError(short revents) const;
 

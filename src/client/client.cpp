@@ -300,6 +300,7 @@ void client::resetClient() {
 
 //    _response.clear();
 //    bzero(&_buffer, sizeof(_buffer));
+    _cgiResponse.clear();
     _isCgi = false;
     _cgiFd = -1;
     _buffer.clear();
@@ -310,4 +311,15 @@ void client::resetClient() {
     _bodyPresent = false;
     _status = 200;
     _bodySize = 0;
+}
+
+std::string client::getCgiResponse() const {
+    return _cgiResponse;
+}
+
+void    client::saveCgiResponse(char *buffer) {
+
+    std::string str(buffer);
+
+    _cgiResponse = str;
 }
