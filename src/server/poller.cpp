@@ -190,6 +190,8 @@ void poller::pollConnections() {
                     if (cgiRead)
                         cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
                     memset(cgiBuffer, 0, sizeof(buffer));
+                    close(it->fd);
+                    cgiSockets.erase(cgiSockets.find(it->fd));
                     continue;
                 }
 
