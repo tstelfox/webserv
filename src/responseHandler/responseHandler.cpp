@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "responseHandler.hpp"
+#include "cgi.hpp"
 #include "colours.hpp"
 #include <iostream>
 #include <map>
@@ -20,13 +21,12 @@
 #include <dirent.h> // For getting directory contents
 #include <time.h> // time for time
 #include <stdio.h> // remove()
+#include <unistd.h>
 
 
 responseHandler::responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
                                  std::map <std::string, std::string> &fields, std::string body)
-        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body) {
-//    std::cout << ITALIC << COLOR_NEON << "Brr I find out what to respond now" << FORMAT_RESET << RESET_COLOUR << std::endl;
-}
+        : _requestLine(requestLine), _config(configs), _requestFields(fields), _body(body), _isCGI(false), _cgiFd(-1) {}
 
 responseHandler::responseHandler() {}
 
@@ -35,9 +35,7 @@ responseHandler::~responseHandler() {}
 std::string responseHandler::parseAndRespond(int status, int method, std::string uri) {
     if (status != 200)
         return respondError(status);
-
     matchLocation(uri);
-
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
 
 //    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
@@ -56,8 +54,6 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         std::cout << "That method is not allowed yo" << std::endl;
         method = 0;
     }
-
-
     /* Parsing method */
     std::cout << "Request Line is: " << _requestLine << std::endl;
     switch (method) {
@@ -72,7 +68,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
         case 3:
             return deleteResponse(uri);
         default:
-            return "Absolutely fuckin nvm"; // TODO IUNKNOW
+            return respondError(405);
     }
 }
 
@@ -98,10 +94,12 @@ int responseHandler::matchLocation(std::string uri) {
         /* Check if the first part of the uri is an exact match of the location */
 //        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
 //        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
-        if (path.length() > 1 && !uri.compare(0, path.size(), path)) {
+        if ((path.length() > 1 && !uri.compare(0, path.size(), path))
+            || (path.length() == 1 && std::count(uri.begin(), uri.end(), '/') == 1)) {
             std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
             location = *locIter;
         }
+
     }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
@@ -124,35 +122,26 @@ int responseHandler::matchLocation(std::string uri) {
      *          - If uri leads to root which is a folder with index then display index
      *
      *
-     * Requested path is root + location + uri
      * */
 
 std::string responseHandler::getResponse(std::string const& uri) {
 
+    /* TODO clean up and split this func */
+
     std::string redirection = _location.get_redirect().first;
     if (!redirection.empty()) {
         std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
-//        if (!uri.compare(redirection)) {
         if (uri == redirection) {
             std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
             return redirectionResponse(_location.get_redirect().second);
         }
     }
 
-
     std::cout << COLOR_BABYBLUE << "location root is: " << _location.get_root() <<
                 " and, if present, index is: " << _location.get_index() << RESET_COLOUR << std::endl;
 
     std::string requestedPath = rootResolution(uri);
-//    if (!_location.get_root().empty()) {
-//        if (!uri.compare(_location.get_location_path()))
-//            requestedPath = _location.get_root();
-//        else
-//            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
-//    }
-//    else {
-//        requestedPath = uri;
-//    }
+
     std::cout << CYAN << "Correct full requested path is: " << requestedPath << " and the uri: " << uri << RESET_COLOUR << std::endl;
 
     /* Check for index -
@@ -183,12 +172,26 @@ std::string responseHandler::getResponse(std::string const& uri) {
         }
     }
     std::ifstream myFile;
+
+    // TODO check if it is a cgi request.
+    int cgiFd;
+    cgiFd = cgiRequest(requestedFile);
+    if (cgiFd != -1) {
+        std::cout << "Panic: " << cgiFd << std::endl;
+        _cgiFd = cgiFd;
+        _isCGI = true;
+        return "This-Is-a-CGI___frfr";
+    }
+    else if (cgiFd == -99)
+        return respondError(404);
+
+
+
     myFile.open(requestedFile);
     if (myFile.fail()) {
-        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
+//        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
         return respondError(404);
     }
-
 
     std::ostringstream fileContent;
     fileContent << myFile.rdbuf();
@@ -206,34 +209,26 @@ std::string responseHandler::getResponse(std::string const& uri) {
               << responseHeader << std::endl;
     responseHeader.append(responseBody + "\n");
 
-
     return responseHeader;
 }
 
 std::string responseHandler::postResponse(std::string const& uri) {
 
     std::string path = rootResolution(uri);
-//    if (_location.get_root().empty())
-//        path = _location.get_location_path();
-//    else
-//        path = _location.get_root();
-
     std::string fileName = path + "/Madonna";
-    if (std::ifstream(fileName))
+
+    while (std::ifstream(fileName))
         fileName += "Maiala";
     std::ofstream file(fileName);
     if (!file) {
         std::cout << "File creation failed" << std::endl;
-        return "dé";
-        /* if it fails, give some sort of error ffs */
-        //        return respondError();
+        return respondError(404);
     }
     file << _body;
-
+    file.close();
     std::string response = "HTTP/1.1 201 Created\n";
     response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
             + std::to_string(_config.get_port()) + "/" + fileName + "\n\n";
-
 
     return response;
 }
@@ -286,20 +281,68 @@ std::string responseHandler::respondError(int status) {
     return response;
 }
 
-std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
-    std::ifstream errFile;
-    std::string path = _config.get_error_page();
-//    std::cout << "Error file path: " << path << std::endl;
-    path += std::to_string(status) + ".html";
-//    std::cout << "Error File path: " << path << std::endl;
-    errFile.open(path);
-    if (errFile.fail()) {
-        // panic hard
+/* < ---------- CGI HANDLER ---------- > */
+
+int responseHandler::cgiRequest(std::string request) {
+
+    if (request.find(".py?") == std::string::npos) {
+        std::cout << "Nothing to see here, go about your business." << std::endl;
+        return -1;
     }
-    std::ostringstream fileContent;
-    fileContent << errFile.rdbuf();
-    return fileContent.str();
+    std::cout << RED << "Holy friggin shit boys it's a cgi" << RESET_COLOUR << std::endl;
+    std::string executablePath = request.substr(0, request.find(".py") + 3); // hacky but lel
+    std::cout << executablePath << " dioganaccio INFAME" << std::endl;
+
+    std::string arguments = request.substr(request.find(".py?") + 4);
+    std::cout << "The arguments themselves are: " << arguments << std::endl;
+    // Make a vector of arguments?
+    std::vector<std::string> args;
+    size_t pos = arguments.find("&");
+    args.push_back(arguments.substr(0, pos));
+    arguments.erase(0, pos + 1);
+    while (pos != std::string::npos) {
+        pos = arguments.find("&");
+        args.push_back(arguments.substr(0, pos));
+    }
+    for (size_t i = 0; i < args.size(); i++) {
+        args[i] = args[i].substr(args[i].find("=") + 1);
+        std::cout << args[i] << std::endl;
+    }
+
+    // Hacky but living for it
+//    char buffer[5000];
+//    read(*exec.get_cgi_fd(), &buffer, 5000);
+//    std::cout << buffer << std::endl;
+    int ret = -99;
+    try {
+        WSERV::Cgi exec(executablePath, args[0], args[1]);
+        ret = *exec.get_cgi_fd();
+    }
+    catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+        return -99;
+    }
+
+    return ret;
+
+
+//    exec.get_cgi_fd();
+
+//    for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++) {
+//        *it = it->substr(it->find("="), 0);
+//        std::cout << "The arguments: " << *it << std::endl;
+//    }
+    /* get the path out of the location I guess (?)*/
+    /* Extract the arguments */
+
+    /* Cgi  cgiExec(path, arg1, arg2);
+     * int output = cgiExec.get_cgi_fd();
+     * */
+
+    return 0; // Placeholder
 }
+
+/* < ---------- DIRECTORY LISTING ---------- > */
 
 std::string responseHandler::buildDirectoryListing(std::string &directory) {
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
@@ -356,20 +399,20 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     return directoryResponse;
 }
 
+/* < ---------- REDIRECTION RESPONSE ---------- > */
+
 std::string responseHandler::redirectionResponse(std::string redirectionUri) {
-//    std::string placeHolder = "put_test/index.html";
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
 //    redirectResponse += std::to_string(_config.get_port()[0]) + placeHolder + "\n\n";
 
     redirectResponse += redirectionUri + "\n\n";
-
     std::cout << redirectResponse << std::endl;
     return redirectResponse;
 }
 
-/* < ---------- Response header building utils ---------- > */
+/* < ---------- RESPONSE HEADER BUILDING UTILS ---------- > */
 
 std::string responseHandler::buildHttpLine(int status) {
     std::map<int, std::string> statusCodes;
@@ -392,12 +435,25 @@ std::string responseHandler::buildHttpLine(int status) {
 std::string responseHandler::buildDateLine() {
 
     time_t now = time(0);
-    char *date = ctime(&now); // TODO check if it leaks
+    char *date = ctime(&now); // TODO check if it leaks (Doesn't seem to)
     std::string stringDate = date;
     stringDate.insert(3, ",");
     stringDate.resize(stringDate.size() - 1);
     stringDate = "Date: " + stringDate + " GMT\n";
     return stringDate;
+}
+
+std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
+    std::ifstream errFile;
+    std::string path = _config.get_error_page();
+//    std::cout << "Error file path: " << path << std::endl;
+    path += std::to_string(status) + ".html";
+    errFile.open(path);
+    if (errFile.fail())
+        return "Even extracting the error file failed.";
+    std::ostringstream fileContent;
+    fileContent << errFile.rdbuf();
+    return fileContent.str();
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
@@ -468,11 +524,23 @@ std::string responseHandler::rootResolution(std::string const& uri) {
     if (!_location.get_root().empty()) {
         if (!uri.compare(_location.get_location_path()))
             requestedPath = _location.get_root();
-        else
-            requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+        else {
+            if (std::count(uri.begin(), uri.end(), '/') > 1)
+                requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
+            else
+                requestedPath = _location.get_root() + uri;
+        }
     }
     else {
         requestedPath = uri;
     }
     return requestedPath;
+}
+
+bool responseHandler::isCgiResponse() const {
+    return _isCGI;
+}
+
+int responseHandler::getCgiFd() const {
+    return _cgiFd;
 }

@@ -17,7 +17,7 @@
 #include "responseHandler.hpp"
 
 client::client(std::string hostIp, int port, configVector const& configs, int socket)
-    : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket) {
+    : _configs(configs), _hostIp(hostIp), _port(port), _socket(socket), _isCgi(false) {
 
     _isChunked = false;
     _chunkSize = 0;
@@ -26,6 +26,7 @@ client::client(std::string hostIp, int port, configVector const& configs, int so
     _status = 200;
     _method = 0;
     _bodySize = 0;
+    _cgiFd = -1;
 }
 
 client::client() {
@@ -125,6 +126,7 @@ int client::chunkedRequest(std::string buffer, bool onlyBody) {
             return 1;
         }
         if (_chunkSize > BUFF_SIZE) {
+            std::cout << "Invalid chunked request larger than buffer size" << std::endl;
             _status = 400;
             return 1;
         }
@@ -156,24 +158,18 @@ void client::parseRequestLine(std::string request) {
 
     ss >> field;
     /* 405 Method not allowed */
-    if (!field.compare("POST")) {
+    if (!field.compare("POST"))
         _method = POST;
-//        std::cout << "Poche seghe, la richiesta POST gl'é: " << _buffer << std::endl;
-    }
     else if (!field.compare("DELETE"))
         _method = DELETE;
     else if (!field.compare("GET"))
         _method = GET;
     ss >> _uri;
-    if (!_uri.empty() && _uri[0] != '/') {
+    if (!_uri.empty() && _uri[0] != '/')
         _status = 400;
-    }
     ss >> _http;
     if (_http.empty() || (!_http.empty() && _http.compare("HTTP/1.1"))) {
         _status = 505; // HTTP VERSION NOT SUPPORTED
-    }
-    if (_status != 200) {
-        //Ya know the drill todo
     }
 }
 
@@ -233,7 +229,7 @@ void client::parseRequestHeader() {
 //    std::cout << MAGENTA << "<--------Optional Header requests------->" << RESET_COLOUR << std::endl;
 //    for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
 //        std::cout << "Field: [" << it->first << "] " << "- " << "Value [" << it->second << "]" << std::endl;
-    std::cout << std::endl;
+//    std::cout << std::endl;
     requestedHost(fields);
     routeConfig(fields);
 }
@@ -264,6 +260,11 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
 
     responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);
+    if (response.isCgiResponse()) {
+        _isCgi = true;
+        _cgiFd = response.getCgiFd();
+        std::cout << CYAN << "So cgi fd now in client is: " << _cgiFd << RESET_COLOUR << std::endl;
+    }
 
 }
 
@@ -277,8 +278,20 @@ std::string client::getResponse() const {
     return _response;
 }
 
+int     client::getSocket() const {
+    return _socket;
+}
+
 bool client::isBufferFull() const {
     return _isBuffFull;
+}
+
+bool client::isCgi() const {
+    return _isCgi;
+}
+
+int client::getCgiFd() const {
+    return _cgiFd;
 }
 
 void client::resetClient() {
@@ -286,6 +299,9 @@ void client::resetClient() {
 
 //    _response.clear();
 //    bzero(&_buffer, sizeof(_buffer));
+    _cgiResponse.clear();
+    _isCgi = false;
+    _cgiFd = -1;
     _buffer.clear();
     _isChunked = false;
     _chunk.clear();
@@ -294,4 +310,15 @@ void client::resetClient() {
     _bodyPresent = false;
     _status = 200;
     _bodySize = 0;
+}
+
+std::string client::getCgiResponse() const {
+    return _cgiResponse;
+}
+
+void    client::saveCgiResponse(char *buffer) {
+
+    std::string str(buffer);
+
+    _cgiResponse = str;
 }

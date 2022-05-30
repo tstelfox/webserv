@@ -49,13 +49,17 @@ int poller::connectionError(short revents) const {
 
 void poller::deleteConnection(int fd) {
     std::map<int, client>::iterator clientIt = _clients.find(fd);
+//    std::cout << "CLient size before: " << _clients.size() << std::endl;
+//    _client.erase()
     if (clientIt != _clients.end()) {
         _clients.erase(clientIt);
         close(fd);
     }
+//    std::cout << "CLient size after: " << _clients.size() << std::endl;
 }
 
 int poller::newConnection(int fd) {
+    /* TODO cleanup and split this function after cgi */
     socklen_t addrLen;
     struct sockaddr_in addr;
     bzero(&addr, sizeof(struct sockaddr_in));
@@ -69,6 +73,7 @@ int poller::newConnection(int fd) {
         return 0;
     }
     int on = 1;
+//    if ((setsockopt(newConnection, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0)) {
     if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int)) < 0)) {
         std::cout << "sockoptions got fucked" << std::endl;
         return 0;
@@ -78,13 +83,12 @@ int poller::newConnection(int fd) {
         return 0;
     }
     setPollFd(newConnection, (POLLIN | POLLOUT));
-
     /* Retrieving the host:port this connection is coming from
      * This could Perhaps even be its own function
     */
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
-    int port; // This might not work?
+    int port;
     char *host = NULL;
 
     if (getsockname(newConnection, (struct sockaddr *)&sin, &len))
@@ -97,7 +101,7 @@ int poller::newConnection(int fd) {
     }
     /*
         Make a vector of only the configs relevant to the host:port combination
-        And pass that into the client class
+        And pass that into the client class for server block routing
     */
     configVector relevant;
     std::string hostIp = host;
@@ -112,7 +116,6 @@ int poller::newConnection(int fd) {
 //            " and server_name: " << iter->get_server_name() << std::endl;
 //    }
 
-
     std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
 
     client  newClient(hostIp, port, relevant, newConnection);
@@ -120,6 +123,11 @@ int poller::newConnection(int fd) {
 
     return 1;
 }
+
+//int poller::newCgiConnection(int fd) {
+//
+//
+//}
 
 std::set<int> poller::openPorts() {
     std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
@@ -145,7 +153,6 @@ std::set<int> poller::openPorts() {
 
 int poller::respondToClient(int socket, std::string response) {
 
-//    std::cout << "RESPONSE:\n" << response << std::endl;
     char toSend[response.length() + 1];
     std::strcpy(toSend, response.c_str());
 
@@ -156,6 +163,7 @@ int poller::respondToClient(int socket, std::string response) {
 void poller::pollConnections() {
 
     std::set<int> portSockets = openPorts();
+    std::map<int, client*> cgiSockets;
     char buffer[BUFF_SIZE] = {0};
     while (true) {
         if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
@@ -166,15 +174,26 @@ void poller::pollConnections() {
             client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+                deleteConnection(it->fd);
+                _sockets.erase(it);
                 break;
             }
             if (it->revents & POLLIN) {
-                if (portSockets.count(it->fd)) { // This should check that it's one of the listening sockets
+                if (portSockets.count(it->fd)) { // This checks that it's one of the listening sockets
                     newConnection(it->fd);
                     break;
                 }
-//                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
-//                size_t valRead = recv(it->fd, buffer, 1000, 0);
+                if (cgiSockets.count(it->fd)) {
+                    char cgiBuffer[BUFF_SIZE];
+                    int cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
+                    std::cout << RED << "Cgi buffer" << cgiBuffer << RESET_COLOUR << std::endl;
+                    if (cgiRead)
+                        cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
+                    memset(cgiBuffer, 0, sizeof(buffer));
+                    close(it->fd);
+                    cgiSockets.erase(cgiSockets.find(it->fd));
+                    continue;
+                }
                 int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
 //                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
@@ -182,25 +201,52 @@ void poller::pollConnections() {
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
-//                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
+                    deleteConnection(it->fd);
+                    _sockets.erase(it);
+                    break;
                 }
                 if (valRead < 0) {
                     std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
-//                    perror("Error: ");
                     deleteConnection(it->fd);
+                    _sockets.erase(it);
                     break;
                 }
             } else if (it->revents & POLLOUT) {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();
-                    int valSent = respondToClient(it->fd, currentClient.getResponse());
-                    if (!valSent)
-                        std::cout << "Nothing more to send" << std::endl;
-                    if (valSent < 0) {
-                        std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
-//                        perror("send() failed");
+                    std::string response = currentClient.getResponse();
+                    if (currentClient.isCgi()) {
+                        if (!currentClient.getCgiResponse().empty()) {
+                            response = currentClient.getCgiResponse();
+                        }
+                        else {
+                            int cgiFd = currentClient.getCgiFd();
+                            struct pollfd newCgiFd;
+                            newCgiFd.fd = cgiFd;
+                            newCgiFd.events = POLLIN;
+
+                            cgiSockets.insert(std::make_pair(cgiFd, &currentClient));
+                            _sockets.insert(_sockets.begin(), newCgiFd);
+                            break;
+                        }
+                    }
+                    int valSent = respondToClient(it->fd, response);
+                    if (valSent) {
                         deleteConnection(it->fd);
+                        _sockets.erase(it);
+                        break;
+                    }
+                    else if (!valSent) {
+                        deleteConnection(it->fd);
+                        _sockets.erase(it);
+                        break;
+                        std::cout << "Nothing more to send" << std::endl;
+                    }
+                    else if (valSent < 0) {
+                        std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
+                        deleteConnection(it->fd);
+                        _sockets.erase(it);
                         break;
                     }
                     currentClient.resetClient();

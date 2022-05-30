@@ -36,6 +36,8 @@ public:
 
     int newConnection(int fd);
 
+    int newCgiConnection(int fd);
+
     std::set<int> openPorts();
 
     int respondToClient(int socket, std::string response);
