@@ -224,8 +224,8 @@ void poller::pollConnections() {
                             response = currentClient.getCgiResponse();
                         }
                         else {
-                            std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd()
-                                      << std::endl;
+//                            std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd()
+//                                      << std::endl;
 
                             int cgiFd = currentClient.getCgiFd();
                             struct pollfd newCgiFd;
@@ -234,9 +234,6 @@ void poller::pollConnections() {
 
                             cgiSockets.insert(std::make_pair(cgiFd, &currentClient));
                             _sockets.insert(_sockets.begin(), newCgiFd);
-
-                            //                        socketVector::iterator cgiIt = setPollFd(currentClient.getCgiFd(), POLLIN);
-                            //                        return; // Temporary
                             break;
                         }
                     }

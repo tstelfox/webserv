@@ -185,6 +185,8 @@ std::string responseHandler::getResponse(std::string const& uri) {
     else if (cgiFd == -99)
         return respondError(404);
 
+
+
     myFile.open(requestedFile);
     if (myFile.fail()) {
 //        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;

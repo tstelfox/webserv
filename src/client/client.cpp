@@ -266,7 +266,6 @@ void client::routeConfig(std::map<std::string, std::string> &fields) {
         std::cout << CYAN << "So cgi fd now in client is: " << _cgiFd << RESET_COLOUR << std::endl;
     }
 
-
 }
 
 /* < --------- GENERAL UTILS ------ > */
