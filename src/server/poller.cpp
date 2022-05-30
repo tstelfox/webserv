@@ -194,8 +194,6 @@ void poller::pollConnections() {
                     cgiSockets.erase(cgiSockets.find(it->fd));
                     continue;
                 }
-
-//                std::cout << "Listening socket is readable on fd: " << it->fd << std::endl;
                 int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
 //                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
@@ -206,7 +204,6 @@ void poller::pollConnections() {
                     deleteConnection(it->fd);
                     _sockets.erase(it);
                     break;
-//                    std::cout << GREEN << "Nothing more to read" << RESET_COLOUR << std::endl;
                 }
                 if (valRead < 0) {
                     std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
@@ -224,9 +221,6 @@ void poller::pollConnections() {
                             response = currentClient.getCgiResponse();
                         }
                         else {
-//                            std::cout << "diocane che balle but here is the fd: " << currentClient.getCgiFd()
-//                                      << std::endl;
-
                             int cgiFd = currentClient.getCgiFd();
                             struct pollfd newCgiFd;
                             newCgiFd.fd = cgiFd;
@@ -238,7 +232,7 @@ void poller::pollConnections() {
                         }
                     }
                     int valSent = respondToClient(it->fd, response);
-                    if (valSent) { // TODO this was introduced to fix siege issues but hmmmm
+                    if (valSent) {
                         deleteConnection(it->fd);
                         _sockets.erase(it);
                         break;
