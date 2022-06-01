@@ -19,54 +19,47 @@
 // #include <iostream>
 // #include "webserv.hpp"
 
-class socketMan {
-public:
-    socketMan(int domain, int service, int protocol,
-              int port, const char *host);
+class Create_socket_fd
+{
+    public:
+        Create_socket_fd(int domain, int service, int protocol,
+                  int port, const char *host);
+        virtual ~Create_socket_fd();   // This means inherited classes don't need to have a destructor
 
-    virtual ~socketMan(); // This means inherited classes don't need to have a destructor
+        void    testConnection(int, std::string);
+        int     getSock();
+        struct  sockaddr_in &getAddr();
 
-    virtual int bindServer(int sock, struct sockaddr_in address) = 0;
-
-    void testConnection(int, std::string);
-
-    int getSock();
-
-    struct sockaddr_in &getAddr();
-
-protected:
-    int sock;
-    struct sockaddr_in address;
+    protected:
+        int                 sock;
+        struct sockaddr_in  address;
 };
 
-class serverSock : public socketMan {
+class serverSock : public Create_socket_fd
+{
+    public:
+        serverSock(int domain, int service, int protocol,
+                   int port, const char *host);
+        virtual ~serverSock();
 
-public:
-    serverSock(int domain, int service, int protocol,
-               int port, const char *host);
+        void bindServer(int sock, struct sockaddr_in address);
+        void set_socket_options( void );
+        void listenServer(int bcklg);
+        void make_socket_nonblocking( void );
 
-    virtual ~serverSock();
-    // serverSock(serverSock const &x);
-
-    virtual int bindServer(int sock, struct sockaddr_in address);
-
-    void listenServer(int bcklg);
-
-private:
-    socklen_t addrlen;
-    int backlog;
-
-    serverSock();
-
+    private:
+        socklen_t           addrlen;
+        int                 backlog;
+        serverSock();
 };
 
 
 // For the client side o'sheet
-/* class	clientSock : public socketMan {
+/* class	clientSock : public Create_socket_fd {
 
 	public:
 		clientSock(int domain, int service, int protocol,
-			int port, const char *host) : socketMan(domain, service, protocol, port,host) {
+			int port, const char *host) : Create_socket_fd(domain, service, protocol, port,host) {
 				// Bind/connect the socket
 				connection = connect_server(sock, address);
 				test_connection(connection);

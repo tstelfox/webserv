@@ -18,75 +18,98 @@
 
 // #include "webserv.hpp"
 
-socketMan::socketMan(int domain, int service, int protocol, int port,
-                     const char *host) {
-
-//    std::cout << "host: " << host << std::endl;
+Create_socket_fd::Create_socket_fd(int domain, int service, int protocol, int port,
+                     const char *host)
+{
     // Set up address structure
-    address.sin_family = domain;
-    address.sin_addr.s_addr = inet_addr(host);
-    address.sin_port = htons(port);
-    // Create the socket
-    sock = socket(domain, service, protocol);
-    testConnection(sock, "Creation of Socket");
+    address.sin_family =        domain;
+    address.sin_addr.s_addr =   inet_addr(host);
+    address.sin_port =          htons(port);
 
+    // Create the socket
+    /*  
+        socket() simply returns to you a socket descriptor 
+        that you can use in later system calls, or -1 on error
+    */
+    sock =                      socket(domain, service, protocol);
+
+    // Test the socket
+    testConnection(sock, "Creation of Socket");
 }
 
-socketMan::~socketMan() {}
+Create_socket_fd::~Create_socket_fd() {}
 
-void socketMan::testConnection(int to_test, std::string str) {
-    if (to_test < 0) {
+void Create_socket_fd::testConnection(int to_test, std::string str)
+{
+    if (to_test < 0)
+    {
         std::cerr << "Failed to connect: " << str << "\n";
         exit(EXIT_FAILURE);
     }
-
 }
 
-int socketMan::getSock() { return sock; }
+int Create_socket_fd::getSock() { return sock; }
 
-struct sockaddr_in &socketMan::getAddr() { return address; }
+struct sockaddr_in &Create_socket_fd::getAddr() { return address; }
+
+
+/***
+ * Once you have a socket, you might have to associate that socket with a port 
+ * on your local machine. The port number is used by the kernel to match 
+ * an incoming packet to a certain process’s socket descriptor.
+ * When a remote machine wants to connect to your server program,
+ * it needs two pieces of information: the IP address and the port number. 
+ * The bind() call allows you to do just that, the IP address and port will be
+ * bound to the socket.
+***/
 
 serverSock::serverSock(int domain, int service, int protocol,
-                       int port, const char *host) : socketMan(domain, service, protocol, port, host), backlog(0) {
-    // Bind/connect the socket
-    int ret;
+                       int port, const char *host) : Create_socket_fd(domain, service, protocol, port, host), backlog(0)
+{
+    set_socket_options();
+    bindServer(sock, address);
+    listenServer(5);
+    make_socket_nonblocking();
+}
+
+void serverSock::bindServer(int sock, struct sockaddr_in address)
+{
+    int ret = bind(sock, (struct sockaddr *) &address, sizeof(address));
+    testConnection(ret, "Binding failure");
+}
+
+void serverSock::set_socket_options( void )
+{
     int on = 1;
-    // Make socket reusable
-    // (char *)&on
-    ret = setsockopt(getSock(), SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-    if (ret < 0) {
+    int ret = setsockopt(getSock(), SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+    if (ret < 0)
+    {
         std::cout << "setsock fucked up" << std::endl;
         exit(-1);
     }
+}
 
+void serverSock::listenServer(int bcklg)
+{
+    backlog = bcklg;
+    int connection = listen(sock, backlog);
+    testConnection(connection, "Listen failure");
+}
 
-    ret = bindServer(sock, address);
-    testConnection(ret, "Binding failure");
-    // ret = fcntl(getSock(), F_GETFL, 0);
-    listenServer(5);
-    /* The following is the fcntl version which must be used, as per subject */
-    //Set socket to be nonblocking
-    ret = fcntl(getSock(), F_SETFL, O_NONBLOCK);
-
-    if (ret < 0) {
+    /* 
+        The following is the fcntl version which must be used, as per subject
+        Set socket to be nonblocking.
+    */
+   
+void serverSock::make_socket_nonblocking( void )
+{
+    int ret = fcntl(getSock(), F_SETFL, O_NONBLOCK);
+    if (ret < 0)
+    {
         std::cout << "ioctl failed" << std::endl;
         exit(-1);
     }
 }
 
 serverSock::~serverSock() {}
-
-int serverSock::bindServer(int sock, struct sockaddr_in address) {
-    return bind(sock, (struct sockaddr *) &address, sizeof(address));
-}
-
-void serverSock::listenServer(int bcklg) {
-    backlog = bcklg;
-    int connection = listen(sock, backlog);
-    testConnection(connection, "Listen failure");
-}
-
-// int	clientSock::connect_server(int sock, struct sockaddr_in address) {
-// 	// int addrlen;
-// 	return connect(sock, (struct sockaddr *)&address, (socklen_t)&addrlen);
-// }

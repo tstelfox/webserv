@@ -31,7 +31,10 @@
 #include <arpa/inet.h> // inet_addr()
 #include <utility>
 
-poller::poller(configVector const& configVector) : _serverConfigs(configVector) {}
+poller::poller(configVector const& configVector) : _serverConfigs(configVector) 
+{
+    pollConnections();
+}
 
 poller::~poller() {}
 
@@ -124,30 +127,37 @@ int poller::newConnection(int fd) {
     return 1;
 }
 
-//int poller::newCgiConnection(int fd) {
-//
-//
-//}
-
-std::set<int> poller::openPorts() {
-    std::set<std::pair<std::string, int> > ports; // cmd/shift f6 select all instances in project
-    std::set<int> listenSockets;
-    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
+void    poller::pair_host_and_port(std::set<std::pair<std::string, int> >  &ports)
+{
+    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++)
         ports.insert(std::make_pair(it->get_host(), it->get_port()));
-    }
-    for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++) {
-        std::cout << "Host: " << i->first << " Port: " << i->second << std::endl;
-//        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, i->second, INADDR_ANY);
-        std::string host;
-        if (!i->first.compare("localhost"))
-            host = "127.0.0.1";
-        else
-            host = i->first;
-        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, i->second, host.c_str());
+}
+
+void    poller::create_vector_of_pollfd_sockets(std::set<int> &listenSockets, std::set<std::pair<std::string, int> >  &ports)
+{
+    for (std::set<std::pair<std::string, int> >::iterator i = ports.begin(); i != ports.end(); i++)
+    {
+        std::cout << "Host: " << i->first << " Port: " << i->second << std::endl; //create socket_fd
+        
+        std::string host = i->first;
+        int         port = i->second;
+        serverSock buildSocket(AF_INET, SOCK_STREAM, 0, port, host.c_str()); 
+
         int newSocket = buildSocket.getSock();
         listenSockets.insert(newSocket);
+        
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
+}
+
+std::set<int> poller::openPorts()
+{
+    std::set<std::pair<std::string, int> >  ports;
+    std::set<int>                           listenSockets;
+
+    pair_host_and_port(ports);
+    create_vector_of_pollfd_sockets(listenSockets, ports);
+  
     return listenSockets;
 }
 
@@ -162,15 +172,19 @@ int poller::respondToClient(int socket, std::string response) {
 
 void poller::pollConnections() {
 
-    std::set<int> portSockets = openPorts();
-    std::map<int, client*> cgiSockets;
-    char buffer[BUFF_SIZE] = {0};
-    while (true) {
-        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0) {
+    std::set<int>               portSockets = openPorts();
+    std::map<int, client*>      cgiSockets;
+    char                        buffer[BUFF_SIZE] = {0};
+
+    while (true)
+    {
+        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0)
+        {
             perror("poll");
             break;
         }
-        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) {
+        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++)
+        {
             client &currentClient = _clients.find(it->fd)->second;
             if (connectionError(it->revents)) {
                 std::cout << "Connection Error: " << std::hex << it->revents << std::endl;

@@ -19,50 +19,37 @@
 #include <string>
 #include <set>
 
-class poller {
+class poller
+{
 
-public:
+    public:
 
-    typedef std::vector<struct pollfd> socketVector;
-    typedef std::vector<WSERV::serverConfig> configVector;
+        typedef std::vector<struct pollfd> socketVector;
+        typedef std::vector<WSERV::serverConfig> configVector;
 
-    poller(configVector const &serverBlocks);
+        poller(configVector const &serverBlocks);
+        ~poller();
 
-    ~poller();
+        void            setPollFd(int fd, short events);
+        int             connectionError(short revents) const;
+        int             newConnection(int fd);
+        int             newCgiConnection(int fd);
+        std::set<int>   openPorts( void );
+        void            pair_host_and_port(std::set<std::pair<std::string, int> >  &ports);
+        void            create_vector_of_pollfd_sockets(std::set<int> &listenSockets, std::set<std::pair<std::string, int> >  &ports);
+        int             respondToClient(int socket, std::string response);
+        void            pollConnections( void );
+        void            deleteConnection(int fd);
 
-    void setPollFd(int fd, short events);
+    private:
 
-    int connectionError(short revents) const;
+        /* Vector of the poll structs and events */
+        socketVector            _sockets;
 
-    int newConnection(int fd);
+       /* Vector of all of the server configurations */
+        configVector            _serverConfigs;
 
-    int newCgiConnection(int fd);
-
-    std::set<int> openPorts();
-
-    int respondToClient(int socket, std::string response);
-
-    void pollConnections();
-
-    void deleteConnection(int fd);
-
-    // serverSock		*getSocket() const;
-
-    // int				respondToClient(int sock); // This shit is temporary bollocks
-    // void			closeConnection(std::vector<struct pollfd>::iterator it);
-private:
-
-    /* Vector of the poll structs and events */
-    socketVector _sockets;
-
-    /* Create a map of every host:port combination which I will find whenever
-    I parse the request header */
-
-   /* Vector of all of the server configurations */
-    configVector _serverConfigs;
-
-    /* Map of all the clients sorted by socket */
-    std::map<int, client> _clients;
-
+        /* Map of all the clients sorted by socket */
+        std::map<int, client>   _clients;
 };
 

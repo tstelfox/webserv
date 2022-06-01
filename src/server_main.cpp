@@ -38,7 +38,8 @@ void parsedContents(std::vector<WSERV::serverConfig> const& S) {
             std::cout << "root= " << L_temp.get_root() << std::endl;
             std::cout << "location_path= " << L_temp.get_location_path() << std::endl;
             std::cout << "autoindex= " << L_temp.get_autoindex() << std::endl;
-            std::map<int, std::string>::const_iterator it = L_temp.get_allow_method().begin();
+            std::map<int, std::string>::const_iterator it;
+            it = L_temp.get_allow_method().begin();
             std::map<int, std::string> temp = L_temp.get_allow_method();
             for (it = temp.begin();
                 it != temp.end(); ++it)
@@ -74,35 +75,9 @@ int main(int argc, char *argv[]) {
     }
     /*Print all configs*/
 //   parsedContents(S);
-
-    /*Extract all the unique ports and put them into a set.*/
-
-    /*      cgi     */
-    
-    // try {
-    //     WSERV::Location L = S[0].get_Location_vec()[0];
-    //     std::string cgistr = L.get_cgi();
-    //     // std::cout << cgistr << std::endl;
-    //     WSERV::Cgi cgi_yo(cgistr, "17", "3");
-    //     char string[150];
-    //     bzero(string, 150);
-    //     read(cgi_yo.get_cgi_fd()[READ], string, 150);
-    //     std::cout << string << std::endl;
-    // }
-    // catch (const std::exception &e) {
-    //     std::cerr << e.what() << '\n';
-    //     return EXIT_FAILURE;
-    // }
     
     poller littyServer(S);
-    littyServer.pollConnections();
+    // littyServer.pollConnections();
 
-    /*Functioning main pre restructure*/
-//    serverSock hello(AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY);
-//    serverBoy littyServer(hello);
-//
-//
-//    littyServer.runServer();
-//    std::cout << "Exiting via here?" << std::endl;
     return 0;
 }
