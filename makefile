@@ -6,13 +6,14 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/05/24 19:35:32 by akramp        ########   odam.nl          #
+#    Updated: 2022/06/01 20:26:02 by ask           ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = server
 CXX = c++
-SRC = server_main.cpp sockets/socket.cpp client/client.cpp responseHandler/responseHandler.cpp \
+SRC = server_main.cpp sockets/socket.cpp client/client.cpp client/client_getters.cpp \
+		responseHandler/responseHandler.cpp \
 		$(SERVER_PREFIX) exceptions/exceptions.cpp $(PARSE_PREFIX) $(CGI_PREFIX) \
 		cgi/cgi.cpp
 SERVER_PREFIX = $(addprefix server/, $(SERV))

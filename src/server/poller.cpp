@@ -45,11 +45,6 @@ void poller::setPollFd(int fd, short events) {
     _sockets.push_back(newPollFd);
 }
 
-int poller::connectionError(short revents) const {
-    return revents & (POLLERR | POLLNVAL) ||
-           (!(revents & (POLLIN)) && revents & POLLHUP);
-};
-
 void poller::deleteConnection(int fd) {
     std::map<int, client>::iterator clientIt = _clients.find(fd);
 //    std::cout << "CLient size before: " << _clients.size() << std::endl;
@@ -145,12 +140,12 @@ void    poller::create_vector_of_pollfd_sockets(std::set<int> &listenSockets, st
 
         int newSocket = buildSocket.getSock();
         listenSockets.insert(newSocket);
-        
+
         setPollFd(newSocket, (POLLIN | POLLOUT));
     }
 }
 
-std::set<int> poller::openPorts()
+std::set<int> poller::openPorts( void )
 {
     std::set<std::pair<std::string, int> >  ports;
     std::set<int>                           listenSockets;
@@ -170,7 +165,57 @@ int poller::respondToClient(int socket, std::string response) {
     return ret;
 }
 
-void poller::pollConnections() {
+bool poller::check_fds_with_poll( void )
+{
+    /**
+         * poll();
+         * it waits for one of a set of file descriptors to become 
+         * ready to perform I/O.
+    **/
+
+    if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0)
+    {
+        perror("poll");
+        return false;
+    }
+    return true;
+}
+
+int poller::connectionError(short revents) const
+{
+    /*  
+        connectionError() checks if poll has set the revents of that socket to error
+        So it returns true if revents is set to POLLERR or POLLNVAL
+        OR if it is set to POLLHUP but not to POLLIN
+
+        from the poll man page:
+        POLLERR, POLLHUP, or POLLNVAL.
+        (These three bits are
+        meaningless in the events field, and will be set in the revents
+        field whenever the corresponding condition is true.
+    */
+
+    return revents & (POLLERR | POLLNVAL) ||
+           (!(revents & (POLLIN)) && revents & POLLHUP);
+}
+
+bool poller::check_if_revents_errors (socketVector::iterator &it)
+{
+    if (connectionError(it->revents))
+    {
+        std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
+        deleteConnection(it->fd);
+        _sockets.erase(it);
+        return false;
+    }
+    return true;
+}
+
+// bool poller::there_is_data_to_read_from_the_fd()
+// {}
+
+void poller::pollConnections()
+{
 
     std::set<int>               portSockets = openPorts();
     std::map<int, client*>      cgiSockets;
@@ -178,21 +223,21 @@ void poller::pollConnections() {
 
     while (true)
     {
-        if (poll(&(*_sockets.begin()), _sockets.size(), -1) < 0)
+        if (check_fds_with_poll() == false)
+            break ;
+        
+        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++) // loop_over_open_fds
         {
-            perror("poll");
-            break;
-        }
-        for (socketVector::iterator it = _sockets.begin(); it != _sockets.end(); it++)
-        {
-            client &currentClient = _clients.find(it->fd)->second;
-            if (connectionError(it->revents)) {
-                std::cout << "Connection Error: " << std::hex << it->revents << std::endl;
-                deleteConnection(it->fd);
-                _sockets.erase(it);
-                break;
-            }
-            if (it->revents & POLLIN) {
+            /* 
+                Map of current client sorted by socket
+                to find wich socket is mapped to which client
+             */
+            client &currentClient = _clients.find(it->fd)->second; 
+
+            check_if_revents_errors(it);
+
+            if (it->revents & POLLIN)
+            {
                 if (portSockets.count(it->fd)) { // This checks that it's one of the listening sockets
                     newConnection(it->fd);
                     break;
@@ -211,7 +256,7 @@ void poller::pollConnections() {
                 int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
                 if (valRead) {
 //                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
-                    currentClient.fillBuffer(buffer, valRead);
+                    currentClient.fillBuffer(buffer);
                     memset(buffer, 0, sizeof(buffer));
                 }
                 if (!valRead) {
@@ -225,7 +270,8 @@ void poller::pollConnections() {
                     _sockets.erase(it);
                     break;
                 }
-            } else if (it->revents & POLLOUT) {
+            }
+            else if (it->revents & POLLOUT) {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();

@@ -38,8 +38,13 @@ class poller
         void            pair_host_and_port(std::set<std::pair<std::string, int> >  &ports);
         void            create_vector_of_pollfd_sockets(std::set<int> &listenSockets, std::set<std::pair<std::string, int> >  &ports);
         int             respondToClient(int socket, std::string response);
-        void            pollConnections( void );
         void            deleteConnection(int fd);
+
+        /* Poll loop functions */
+        void            pollConnections( void );
+        bool            check_fds_with_poll( void );
+        bool            check_if_revents_errors (socketVector::iterator &it);
+
 
     private:
 
