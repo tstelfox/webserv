@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 11:57:21 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 17:27:56 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,9 @@ class poller
         int             listening_socket(std::set<int> &portSockets, socketVector::iterator &it);
         int             cgi_socket(std::map<int, client*> &cgiSockets, char *buffer, socketVector::iterator &it);
         int             handle_incoming_message(socketVector::iterator &it, char *buffer, client &currentClient);
-        
+        int             write_to_fd(std::map<int, client*> &cgiSockets, socketVector::iterator &it, client &currentClient);
+        int             send_to_cgi_socket(client &currentClient, std::string &response, std::map<int, client*> &cgiSockets);
+
         typedef enum e_num
         {
             CONTINUE = 0,

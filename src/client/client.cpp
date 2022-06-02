@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/01 15:35:44 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 13:25:39 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 17:04:07 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,7 +277,7 @@ void client::parseRequestHeader()
             value += rcodio + " ";
         }
         if (value.size() > 2)
-            value.resize(value.size() - 2); // Also could just str.replace(", ") or smoething cause this be abit retarded lol
+            value.resize(value.size() - 2);
         transform(key.begin(), key.end(), key.begin(), ::tolower);
         fields[key] = value;
     }

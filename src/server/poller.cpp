@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 13:25:26 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 17:27:34 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,6 +351,61 @@ int poller::read_from_fd(std::set<int> &portSockets, \
     return DO_NOTHING;
 }
 
+int poller::send_to_cgi_socket(client &currentClient, std::string &response, std::map<int, client*> &cgiSockets)
+{
+    if (!currentClient.getCgiResponse().empty())
+        response = currentClient.getCgiResponse();
+    else 
+    {
+        int             cgiFd = currentClient.getCgiFd();
+        struct pollfd   newCgiFd;
+        
+        newCgiFd.fd     = cgiFd;
+        newCgiFd.events = POLLIN;
+        cgiSockets.insert(std::make_pair(cgiFd, &currentClient));
+        _sockets.insert(_sockets.begin(), newCgiFd);
+        return BREAK;
+    }
+    return DO_NOTHING;
+}
+
+int poller::write_to_fd(std::map<int, client*> &cgiSockets, socketVector::iterator &it, client &currentClient)
+{
+    if (currentClient.isBufferFull())
+    {
+        currentClient.parseRequestHeader();
+        std::string response = currentClient.getResponse();
+        if (currentClient.isCgi())
+        {
+            if (send_to_cgi_socket(currentClient, response, cgiSockets) == BREAK)
+                return BREAK;
+        }
+        int valSent = respondToClient(it->fd, response);
+        if (valSent)
+        {
+            deleteConnection(it->fd);
+            _sockets.erase(it);
+            return BREAK;
+        }
+        else if (!valSent)
+        {
+            deleteConnection(it->fd);
+            _sockets.erase(it);
+            std::cout << "Nothing more to send" << std::endl;
+            return BREAK;
+        }
+        else if (valSent < 0)
+        {
+            std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
+            deleteConnection(it->fd);
+            _sockets.erase(it);
+            return BREAK;
+        }
+        currentClient.resetClient();
+    }
+    return DO_NOTHING;
+}
+
 void poller::pollConnections()
 {
 
@@ -384,45 +439,8 @@ void poller::pollConnections()
             }
             else if (it->revents & POLLOUT)
             {
-//                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
-                if (currentClient.isBufferFull()) {
-                    currentClient.parseRequestHeader();
-                    std::string response = currentClient.getResponse();
-                    if (currentClient.isCgi()) {
-                        if (!currentClient.getCgiResponse().empty()) {
-                            response = currentClient.getCgiResponse();
-                        }
-                        else {
-                            int cgiFd = currentClient.getCgiFd();
-                            struct pollfd newCgiFd;
-                            newCgiFd.fd = cgiFd;
-                            newCgiFd.events = POLLIN;
-
-                            cgiSockets.insert(std::make_pair(cgiFd, &currentClient));
-                            _sockets.insert(_sockets.begin(), newCgiFd);
-                            break;
-                        }
-                    }
-                    int valSent = respondToClient(it->fd, response);
-                    if (valSent) {
-                        deleteConnection(it->fd);
-                        _sockets.erase(it);
-                        break;
-                    }
-                    else if (!valSent) {
-                        deleteConnection(it->fd);
-                        _sockets.erase(it);
-                        break;
-                        std::cout << "Nothing more to send" << std::endl;
-                    }
-                    else if (valSent < 0) {
-                        std::cout << RED << "Error sending to client" << RESET_COLOUR << std::endl;
-                        deleteConnection(it->fd);
-                        _sockets.erase(it);
-                        break;
-                    }
-                    currentClient.resetClient();
-                }
+                if (write_to_fd(cgiSockets, it, currentClient) == BREAK)
+                    break ;
             }
         }
     }
