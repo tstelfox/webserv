@@ -32,17 +32,12 @@ responseHandler::responseHandler() {}
 
 responseHandler::~responseHandler() {}
 
-std::string responseHandler::parseAndRespond(int status, int method, std::string uri) {
+std::string responseHandler::parseAndRespond(int status, int method, std::string uri)
+{
     if (status != 200)
         return respondError(status);
     matchLocation(uri);
     std::map<int, std::string> allowedMethod = _location.get_allow_method();
-
-//    for (std::map<int, std::string>::iterator it = allowedMethod.begin(); it != allowedMethod.end(); it++)
-//        std::cout << RED << "UEEE " << it->first << " ohhh " << it->second << RESET_COLOUR << std::endl;
-//    std::cout << RED << "AOOOOOOO " << allowedMethod.size() << RESET_COLOUR <<std::endl;
-//    std::cout << "Requested method is " << method << " And there is " << allowedMethod.count(method) << std::endl;
-
 
     /* if (_method is not in location list of methods)
         set method to 0 and triggers a 405 */
@@ -72,18 +67,20 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     }
 }
 
-int responseHandler::matchLocation(std::string uri) {
+int responseHandler::matchLocation(std::string uri)
+{
     std::vector <WSERV::Location> locationsVec = _config.get_Location_vec();
     WSERV::Location location;
     int success = 0;
 
     bool aMatch = false;
     for (std::vector<WSERV::Location>::iterator locIter = locationsVec.begin();
-         locIter != locationsVec.end(); locIter++) {
+         locIter != locationsVec.end(); locIter++)
+    {
         std::string path = locIter->get_location_path();
-//        std::cout << "The fucking path is: " << path << std::endl;
         /* Exact match */
-        if (!uri.compare(path)) {
+        if (!uri.compare(path))
+        {
             std::cout << GREEN << "Exact Location match" << RESET_COLOUR << std::endl;
             location = *locIter;
             aMatch = true;
@@ -92,14 +89,12 @@ int responseHandler::matchLocation(std::string uri) {
 
         }
         /* Check if the first part of the uri is an exact match of the location */
-//        std::cout << COLOR_HOTPINK << "URI: " << uri << " and path: [" << path << "]" << RESET_COLOUR << std::endl;
-//        std::cout << COLOR_DARKPINK << "Comparison: " << uri.compare(0, path.size(), path) << RESET_COLOUR << std::endl;
         if ((path.length() > 1 && !uri.compare(0, path.size(), path))
-            || (path.length() == 1 && std::count(uri.begin(), uri.end(), '/') == 1)) {
+            || (path.length() == 1 && std::count(uri.begin(), uri.end(), '/') == 1))
+        {
             std::cout << GREEN << "Partial match" << RESET_COLOUR << std::endl;
             location = *locIter;
         }
-
     }
     _location = location;
     std::cout << "The correct location is: " << _location.get_location_path() << std::endl;
@@ -124,14 +119,17 @@ int responseHandler::matchLocation(std::string uri) {
      *
      * */
 
-std::string responseHandler::getResponse(std::string const& uri) {
+std::string responseHandler::getResponse(std::string const& uri)
+{
 
     /* TODO clean up and split this func */
 
     std::string redirection = _location.get_redirect().first;
-    if (!redirection.empty()) {
+    if (!redirection.empty()) 
+    {
         std::cout << "Diocane " << "[" << redirection << "]" << std::endl;
-        if (uri == redirection) {
+        if (uri == redirection)
+        {
             std::cout << "Redirection stuff for " << uri << " to " << _location.get_redirect().second << std::endl;
             return redirectionResponse(_location.get_redirect().second);
         }
@@ -152,7 +150,7 @@ std::string responseHandler::getResponse(std::string const& uri) {
                 return 404 (It's what nginx does) [Update: not really]
         else
             look for root plus index
-            */
+    */
 
     std::string requestedFile;
     if (isDirectory(requestedPath) && !_location.get_index().empty())
@@ -162,21 +160,22 @@ std::string responseHandler::getResponse(std::string const& uri) {
     if (requestedFile[0] == '/')
         requestedFile.erase(0, 1);
     std::cout << "Requested file is ultimately: " << requestedFile << std::endl;
-    if (isDirectory(requestedFile)) {
+    if (isDirectory(requestedFile)) 
+    {
         std::cout << "Should come here" << std::endl;
         // Directory Listing
-        if (!_location.get_autoindex()) {
+        if (!_location.get_autoindex())
             return respondError(403);
-        } else {
+        else
             return buildDirectoryListing(requestedFile);
-        }
     }
     std::ifstream myFile;
 
     // TODO check if it is a cgi request.
     int cgiFd;
     cgiFd = cgiRequest(requestedFile);
-    if (cgiFd != -1) {
+    if (cgiFd != -1) 
+    {
         std::cout << "Panic: " << cgiFd << std::endl;
         _cgiFd = cgiFd;
         _isCGI = true;
@@ -188,16 +187,13 @@ std::string responseHandler::getResponse(std::string const& uri) {
 
 
     myFile.open(requestedFile);
-    if (myFile.fail()) {
-//        std::cout << CYAN << "This here?: " << requestedFile << RESET_COLOUR << std::endl;
+    if (myFile.fail()) 
         return respondError(404);
-    }
 
     std::ostringstream fileContent;
     fileContent << myFile.rdbuf();
     std::string responseBody = fileContent.str();
     myFile.close();
-//    std::cout << "Opened content: " << fileContent << std::endl;
 
     std::string responseHeader;
     responseHeader = buildHttpLine(200);
@@ -212,7 +208,8 @@ std::string responseHandler::getResponse(std::string const& uri) {
     return responseHeader;
 }
 
-std::string responseHandler::postResponse(std::string const& uri) {
+std::string responseHandler::postResponse(std::string const& uri)
+{
 
     std::string path = rootResolution(uri);
     std::string fileName = path + "/Madonna";
@@ -220,11 +217,14 @@ std::string responseHandler::postResponse(std::string const& uri) {
     while (std::ifstream(fileName))
         fileName += "Maiala";
     std::ofstream file(fileName);
-    if (!file) {
+    if (!file)
+    {
         std::cout << "File creation failed" << std::endl;
         return respondError(404);
     }
+
     file << _body;
+
     file.close();
     std::string response = "HTTP/1.1 201 Created\n";
     response += buildDateLine() + "Location: http://" + _config.get_host() + ":" \
@@ -233,7 +233,8 @@ std::string responseHandler::postResponse(std::string const& uri) {
     return response;
 }
 
-std::string responseHandler::deleteResponse(std::string uri) {
+std::string responseHandler::deleteResponse(std::string uri)
+{
 
     std::string filePath = rootResolution(uri);
     std::cout << RED << "Delete tae fack: " << filePath << RESET_COLOUR << std::endl;
@@ -242,14 +243,16 @@ std::string responseHandler::deleteResponse(std::string uri) {
     // 404 not found
     // 410 gone (?)
     // 403 Forbidden (God knows how)
-    if (remove(filePath.c_str())) {
+    if (remove(filePath.c_str()))
+    {
         std::cout << "It didn't delete shit" << std::endl;
         std::cout << errno << std::endl;
         perror("wassup: ");
         if (errno == 2)
             return respondError(404);
     }
-    else {
+    else
+    {
         response = "HTTP/1.1 200 OK\n" + buildDateLine() + "\n";
         response += "<html>\n   <body>\n        <h1>That shit has been duly yote.</h1>\n    </body>\n</html>";
     }
@@ -257,7 +260,8 @@ std::string responseHandler::deleteResponse(std::string uri) {
     return response;
 }
 
-std::string responseHandler::respondError(int status) {
+std::string responseHandler::respondError(int status)
+{
 
     std::cout << MAGENTA << "We be responding to an error: " << status << RESET_COLOUR << std::endl;
     std::string response;
@@ -268,7 +272,7 @@ std::string responseHandler::respondError(int status) {
     response += "Content-type: text/html; charset=UTF-8\nContent-Length:";
     // Extract file
     std::string body = extractErrorFile(status);
-//    std::cout << "Error html: " << body << std::endl;
+
     response.append(std::to_string(body.size()));
     //Error files
     response += "\nConnection: close";
@@ -283,9 +287,11 @@ std::string responseHandler::respondError(int status) {
 
 /* < ---------- CGI HANDLER ---------- > */
 
-int responseHandler::cgiRequest(std::string request) {
+int responseHandler::cgiRequest(std::string request)
+{
 
-    if (request.find(".py?") == std::string::npos) {
+    if (request.find(".py?") == std::string::npos)
+    {
         std::cout << "Nothing to see here, go about your business." << std::endl;
         return -1;
     }
@@ -300,51 +306,36 @@ int responseHandler::cgiRequest(std::string request) {
     size_t pos = arguments.find("&");
     args.push_back(arguments.substr(0, pos));
     arguments.erase(0, pos + 1);
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         pos = arguments.find("&");
         args.push_back(arguments.substr(0, pos));
     }
-    for (size_t i = 0; i < args.size(); i++) {
+    for (size_t i = 0; i < args.size(); i++)
+    {
         args[i] = args[i].substr(args[i].find("=") + 1);
         std::cout << args[i] << std::endl;
     }
 
     // Hacky but living for it
-//    char buffer[5000];
-//    read(*exec.get_cgi_fd(), &buffer, 5000);
-//    std::cout << buffer << std::endl;
     int ret = -99;
-    try {
+    try
+    {
         WSERV::Cgi exec(executablePath, args[0], args[1]);
         ret = *exec.get_cgi_fd();
     }
-    catch (const std::exception &e) {
+    catch (const std::exception &e)
+    {
         std::cout << e.what() << std::endl;
         return -99;
     }
-
     return ret;
-
-
-//    exec.get_cgi_fd();
-
-//    for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); it++) {
-//        *it = it->substr(it->find("="), 0);
-//        std::cout << "The arguments: " << *it << std::endl;
-//    }
-    /* get the path out of the location I guess (?)*/
-    /* Extract the arguments */
-
-    /* Cgi  cgiExec(path, arg1, arg2);
-     * int output = cgiExec.get_cgi_fd();
-     * */
-
-    return 0; // Placeholder
 }
 
 /* < ---------- DIRECTORY LISTING ---------- > */
 
-std::string responseHandler::buildDirectoryListing(std::string &directory) {
+std::string responseHandler::buildDirectoryListing(std::string &directory)
+{
     std::cout << "Gotta make the directory page for: " << directory << std::endl;
 
     /* nginx lists directories first in alphabetical order then files in alphabetical order
@@ -361,32 +352,39 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
     dh = opendir(directory.c_str());
     if (!dh)
         std::cout << "No such directory as " << directory << std::endl;
-    else {
-        while ((contents = readdir(dh)) != NULL) {
+    else
+    {
+        while ((contents = readdir(dh)) != NULL)
+        {
             std::string name = contents->d_name;
             if (!name.compare("."))
                 continue;
             struct stat s;
             std::string path = directory + "/" + name;
-            if (lstat(path.c_str(), &s) == 0) {
+            if (lstat(path.c_str(), &s) == 0)
+            {
                 std::vector <std::string> details;
-                if (name.compare("..")) {
+                if (name.compare(".."))
+                {
                     details.push_back(name);
                     struct tm *timeInfo = localtime(&s.st_ctime);
                     std::string date = std::to_string(timeInfo->tm_mday) + "-" + std::to_string(timeInfo->tm_mon) + "-" \
- + std::to_string(timeInfo->tm_year + 1900);
+                                                    + std::to_string(timeInfo->tm_year + 1900);
                     details.push_back(date);
-                } else {
+                } 
+                else
+                {
                     name += "/";
                     details.push_back(name);
                 }
-                if (S_ISDIR(s.st_mode)) {
-                    if (name.compare("../")) {
+                if (S_ISDIR(s.st_mode))
+                {
+                    if (name.compare("../"))
                         details.push_back("-");
-                    }
-
                     directorySet.insert(details);
-                } else if (S_ISREG(s.st_mode)) {
+                } 
+                else if (S_ISREG(s.st_mode))
+                {
                     details.push_back(std::to_string(s.st_size));
                     fileSet.insert(details);
                 }
@@ -401,7 +399,8 @@ std::string responseHandler::buildDirectoryListing(std::string &directory) {
 
 /* < ---------- REDIRECTION RESPONSE ---------- > */
 
-std::string responseHandler::redirectionResponse(std::string redirectionUri) {
+std::string responseHandler::redirectionResponse(std::string redirectionUri)
+{
     std::string redirectResponse = "HTTP/1.1 301 Moved Permanently\nLocation: ";
 
 //    redirectResponse += _config.get_host() + ":";
@@ -414,7 +413,8 @@ std::string responseHandler::redirectionResponse(std::string redirectionUri) {
 
 /* < ---------- RESPONSE HEADER BUILDING UTILS ---------- > */
 
-std::string responseHandler::buildHttpLine(int status) {
+std::string responseHandler::buildHttpLine(int status)
+{
     std::map<int, std::string> statusCodes;
     statusCodes[200] = "OK";
     statusCodes[400] = "Bad Request";
@@ -432,7 +432,8 @@ std::string responseHandler::buildHttpLine(int status) {
     return response;
 }
 
-std::string responseHandler::buildDateLine() {
+std::string responseHandler::buildDateLine()
+{
 
     time_t now = time(0);
     char *date = ctime(&now); // TODO check if it leaks (Doesn't seem to)
@@ -443,10 +444,10 @@ std::string responseHandler::buildDateLine() {
     return stringDate;
 }
 
-std::string responseHandler::extractErrorFile(int status) { // So there is still some sheet here
+std::string responseHandler::extractErrorFile(int status)
+{ // So there is still some sheet here
     std::ifstream errFile;
     std::string path = _config.get_error_page();
-//    std::cout << "Error file path: " << path << std::endl;
     path += std::to_string(status) + ".html";
     errFile.open(path);
     if (errFile.fail())
@@ -457,7 +458,8 @@ std::string responseHandler::extractErrorFile(int status) { // So there is still
 }
 
 std::string responseHandler::directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                                   std::set <std::vector<std::string> > &files, std::string directory) {
+                                                   std::set <std::vector<std::string> > &files, std::string directory)
+{
     // Creating the Html as I would like it
     std::string htmlFile = "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile += "\t<title>Index of " + directory + "/</title>\n";
@@ -467,11 +469,13 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
 
     /* Don't look at this absolute horror, for god's sake */
 //    std::string root = _location.get_root();
-    for (std::set < std::vector < std::string > > ::iterator it = directories.begin(); it != directories.end(); it++) {
+    for (std::set < std::vector < std::string > > ::iterator it = directories.begin(); it != directories.end(); it++)
+    {
         std::vector <std::string> iter = *it;
         if (!iter[0].compare("../"))
             htmlFile += "<a href =\"" + iter[0] + "\">" + iter[0] + "</a>\n";
-        else {
+        else
+        {
             int justification = 47 - iter[0].length() + iter[1].length();
             std::string firstPad = " ";
             firstPad.append(justification, ' ');
@@ -482,7 +486,8 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
         }
     }
     for (std::set < std::vector < std::string > > ::iterator it = files.begin(); it != files.end();
-    it++) {
+    it++)
+    {
         std::vector <std::string> iter = *it;
         int justification = 47 - iter[0].length() + iter[1].length();
         std::string firstPad = " ";
@@ -507,9 +512,11 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
 
 /* < ---------- GENERIC UTILS ---------- > */
 
-bool responseHandler::isDirectory(std::string const& path) {
+bool responseHandler::isDirectory(std::string const& path)
+{
     struct stat s;
-    if (lstat(path.c_str(), &s) == 0) {
+    if (lstat(path.c_str(), &s) == 0)
+    {
         if (S_ISDIR(s.st_mode))
             return true;
         else
@@ -518,29 +525,26 @@ bool responseHandler::isDirectory(std::string const& path) {
     return false;
 }
 
-std::string responseHandler::rootResolution(std::string const& uri) {
-
+std::string responseHandler::rootResolution(std::string const& uri)
+{
     std::string requestedPath;
-    if (!_location.get_root().empty()) {
+    if (!_location.get_root().empty())
+    {
         if (!uri.compare(_location.get_location_path()))
             requestedPath = _location.get_root();
-        else {
+        else
+        {
             if (std::count(uri.begin(), uri.end(), '/') > 1)
                 requestedPath = _location.get_root() + uri.substr(_location.get_location_path().size());
             else
                 requestedPath = _location.get_root() + uri;
         }
     }
-    else {
+    else
         requestedPath = uri;
-    }
     return requestedPath;
 }
 
-bool responseHandler::isCgiResponse() const {
-    return _isCGI;
-}
+bool responseHandler::isCgiResponse() const { return _isCGI; }
 
-int responseHandler::getCgiFd() const {
-    return _cgiFd;
-}
+int responseHandler::getCgiFd() const { return _cgiFd; }
