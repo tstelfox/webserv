@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/22 13:38:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/06/02 11:38:38 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,12 @@ class poller
 
         void            setPollFd(int fd, short events);
         int             connectionError(short revents) const;
+       
+        /* newConnection functions*/
         int             newConnection(int fd);
+        void            make_relevant_config_vec(int &newConnection, configVector &relevant, \
+                                                    int &port, std::string &hostIp);
+
         int             newCgiConnection(int fd);
         std::set<int>   openPorts( void );
         void            pair_host_and_port(std::set<std::pair<std::string, int> >  &ports);
@@ -44,7 +49,14 @@ class poller
         void            pollConnections( void );
         bool            check_fds_with_poll( void );
         bool            check_if_revents_errors (socketVector::iterator &it);
-
+        int             read_from_fd(std::set<int> &portSockets, std::map<int, client*> &cgiSockets, \
+                                    char *buffer, socketVector::iterator &it, client &currentClient);
+        typedef enum e_num
+        {
+            CONTINUE = 0,
+            BREAK = 1,
+            DO_NOTHING = 2
+        }           t_num;
 
     private:
 

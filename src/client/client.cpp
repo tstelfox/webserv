@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/01 15:35:44 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/01 20:25:28 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/01 21:10:50 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ int client::fullHeaderReceived(const char *buff)
             }
             if (!headerElement.compare("Content-Length:"))
             {
-//                std::cout << MAGENTA << "The fucker has a body: [" << headerElement << "]" << RESET_COLOUR << std::endl;
                 stream >> _bodySize;
+
                 std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
                 _bodyPresent = true;
             }
@@ -119,9 +119,11 @@ int client::chunkedRequest(std::string buffer, bool onlyBody)
     if (!onlyBody)
     {
         size_t pos = buffer.find("\r\n\r\n");
+
         buffer.erase(0, pos + 4);
         if (buffer.empty())
             return 0;
+
         std::cout << GREEN << "Correctly removed header? [" << buffer << "]" << RESET_COLOUR << std::endl;
     }
     if (!_chunkSize)
@@ -130,6 +132,7 @@ int client::chunkedRequest(std::string buffer, bool onlyBody)
         ss >> chunkLenStr;
         sizeStream << std::hex << chunkLenStr;
         sizeStream >> _chunkSize;
+
         if (_chunkSize == 0)
         {
             std::cout << "All chunks received" << std::endl;
@@ -166,6 +169,7 @@ void client::parseRequestLine(std::string request)
     std::string field;
 
     ss >> field;
+
     /* 405 Method not allowed */
     if (!field.compare("POST"))
         _method = POST;
@@ -173,20 +177,24 @@ void client::parseRequestLine(std::string request)
         _method = DELETE;
     else if (!field.compare("GET"))
         _method = GET;
+
     ss >> _uri;
+
     if (!_uri.empty() && _uri[0] != '/')
         _status = 400;
+
     ss >> _http;
+
     if (_http.empty() || (!_http.empty() && _http.compare("HTTP/1.1")))
         _status = 505; // HTTP VERSION NOT SUPPORTED
 }
 
 void client::requestedHost(std::map<std::string, std::string> &fields)
 {
-
     /* Check that there is a valid Host */
     std::map<std::string, std::string>::iterator it;
     it = fields.find("host");
+
     if (it == fields.end())
     {
         _status = 400;
@@ -224,7 +232,9 @@ void client::parseRequestHeader()
         std::replace(line.begin(), line.end(), ':', ' ');
         std::stringstream stream(line);
         std::string key;
+
         stream >> key;
+
         std::string value;
         while (stream)
         {
@@ -245,6 +255,7 @@ void client::routeConfig(std::map<std::string, std::string> &fields)
 {
     WSERV::serverConfig  rightConfig;
     WSERV::serverConfig  *namelessConfig = nullptr;
+    
     for (configVector::iterator iter = _configs.begin(); iter != _configs.end(); iter++)
     {
         if (!_requestedHost.compare(iter->get_server_name()))
@@ -262,8 +273,8 @@ void client::routeConfig(std::map<std::string, std::string> &fields)
                 rightConfig = *namelessConfig;
         }
     }
+    
     std::cout << "This was the right server after all: " << rightConfig.get_server_name() << std::endl;
-
 
     responseHandler response(_requestLine, rightConfig, fields, _body);
     _response = response.parseAndRespond(_status, _method, _uri);

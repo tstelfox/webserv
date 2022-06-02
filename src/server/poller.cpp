@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/16 14:27:57 by akramp        ########   odam.nl         */
+/*   Updated: 2022/06/02 11:39:03 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ poller::poller(configVector const& configVector) : _serverConfigs(configVector)
 
 poller::~poller() {}
 
-void poller::setPollFd(int fd, short events) {
+void poller::setPollFd(int fd, short events)
+{
     struct pollfd newPollFd;
-    newPollFd.fd = fd;
-    newPollFd.events = events;
+    
+    newPollFd.fd        = fd;
+    newPollFd.events    = events;
+
     _sockets.push_back(newPollFd);
 }
 
@@ -56,44 +59,107 @@ void poller::deleteConnection(int fd) {
 //    std::cout << "CLient size after: " << _clients.size() << std::endl;
 }
 
-int poller::newConnection(int fd) {
-    /* TODO cleanup and split this function after cgi */
-    socklen_t addrLen;
-    struct sockaddr_in addr;
+static bool    accept_error_check(int newConnection)
+{
+    if (newConnection < 0)
+    {
+        if (errno != EWOULDBLOCK)
+            perror("accept failed");
+        return false;
+    }
+    return true;
+}
+
+static bool set_socket_options(int &newConnection)
+{
+    int on = 1;
+    if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int)) < 0))
+    {
+        std::cout << "sockoptions got fucked" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+static bool make_fd_non_blocking(int &newConnection)
+{
+    if ((fcntl(newConnection, F_SETFL, O_NONBLOCK)) < 0)
+    {
+        std::cout << "fcntl got fucked" << std::endl;
+        return false;
+    }
+    return true;
+}
+void    set_sockadr_struct(int &newConnection, struct sockaddr_in &sin, socklen_t &len, int &port, \
+                            char *host)
+{
+    /**
+     * getsockname() returns the current address to which the socket
+     * sockfd is bound
+     * Here we check if it's an empty connection, should be by now in the code
+     **/
+    if (getsockname(newConnection, (struct sockaddr *)&sin, &len))
+        perror("getsockname");
+    else
+    {
+        port = ntohs(sin.sin_port);     // ntohs: Convert multi-byte integer types \
+                                        // from host byte order to network byte order
+        host = inet_ntoa(sin.sin_addr); // inet_ntoa: Convert IP addresses from a \
+                                        // dots-and-number string to a struct in_addr and back
+
+        std::cout << "New connection from port: " << port << \
+            " on host: " << host << std::endl;
+    }
+}
+
+void    poller::make_relevant_config_vec(int &newConnection, configVector &relevant, int &port, std::string &hostIp)
+{
+    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++)
+    {
+        if (it->get_port() == port && (it->get_host() == hostIp || \
+            ((it->get_host()) == "localhost" && !hostIp.compare("127.0.0.1"))))
+            relevant.push_back(*it);
+    }
+
+    std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
+}
+
+int poller::newConnection(int fd)
+{
+    socklen_t           addrLen;
+    struct sockaddr_in  addr;
+
     bzero(&addr, sizeof(struct sockaddr_in));
     std::cout << RED << "fd: " << fd << RESET_COLOUR << std::endl;
     int newConnection = accept(fd, (struct sockaddr *) &addr, (socklen_t * ) &addrLen);
 
-    if (newConnection < 0) {
-        if (errno != EWOULDBLOCK) {
-            perror("accept failed");
-        }
+    if (accept_error_check(newConnection) == false)
         return 0;
-    }
-    int on = 1;
-//    if ((setsockopt(newConnection, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) < 0)) {
-    if ((setsockopt(newConnection, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int)) < 0)) {
-        std::cout << "sockoptions got fucked" << std::endl;
+    if (set_socket_options(newConnection) == false)
         return 0;
-    }
-    if ((fcntl(newConnection, F_SETFL, O_NONBLOCK)) < 0) {
-        std::cout << "fcntl got fucked" << std::endl;
+    if (make_fd_non_blocking(newConnection) == false)
         return 0;
-    }
     setPollFd(newConnection, (POLLIN | POLLOUT));
-    /* Retrieving the host:port this connection is coming from
-     * This could Perhaps even be its own function
-    */
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    int port;
-    char *host = NULL;
 
+    struct sockaddr_in  sin;
+    socklen_t           len = sizeof(sin);
+    int                 port;
+    char                *host = NULL;
+    
+    /**
+     * getsockname() returns the current address to which the socket
+     * sockfd is bound
+     * Here we check if it's an empty connection, should be by now in the code
+     **/
     if (getsockname(newConnection, (struct sockaddr *)&sin, &len))
         perror("getsockname");
-    else {
-        port = ntohs(sin.sin_port);
-        host = inet_ntoa(sin.sin_addr);
+    else
+    {
+        port = ntohs(sin.sin_port);     // ntohs: Convert multi-byte integer types \
+                                        // from host byte order to network byte order
+        host = inet_ntoa(sin.sin_addr); // inet_ntoa: Convert IP addresses from a \
+                                        // dots-and-number string to a struct in_addr and back
+
         std::cout << "New connection from port: " << port << \
             " on host: " << host << std::endl;
     }
@@ -103,18 +169,7 @@ int poller::newConnection(int fd) {
     */
     configVector relevant;
     std::string hostIp = host;
-    for (configVector::iterator it = _serverConfigs.begin(); it != _serverConfigs.end(); it++) {
-        if (it->get_port() == port && (it->get_host() == hostIp || \
-            ((it->get_host()) == "localhost" && !hostIp.compare("127.0.0.1"))))
-            relevant.push_back(*it);
-    }
-//    std::cout << "Relevant vectors are:" << std::endl;
-//    for (configVector::iterator iter = relevant.begin(); iter != relevant.end(); iter++) {
-//        std::cout << "Port: " << iter->get_port() << " host: " << iter->get_host() << \
-//            " and server_name: " << iter->get_server_name() << std::endl;
-//    }
-
-    std::cout << RED << "New accepted client connection: " << newConnection << RESET_COLOUR << std::endl;
+    make_relevant_config_vec(newConnection, relevant, port, hostIp);
 
     client  newClient(hostIp, port, relevant, newConnection);
     _clients.insert(std::make_pair(newConnection, newClient));
@@ -211,16 +266,54 @@ bool poller::check_if_revents_errors (socketVector::iterator &it)
     return true;
 }
 
-// bool poller::there_is_data_to_read_from_the_fd()
-// {}
+int poller::read_from_fd(std::set<int> &portSockets, \
+                        std::map<int, client*> &cgiSockets, char *buffer, \
+                        socketVector::iterator &it, client &currentClient)
+{
+    if (portSockets.count(it->fd))
+    { // This checks that it's one of the listening sockets
+        newConnection(it->fd);
+        return BREAK;
+    }
+    if (cgiSockets.count(it->fd)) {
+        char cgiBuffer[BUFF_SIZE];
+        int cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
+        std::cout << RED << "Cgi buffer" << cgiBuffer << RESET_COLOUR << std::endl;
+        if (cgiRead)
+            cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
+        memset(cgiBuffer, 0, sizeof(buffer));
+        close(it->fd);
+        cgiSockets.erase(cgiSockets.find(it->fd));
+        return CONTINUE;
+    }
+    int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
+    if (valRead) {
+//                  std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
+        currentClient.fillBuffer(buffer);
+        memset(buffer, 0, BUFF_SIZE);
+    }
+    if (!valRead) {
+        deleteConnection(it->fd);
+        _sockets.erase(it);
+        return BREAK;
+    }
+    if (valRead < 0) {
+        std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
+        deleteConnection(it->fd);
+        _sockets.erase(it);
+        return BREAK;
+    }
+    return DO_NOTHING;
+}
 
 void poller::pollConnections()
 {
 
     std::set<int>               portSockets = openPorts();
     std::map<int, client*>      cgiSockets;
-    char                        buffer[BUFF_SIZE] = {0};
-
+    char                        *buffer = new char[BUFF_SIZE];
+    bzero(buffer, BUFF_SIZE); 
+    
     while (true)
     {
         if (check_fds_with_poll() == false)
@@ -238,38 +331,11 @@ void poller::pollConnections()
 
             if (it->revents & POLLIN)
             {
-                if (portSockets.count(it->fd)) { // This checks that it's one of the listening sockets
-                    newConnection(it->fd);
-                    break;
-                }
-                if (cgiSockets.count(it->fd)) {
-                    char cgiBuffer[BUFF_SIZE];
-                    int cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
-                    std::cout << RED << "Cgi buffer" << cgiBuffer << RESET_COLOUR << std::endl;
-                    if (cgiRead)
-                        cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
-                    memset(cgiBuffer, 0, sizeof(buffer));
-                    close(it->fd);
-                    cgiSockets.erase(cgiSockets.find(it->fd));
+                int ret = read_from_fd(portSockets, cgiSockets, buffer, it, currentClient);
+                if (ret == BREAK)
+                    break ;
+                else if (ret == CONTINUE)
                     continue;
-                }
-                int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
-                if (valRead) {
-//                    std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
-                    currentClient.fillBuffer(buffer);
-                    memset(buffer, 0, sizeof(buffer));
-                }
-                if (!valRead) {
-                    deleteConnection(it->fd);
-                    _sockets.erase(it);
-                    break;
-                }
-                if (valRead < 0) {
-                    std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
-                    deleteConnection(it->fd);
-                    _sockets.erase(it);
-                    break;
-                }
             }
             else if (it->revents & POLLOUT) {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
@@ -314,4 +380,5 @@ void poller::pollConnections()
             }
         }
     }
+    delete[] buffer;
 }

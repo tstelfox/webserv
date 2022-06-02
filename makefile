@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/06/01 20:26:02 by ask           ########   odam.nl          #
+#    Updated: 2022/06/02 11:22:15 by ask           ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 INCLUDES = -Isrc/utils -Isrc/sockets -Isrc/server -Isrc/parsing \
 		-Isrc/exceptions -Isrc/responseHandler -Isrc/client -Isrc/cgi
 ifdef DEBUG
-  FLAGS += -g #-fsanitize=address
+  FLAGS += -g -fsanitize=address
 endif
 
 X           = \033[38;5;
