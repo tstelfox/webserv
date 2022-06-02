@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 17:27:56 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 18:35:43 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,22 @@
 #include "client.hpp"
 //#include "clientConnecter.hpp"
 #include "serverConfig.hpp"
-#include <string>
 #include <set>
+#include <signal.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/fcntl.h>
+#include <sys/types.h>
+#include "sys/poll.h"
+#include <netinet/in.h> // inet_addr()
+#include <arpa/inet.h> // inet_addr()
+#include <utility>
+#include "colours.hpp"
+
 
 class poller
 {

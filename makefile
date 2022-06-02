@@ -6,7 +6,7 @@
 #    By: tmullan <tmullan@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/02/01 12:43:01 by tmullan       #+#    #+#                  #
-#    Updated: 2022/06/02 11:22:15 by ask           ########   odam.nl          #
+#    Updated: 2022/06/02 18:43:40 by ask           ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SRC = server_main.cpp sockets/socket.cpp client/client.cpp client/client_getters
 SERVER_PREFIX = $(addprefix server/, $(SERV))
 PARSE_PREFIX = $(addprefix parsing/, $(PARSE))
 CGI_PREFIX = $(addprefix cgi/, $(CGI))
-SERV = poller.cpp serverConfig.cpp Location.cpp
+SERV = poller.cpp serverConfig.cpp Location.cpp poller_utils.cpp poller_newConnection.cpp
 PARSE = Pars_add_vars_to_vec.cpp Pars_helper_funcs.cpp Pars_setters.cpp Parsing.cpp
 CGI = cgi.cpp
 OBJ_DIR = obj
