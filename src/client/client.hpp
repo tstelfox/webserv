@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/01 15:35:37 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/01 20:30:19 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 13:19:33 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,14 @@ class client
 
         /* Header retrieval */
         int fullHeaderReceived(const char *buff);
-        //    int chunkedRequest(std::istringstream &ss);
+        int empty_body_header_handler(std::istringstream  &ss, std::string &line, bool &onlyBody);
+        int append_to_body(std::istringstream  &ss, std::string &line);
+        
         int chunkedRequest(std::string buffer, bool onlyBody);
-
+        int chunked_request_handler(std::string &buffer, std::string &chunkLenStr, std::stringstream &sizeStream, \
+                                    std::stringstream &ss);
+        void update_buffers(std::string &buffer, std::string &chunkLenStr);
+        
         /* Variables needed for config routing */
         configVector _configs;
 

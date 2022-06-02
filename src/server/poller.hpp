@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 11:38:38 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 11:57:21 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,10 @@ class poller
         bool            check_if_revents_errors (socketVector::iterator &it);
         int             read_from_fd(std::set<int> &portSockets, std::map<int, client*> &cgiSockets, \
                                     char *buffer, socketVector::iterator &it, client &currentClient);
+        int             listening_socket(std::set<int> &portSockets, socketVector::iterator &it);
+        int             cgi_socket(std::map<int, client*> &cgiSockets, char *buffer, socketVector::iterator &it);
+        int             handle_incoming_message(socketVector::iterator &it, char *buffer, client &currentClient);
+        
         typedef enum e_num
         {
             CONTINUE = 0,

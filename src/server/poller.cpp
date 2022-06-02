@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:59:58 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/02 11:39:03 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 13:25:26 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,15 @@ void poller::setPollFd(int fd, short events)
     _sockets.push_back(newPollFd);
 }
 
-void poller::deleteConnection(int fd) {
+void poller::deleteConnection(int fd)
+{
     std::map<int, client>::iterator clientIt = _clients.find(fd);
-//    std::cout << "CLient size before: " << _clients.size() << std::endl;
-//    _client.erase()
-    if (clientIt != _clients.end()) {
+    
+    if (clientIt != _clients.end())
+    {
         _clients.erase(clientIt);
         close(fd);
     }
-//    std::cout << "CLient size after: " << _clients.size() << std::endl;
 }
 
 static bool    accept_error_check(int newConnection)
@@ -266,38 +266,83 @@ bool poller::check_if_revents_errors (socketVector::iterator &it)
     return true;
 }
 
-int poller::read_from_fd(std::set<int> &portSockets, \
-                        std::map<int, client*> &cgiSockets, char *buffer, \
-                        socketVector::iterator &it, client &currentClient)
+int poller::listening_socket(std::set<int> &portSockets, socketVector::iterator &it)
 {
-    if (portSockets.count(it->fd))
-    { // This checks that it's one of the listening sockets
+    if (portSockets.count(it->fd)) // This checks that it's one of the listening sockets
+    { 
         newConnection(it->fd);
         return BREAK;
     }
-    if (cgiSockets.count(it->fd)) {
-        char cgiBuffer[BUFF_SIZE];
-        int cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
+    return DO_NOTHING;
+}
+
+int poller::cgi_socket(std::map<int, client*> &cgiSockets, char *buffer, socketVector::iterator &it)
+{
+    if (cgiSockets.count(it->fd))
+    {
+        char    cgiBuffer[BUFF_SIZE];
+        int     cgiRead = read(it->fd, cgiBuffer, BUFF_SIZE - 2);
+
         std::cout << RED << "Cgi buffer" << cgiBuffer << RESET_COLOUR << std::endl;
+
         if (cgiRead)
             cgiSockets.find(it->fd)->second->saveCgiResponse(cgiBuffer);
         memset(cgiBuffer, 0, sizeof(buffer));
         close(it->fd);
         cgiSockets.erase(cgiSockets.find(it->fd));
+
         return CONTINUE;
     }
-    int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
-    if (valRead) {
-//                  std::cout << CYAN << "The ahhhhhhh: " << buffer << RESET_COLOUR << std::endl;
+    return DO_NOTHING;
+}
+
+int poller::handle_incoming_message(socketVector::iterator &it, char *buffer, client &currentClient)
+{
+    int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0); //see if thers an incoming message, or none returning -1
+    if (valRead)
+    {
         currentClient.fillBuffer(buffer);
         memset(buffer, 0, BUFF_SIZE);
     }
-    if (!valRead) {
+    if (!valRead)
+    {
         deleteConnection(it->fd);
         _sockets.erase(it);
         return BREAK;
     }
-    if (valRead < 0) {
+    if (valRead < 0)
+    {
+        std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
+        deleteConnection(it->fd);
+        _sockets.erase(it);
+        return BREAK;
+    }
+    return DO_NOTHING;
+}
+
+int poller::read_from_fd(std::set<int> &portSockets, \
+                        std::map<int, client*> &cgiSockets, char *buffer, \
+                        socketVector::iterator &it, client &currentClient)
+{
+    if (listening_socket(portSockets, it) == BREAK)
+        return BREAK;
+    if (cgi_socket(cgiSockets, buffer, it) == CONTINUE)
+        return CONTINUE;
+    
+    int valRead = recv(it->fd, buffer, BUFF_SIZE - 2, 0);
+    if (valRead)
+    {
+        currentClient.fillBuffer(buffer);
+        memset(buffer, 0, BUFF_SIZE);
+    }
+    if (!valRead)
+    {
+        deleteConnection(it->fd);
+        _sockets.erase(it);
+        return BREAK;
+    }
+    if (valRead < 0)
+    {
         std::cout << RED << "Error receiving from client" << RESET_COLOUR << std::endl;
         deleteConnection(it->fd);
         _sockets.erase(it);
@@ -337,7 +382,8 @@ void poller::pollConnections()
                 else if (ret == CONTINUE)
                     continue;
             }
-            else if (it->revents & POLLOUT) {
+            else if (it->revents & POLLOUT)
+            {
 //                std::cout << MAGENTA << "FRIGGIN FRIG" << RESET_COLOUR << std::endl;
                 if (currentClient.isBufferFull()) {
                     currentClient.parseRequestHeader();

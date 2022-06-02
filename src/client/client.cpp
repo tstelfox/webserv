@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/01 15:35:44 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/06/01 21:10:50 by ask           ########   odam.nl         */
+/*   Updated: 2022/06/02 13:25:39 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,57 @@ void client::fillBuffer(const char *buff)
     }
 }
 
+int client::empty_body_header_handler(std::istringstream  &ss, std::string &line, bool &onlyBody)
+{
+    while (std::getline(ss, line))
+    {
+        std::stringstream   stream(line);
+        std::string         headerElement;
+
+        stream >> headerElement;
+
+        if(!headerElement.compare("Transfer-Encoding:"))
+        {
+            stream >> headerElement;
+            
+            if (!headerElement.compare("chunked"))
+            {
+                std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
+                _isChunked = true;
+            }
+        }
+        if (!headerElement.compare("Content-Length:"))
+        {
+            stream >> _bodySize;
+
+            std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
+            _bodyPresent = true;
+        }
+        if (!line.compare("\r"))
+        {
+            onlyBody = false;
+            if (_bodyPresent || _isChunked)
+                break;
+            std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int client::append_to_body(std::istringstream  &ss, std::string &line)
+{
+    while (std::getline(ss, line))
+    {
+        _body.append(line + "\n");
+        if (ss.tellg() == -1)
+            _body.resize(_body.size() - 1);
+        if (_body.size() == _bodySize)
+            return 1;
+    }
+    return 0;
+}
+
 int client::fullHeaderReceived(const char *buff)
 {
     std::string         request(buff);
@@ -60,52 +111,67 @@ int client::fullHeaderReceived(const char *buff)
 
     if (!_bodyPresent && !_isChunked)
     {
-        while (std::getline(ss, line))
-        {
-            std::stringstream   stream(line);
-            std::string         headerElement;
-
-            stream >> headerElement;
-
-            if(!headerElement.compare("Transfer-Encoding:"))
-            {
-                stream >> headerElement;
-
-                if (!headerElement.compare("chunked"))
-                {
-                    std::cout << MAGENTA << "Chunked diobestia" << RESET_COLOUR << std::endl;
-                    _isChunked = true;
-                }
-            }
-            if (!headerElement.compare("Content-Length:"))
-            {
-                stream >> _bodySize;
-
-                std::cout << MAGENTA << "Body size is: " << _bodySize << RESET_COLOUR << std::endl;
-                _bodyPresent = true;
-            }
-            if (!line.compare("\r"))
-            {
-                onlyBody = false;
-                if (_bodyPresent || _isChunked)
-                    break;
-                std::cout << MAGENTA << "FULL HEADER SET WITHOUT BODY" << RESET_COLOUR << std::endl;
-                return 1;
-            }
-        }
+        if (empty_body_header_handler(ss, line, onlyBody) == 1)
+            return 1;
     }
     if (_isChunked)
         return chunkedRequest(request, onlyBody);
     else 
     {
-        while (std::getline(ss, line))
-        {
-            _body.append(line + "\n");
-            if (ss.tellg() == -1)
-                _body.resize(_body.size() - 1);
-            if (_body.size() == _bodySize)
-                return 1;
-        }
+       if (append_to_body(ss, line) == 1)
+        return 1;
+    }
+    return 0;
+}
+
+static int remove_header(std::string &buffer)
+{
+    size_t pos = buffer.find("\r\n\r\n"); //remove header
+
+    buffer.erase(0, pos + 4);
+    if (buffer.empty())
+        return 0;
+    std::cout << GREEN << "Correctly removed header? [" << buffer << "]" << RESET_COLOUR << std::endl;
+    return 1;
+}
+
+void client::update_buffers(std::string &buffer, std::string &chunkLenStr)
+{
+    buffer.erase(0, chunkLenStr.size() + 2);        //erase from buffer
+    int missingSize = _chunkSize - _chunk.size();   //update size
+    _chunk.append(buffer, 0, missingSize);          //append to chunkbuffer
+    _body.append(_chunk);                           //append chunk to body
+    _chunk.clear();                                 //clear chunk buffer
+    _chunkSize = 0;                                 //reset size
+    buffer.erase(0, missingSize + 2);
+}
+
+int client::chunked_request_handler(std::string &buffer, std::string &chunkLenStr, std::stringstream &sizeStream, \
+                                    std::stringstream &ss)
+{
+    ss.str(buffer);
+        
+    ss >> chunkLenStr;
+    sizeStream << std::hex << chunkLenStr;
+    sizeStream >> _chunkSize;
+
+    if (_chunkSize == 0) //all_chunks_received
+    {
+        std::cout << "All chunks received" << std::endl;
+        return 1;
+    }
+    if (_chunkSize > BUFF_SIZE) //invalid chunked request
+    {
+        std::cout << "Invalid chunked request larger than buffer size" << std::endl;
+        _status = 400;
+        return 1;
+    }
+    update_buffers(buffer, chunkLenStr);
+    if (buffer == "0\r\n\r\n") //at the end of chunked request
+    {
+        std::cout << "All chunks received" << std::endl;
+        std::cout << COLOR_PINK << "Full body de-chunked:\n" << _body << std::endl;
+        return 1;
     }
     return 0;
 }
@@ -118,45 +184,13 @@ int client::chunkedRequest(std::string buffer, bool onlyBody)
 
     if (!onlyBody)
     {
-        size_t pos = buffer.find("\r\n\r\n");
-
-        buffer.erase(0, pos + 4);
-        if (buffer.empty())
+        if (remove_header(buffer) == 0)
             return 0;
-
-        std::cout << GREEN << "Correctly removed header? [" << buffer << "]" << RESET_COLOUR << std::endl;
     }
     if (!_chunkSize)
     {
-        ss.str(buffer);
-        ss >> chunkLenStr;
-        sizeStream << std::hex << chunkLenStr;
-        sizeStream >> _chunkSize;
-
-        if (_chunkSize == 0)
-        {
-            std::cout << "All chunks received" << std::endl;
+        if (chunked_request_handler(buffer, chunkLenStr, sizeStream, ss) == 1)
             return 1;
-        }
-        if (_chunkSize > BUFF_SIZE)
-        {
-            std::cout << "Invalid chunked request larger than buffer size" << std::endl;
-            _status = 400;
-            return 1;
-        }
-        buffer.erase(0, chunkLenStr.size() + 2);
-        int missingSize = _chunkSize - _chunk.size();
-        _chunk.append(buffer, 0, missingSize);
-        _body.append(_chunk);
-        _chunk.clear();
-        _chunkSize = 0;
-        buffer.erase(0, missingSize + 2);
-        if (buffer == "0\r\n\r\n")
-        {
-            std::cout << "All chunks received" << std::endl;
-            std::cout << COLOR_PINK << "Full body de-chunked:\n" << _body << std::endl;
-            return 1;
-        }
     }
     return 0;
 }
