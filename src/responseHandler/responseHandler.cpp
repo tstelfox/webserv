@@ -48,7 +48,7 @@ std::string responseHandler::parseAndRespond(int status, int method, std::string
     }
     if (allowedMethod.count(method) == 0)
     {
-        std::cout << "That method is not allowed yo" << std::endl;
+        std::cout << "That method:" << method << "is not allowed yo" << std::endl;
         method = 0;
     }
     /* Parsing method */
@@ -179,16 +179,13 @@ std::string responseHandler::getResponse(std::string const& uri)
     cgiFd = cgiRequest(requestedFile);
     if (cgiFd >= 0)
     {
-        std::cout << "Panic: " << cgiFd << std::endl;
         _cgiFd = cgiFd;
         _isCGI = true;
         return "This-Is-a-CGI___frfr";
     }
     else if (cgiFd == -99) {
-        std::cout << RED << "BRUH BRUH BRUH BRUH BRUH" << RESET_COLOUR << std::endl;
         return respondError(404);
     }
-    std::cout << RED << "What is: " << cgiFd << RESET_COLOUR << std::endl;
 
     myFile.open(requestedFile);
     if (myFile.fail()) 
@@ -296,7 +293,7 @@ int responseHandler::cgiRequest(std::string request)
 
     if (request.find(".py?") == std::string::npos)
     {
-        std::cout << "Nothing to see here, go about your business." << std::endl;
+//        std::cout << "Nothing to see here, go about your business." << std::endl;
         return -1;
     }
     std::cout << RED << "Holy friggin shit boys it's a cgi" << RESET_COLOUR << std::endl;
@@ -454,6 +451,7 @@ std::string responseHandler::extractErrorFile(int status)
     std::string path = _config.get_error_page();
     path += std::to_string(status) + ".html";
     errFile.open(path);
+    std::cout << "Error file path:  " << path << std::endl;
     if (errFile.fail())
         return "Even extracting the error file failed.";
     std::ostringstream fileContent;
@@ -519,7 +517,7 @@ std::string responseHandler::directoryListResponse(std::set <std::vector<std::st
 bool responseHandler::isDirectory(std::string const& path)
 {
     struct stat s;
-    if (lstat(path.c_str(), &s) == 0)
+    if (stat(path.c_str(), &s) == 0)
     {
         if (S_ISDIR(s.st_mode))
             return true;
