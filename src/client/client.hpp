@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/05/01 15:35:37 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/05/01 15:35:37 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/06/02 13:19:33 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,96 +16,99 @@
 #include "serverConfig.hpp"
 #define BUFF_SIZE 2000
 
+class client
+{
+    public:
+        typedef std::vector<WSERV::serverConfig> configVector;
 
-class client {
-public:
+        client(std::string hostIp, int port, configVector const &configs,
+               int socket);
+        ~client();
 
-    typedef std::vector <WSERV::serverConfig> configVector;
+        /* Storing incoming client request */
+        void fillBuffer(const char *buff);
+        bool isBufferFull() const;
 
-    client(std::string hostIp, int port, configVector const &configs,
-           int socket);
+        /* Parsing Request Header and Config Routing */
+        void parseRequestLine(std::string request);
+        void requestedHost(std::map<std::string, std::string> &fields);
+        void parseRequestHeader();
 
-    ~client();
+        void routeConfig(std::map<std::string, std::string> &fields);
 
-    /* Storing incoming client request */
-    void fillBuffer(const char *buff, ssize_t valRead);
-    bool isBufferFull() const;
+        /* Getters */
+        std::string getBuffer() const;
+        std::string getResponse() const;
+        int         getSocket() const;
+        bool        isCgi() const;
+        int         getCgiFd() const;
+        std::string getCgiResponse() const;
 
-    /* Parsing Request Header and Config Routing */
-    void parseRequestLine(std::string request);
-    void requestedHost(std::map<std::string, std::string> &fields);
-    void parseRequestHeader();
+        /* Set Cgi Response */
+        void saveCgiResponse(char *buffer);
 
-    void routeConfig(std::map<std::string, std::string> &fields);
+        /* Reset client */
+        void resetClient();
 
-    /* Getters */
-    std::string getBuffer() const;
-    std::string getResponse() const;
-    int         getSocket() const;
-    bool        isCgi() const;
-    int         getCgiFd() const;
-    std::string getCgiResponse() const;
+        enum methodTypes
+        {
+            EMPTY,
+            GET,
+            POST,
+            DELETE
+        };
 
-    /* Set Cgi Response */
-    void        saveCgiResponse(char *buffer);
+    private:
+        client();
 
-    /* Reset client */
-    void resetClient();
+        /* Header retrieval */
+        int fullHeaderReceived(const char *buff);
+        int empty_body_header_handler(std::istringstream  &ss, std::string &line, bool &onlyBody);
+        int append_to_body(std::istringstream  &ss, std::string &line);
+        
+        int chunkedRequest(std::string buffer, bool onlyBody);
+        int chunked_request_handler(std::string &buffer, std::string &chunkLenStr, std::stringstream &sizeStream, \
+                                    std::stringstream &ss);
+        void update_buffers(std::string &buffer, std::string &chunkLenStr);
+        
+        /* Variables needed for config routing */
+        configVector _configs;
 
+        /* Buffer variables */
+        std::string _buffer;
+        bool        _isChunked;
+        size_t      _chunkSize;
+        std::string _chunk;
+        bool        _bodyPresent;
+        bool        _isBuffFull;
+        size_t      _bodySize;
 
-public:
-    enum methodTypes {
-        EMPTY, GET, POST, DELETE
-    };
+        /* Body */
+        std::string _body;
 
-private:
-    client();
+        /* Host:port and Socket */
+        std::string _hostIp;
+        int         _port;
+        int         _socket;
 
-    /* Header retrieval */
-    int fullHeaderReceived(const char *buff);
-//    int chunkedRequest(std::istringstream &ss);
-    int chunkedRequest(std::string buffer, bool onlyBody);
+        /* Request line info */
+        int         _method;
+        int         _status;
+        std::string _uri;
+        std::string _http;
+        std::string _requestLine;
 
-    /* Variables needed for config routing */
-    configVector _configs;
+        /* Request Header Fields */
+        std::string _requestedHost;
+        //    bool _keepAlive;
 
-    /* Buffer variables */
-    std::string _buffer;
-    bool _isChunked;
-    size_t _chunkSize;
-    std::string _chunk;
-    bool _bodyPresent;
-    bool _isBuffFull;
-    size_t _bodySize;
+        /* Final response string */
+        std::string _response;
 
-
-    /* Body */
-    std::string _body;
-
-    /* Host:port and Socket */
-    std::string _hostIp;
-    int _port;
-    int _socket;
-
-    /* Request line info */
-    int _method;
-    int _status;
-    std::string _uri;
-    std::string _http;
-    std::string _requestLine;
-
-    /* Request Header Fields */
-    std::string _requestedHost;
-//    bool _keepAlive;
-
-    /* Final response string */
-    std::string _response;
-
-    /* CGI vars */
-    bool _isCgi;
-    int _cgiFd;
-    std::string _cgiResponse;
+        /* CGI vars */
+        bool        _isCgi;
+        int         _cgiFd;
+        std::string _cgiResponse;
 };
 
-
-#endif //WEBSERV_CLIENT_HPP
+#endif // WEBSERV_CLIENT_HPP

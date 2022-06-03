@@ -6,7 +6,7 @@
 /*   By: akramp <akramp@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/04/25 10:33:46 by akramp        #+#    #+#                 */
-/*   Updated: 2022/05/19 13:56:19 by akramp        ########   odam.nl         */
+/*   Updated: 2022/06/01 20:26:57 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,6 @@
 
 void set_port_func(WSERV::serverConfig  &S_temp, std::string data)
 {
-    // int start = 0;
-    // std::string delimiter = " ";
-    // int end = data.find(delimiter);
-    // std::vector<int> ports;
-    // while (end != -1)
-    // {
-    //     ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
-    //     start = end + delimiter.size();
-    //     end = data.find(delimiter, start);
-    // }
-    // ports.push_back(std::atoi((data.substr(start, end - start).c_str())));
     if (data.find(" ") != std::string::npos)
     {
         std::cerr << COLOR_RED << "ONLY ONE PORTS PLS ..." << std::endl;
@@ -55,11 +44,6 @@ void set_Location_vec_func(WSERV::serverConfig  &S_temp, std::vector<WSERV::Loca
 {
     S_temp.set_Location_vec( data );
 }
-
-// void set_maxfilesize_func(WSERV::serverConfig  &S_temp, std::string data)
-// {
-//     S_temp.set_maxfilesize(std::atoi( data.c_str() ));
-// }
 
 void set_error_page_func(WSERV::serverConfig  &S_temp, std::string data)
 {

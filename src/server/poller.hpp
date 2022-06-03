@@ -6,7 +6,7 @@
 /*   By: tmullan <tmullan@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/04 18:38:07 by tmullan       #+#    #+#                 */
-/*   Updated: 2022/04/22 13:38:54 by tmullan       ########   odam.nl         */
+/*   Updated: 2022/06/02 18:35:43 by ask           ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,53 +16,77 @@
 #include "client.hpp"
 //#include "clientConnecter.hpp"
 #include "serverConfig.hpp"
-#include <string>
 #include <set>
+#include <signal.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/fcntl.h>
+#include <sys/types.h>
+#include "sys/poll.h"
+#include <netinet/in.h> // inet_addr()
+#include <arpa/inet.h> // inet_addr()
+#include <utility>
+#include "colours.hpp"
 
-class poller {
 
-public:
+class poller
+{
 
-    typedef std::vector<struct pollfd> socketVector;
-    typedef std::vector<WSERV::serverConfig> configVector;
+    public:
 
-    poller(configVector const &serverBlocks);
+        typedef std::vector<struct pollfd> socketVector;
+        typedef std::vector<WSERV::serverConfig> configVector;
 
-    ~poller();
+        poller(configVector const &serverBlocks);
+        ~poller();
 
-    void setPollFd(int fd, short events);
+        void            setPollFd(int fd, short events);
+        int             connectionError(short revents) const;
+       
+        /* newConnection functions*/
+        int             newConnection(int fd);
+        void            make_relevant_config_vec(int &newConnection, configVector &relevant, \
+                                                    int &port, std::string &hostIp);
 
-    int connectionError(short revents) const;
+        int             newCgiConnection(int fd);
+        std::set<int>   openPorts( void );
+        void            pair_host_and_port(std::set<std::pair<std::string, int> >  &ports);
+        void            create_vector_of_pollfd_sockets(std::set<int> &listenSockets, std::set<std::pair<std::string, int> >  &ports);
+        int             respondToClient(int socket, std::string response);
+        void            deleteConnection(int fd);
 
-    int newConnection(int fd);
+        /* Poll loop functions */
+        void            pollConnections( void );
+        bool            check_fds_with_poll( void );
+        bool            check_if_revents_errors (socketVector::iterator &it);
+        int             read_from_fd(std::set<int> &portSockets, std::map<int, client*> &cgiSockets, \
+                                    char *buffer, socketVector::iterator &it, client &currentClient);
+        int             listening_socket(std::set<int> &portSockets, socketVector::iterator &it);
+        int             cgi_socket(std::map<int, client*> &cgiSockets, char *buffer, socketVector::iterator &it);
+        int             handle_incoming_message(socketVector::iterator &it, char *buffer, client &currentClient);
+        int             write_to_fd(std::map<int, client*> &cgiSockets, socketVector::iterator &it, client &currentClient);
+        int             send_to_cgi_socket(client &currentClient, std::string &response, std::map<int, client*> &cgiSockets);
 
-    int newCgiConnection(int fd);
+        typedef enum e_num
+        {
+            CONTINUE = 0,
+            BREAK = 1,
+            DO_NOTHING = 2
+        }           t_num;
 
-    std::set<int> openPorts();
+    private:
 
-    int respondToClient(int socket, std::string response);
+        /* Vector of the poll structs and events */
+        socketVector            _sockets;
 
-    void pollConnections();
+       /* Vector of all of the server configurations */
+        configVector            _serverConfigs;
 
-    void deleteConnection(int fd);
-
-    // serverSock		*getSocket() const;
-
-    // int				respondToClient(int sock); // This shit is temporary bollocks
-    // void			closeConnection(std::vector<struct pollfd>::iterator it);
-private:
-
-    /* Vector of the poll structs and events */
-    socketVector _sockets;
-
-    /* Create a map of every host:port combination which I will find whenever
-    I parse the request header */
-
-   /* Vector of all of the server configurations */
-    configVector _serverConfigs;
-
-    /* Map of all the clients sorted by socket */
-    std::map<int, client> _clients;
-
+        /* Map of all the clients sorted by socket */
+        std::map<int, client>   _clients;
 };
 

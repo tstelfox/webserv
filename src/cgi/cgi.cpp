@@ -19,18 +19,28 @@
 #include <strings.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include "colours.hpp"
 
 WSERV::Cgi::Cgi(std::string &path, std::string first, std::string second) : _path(path)
 {
     pid_t	pid;
     int status;
     char *newenviron[] = { NULL };
+
+    if (first.find_first_not_of("0123456789") != std::string::npos \
+        || second.find_first_not_of("0123456789") != std::string::npos) {
+        std::cout << RED << "CHRISTO " << RESET_COLOUR << std::endl;
+        throw std::runtime_error("Error: Not valid cgi numbers add digits only...");
+    }
+
     _cgi_fd = new int [2];
     _argv = new char* [4];
     _argv[0] = strdup(path.c_str());
     _argv[1] = strdup(first.c_str());
     _argv[2] = strdup(second.c_str());
     _argv[3] = 0;
+
+
 
     pipe(_cgi_fd);
     pid = fork();

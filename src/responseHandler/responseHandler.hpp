@@ -17,79 +17,78 @@
 #include "serverConfig.hpp"
 
 
-class responseHandler {
-public:
+class responseHandler
+{
+    public:
 
-    responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
-                    std::map <std::string, std::string> &request, std::string body);
+        responseHandler(std::string requestLine, WSERV::serverConfig const &configs,
+                        std::map <std::string, std::string> &request, std::string body);
+        ~responseHandler();
 
-    ~responseHandler();
+        std::string parseAndRespond(int status, int method, std::string uri);
 
-    std::string parseAndRespond(int status, int method, std::string uri);
+        bool    isCgiResponse() const;
+        int     getCgiFd() const;
 
-    bool    isCgiResponse() const;
-    int     getCgiFd() const;
+    private:
+        responseHandler();
 
+        /* Match location */
+        int matchLocation(std::string uri);
 
-private:
-    responseHandler();
+        /* Error Responses */
+        std::string respondError(int status);
 
-    /* Match location */
-    int matchLocation(std::string uri);
+        std::string extractErrorFile(int status);
 
-    /* Error Responses */
-    std::string respondError(int status);
+        /* GET request*/
+        std::string getResponse(std::string const& uri);
 
-    std::string extractErrorFile(int status);
+        /* POST request */
+        std::string postResponse(std::string const& uri);
 
-    /* GET request*/
-    std::string getResponse(std::string const& uri);
+        /* DELETE request */
+        std::string deleteResponse(std::string uri);
 
-    /* POST request */
-    std::string postResponse(std::string const& uri);
+        /* CGI request */
+        int cgiRequest(std::string request);
 
-    /* DELETE request */
-    std::string deleteResponse(std::string uri);
+        /* Redirection Response */
+        std::string redirectionResponse(std::string redirectionUri);
 
-    /* CGI request */
-    int cgiRequest(std::string request);
+        /* Response header building utils */
+        std::string buildHttpLine(int status);
 
-    /* Redirection Response */
-    std::string redirectionResponse(std::string redirectionUri);
+        std::string buildDateLine();
 
-    /* Response header building utils */
-    std::string buildHttpLine(int status);
+        /* Create html for Directory listing */
+        std::string buildDirectoryListing(std::string &directory);
 
-    std::string buildDateLine();
-
-    /* Create html for Directory listing */
-    std::string buildDirectoryListing(std::string &directory);
-
-    std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
-                                      std::set <std::vector<std::string> > &files, std::string directory);
-
-
-    /* General utils */
-    bool    isDirectory(std::string const& path);
-    std::string rootResolution(std::string const& uri);
+        std::string directoryListResponse(std::set <std::vector<std::string> > &directories,
+                                          std::set <std::vector<std::string> > &files, std::string directory);
 
 
-    /* Should probably send in the request line tbh */
-    std::string _requestLine;
-    WSERV::serverConfig _config;
-    std::map <std::string, std::string> _requestFields;
-    std::string _body;
+        /* General utils */
+        bool    isDirectory(std::string const& path);
+        std::string rootResolution(std::string const& uri);
 
-    /* Correct Location */
-    WSERV::Location _location;
-    /* Status code */
-//    int _status;
-    /* CGI */
-    bool    _isCGI;
-    int     _cgiFd;
 
-    /* Ultimate response to return */
-    std::string _finalResponse;
+        /* Should probably send in the request line tbh */
+        std::string _requestLine;
+        WSERV::serverConfig _config;
+        std::map <std::string, std::string> _requestFields;
+        std::string _body;
+
+        /* Correct Location */
+        WSERV::Location _location;
+        /* Status code */
+    //    int _status;
+        /* CGI */
+        bool    _isCGI;
+        int     _cgiFd;
+
+        /* Ultimate response to return */
+        std::string _finalResponse;
 
 };
 
