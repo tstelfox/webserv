@@ -177,15 +177,18 @@ std::string responseHandler::getResponse(std::string const& uri)
     // TODO check if it is a cgi request.
     int cgiFd;
     cgiFd = cgiRequest(requestedFile);
-    if (cgiFd != -1) 
+    if (cgiFd >= 0)
     {
         std::cout << "Panic: " << cgiFd << std::endl;
         _cgiFd = cgiFd;
         _isCGI = true;
         return "This-Is-a-CGI___frfr";
     }
-    else if (cgiFd == -99)
+    else if (cgiFd == -99) {
+        std::cout << RED << "BRUH BRUH BRUH BRUH BRUH" << RESET_COLOUR << std::endl;
         return respondError(404);
+    }
+    std::cout << RED << "What is: " << cgiFd << RESET_COLOUR << std::endl;
 
     myFile.open(requestedFile);
     if (myFile.fail()) 
